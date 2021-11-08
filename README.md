@@ -22,6 +22,10 @@ Currently only Binance and Futures are supported.
 - Orders: Fetching open order information costs `40` weight per run
 - The scraper will sleep for a minute when the rate exceeds `800 within a minute`
 
+## Screenshots
+<img width="1346" alt="futuresboard1" src="https://user-images.githubusercontent.com/51025241/140821486-ead40b35-d4c2-4282-986d-76fe62f295a7.png">
+<img width="1346" alt="futuresboard2" src="https://user-images.githubusercontent.com/51025241/140821400-4fb0efdd-fdba-4c0b-bc49-6a997775bbab.png">
+
 ## Alternative dashboards
 
 - https://github.com/hoeckxer/exchanges_dashboard
