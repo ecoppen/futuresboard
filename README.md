@@ -19,7 +19,7 @@ Currently only Binance and Futures are supported.
 - Account: Fetching account information costs `5` weight per run
 - Income: Fetching income information costs `30` weight per 1000
 - Orders: Fetching open order information costs `40` weight per run
-- The scraper will sleep for a minute when the rate exceeds 800 within a minute
+- The scraper will sleep for a minute when the rate exceeds `800 within a minute`
 
 ## Alternative dashboards (my inspiration)
 
