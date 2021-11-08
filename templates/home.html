@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h3><i class="fas fa-tachometer-alt"></i> Dashboard</h3>
+        <div class="btn-toolbar mb-2 mb-md-0">
+          <div class="btn-group me-2">
+            <a type="button" class="btn btn-sm {{ 'btn-secondary' if timeframe == 'today' else 'btn-outline-secondary' }}" href="../../dashboard/today">Today</a>
+            <a type="button" class="btn btn-sm {{ 'btn-secondary' if timeframe == 'week' else 'btn-outline-secondary' }}" href="../../dashboard/week">Week</a>
+            <a type="button" class="btn btn-sm {{ 'btn-secondary' if timeframe == 'month' else 'btn-outline-secondary' }}" href="../../dashboard/month">Month</a>
+            <a type="button" class="btn btn-sm {{ 'btn-secondary' if timeframe == 'quarter' else 'btn-outline-secondary' }}" href="../../dashboard/quarter">Quarter</a>
+            <a type="button" class="btn btn-sm {{ 'btn-secondary' if timeframe == 'year' else 'btn-outline-secondary' }}" href="../../dashboard/year">Year</a>
+            <a type="button" class="btn btn-sm {{ 'btn-secondary' if timeframe == 'all' else 'btn-outline-secondary' }}" href="../../dashboard/all">All</a>
+          </div>
+          <a type="button" class="btn btn-sm btn-outline-secondary" href="https://www.binance.com/en/futures/{{ coin }}" target="_blank">
+            <i class="fas fa-external-link-alt"></i> View on Binance 
+          </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            <div class="card text-center">
+              <div class="card-body">
+                <h5 class="card-title">{{ totals[6][0] }}%</h5>
+                <p class="card-text">${{ totals[1] }}</p>
+              </div>
+              <div class="card-footer text-muted">
+                Profit today
+              </div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="card text-center">
+              <div class="card-body">
+                <h5 class="card-title">{{ totals[6][1] }}%</h5>
+                <p class="card-text">${{ totals[2] }}</p>
+              </div>
+              <div class="card-footer text-muted">
+                Profit past 7 days
+              </div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="card text-center">
+              <div class="card-body">
+                <h5 class="card-title">{{ totals[6][2] }}%</h5>
+                <p class="card-text">${{ totals[3] }}</p>
+              </div>
+              <div class="card-footer text-muted">
+                Profit {{ totals[4] }}
+              </div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="card text-center">
+              <div class="card-body">
+                <h5 class="card-title">{{ totals[6][3] }}%</h5>
+                <p class="card-text">${{ totals[0] }}</p>
+              </div>
+              <div class="card-footer text-muted">
+                Total profit
+              </div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="card text-center">
+              <div class="card-body">
+                <h5 class="card-title">{{ totals[7][0] }}</h5>
+                <p class="card-text">{{ totals[7][1] }}</p>
+              </div>
+              <div class="card-footer text-muted">
+                Unrealised PnL
+              </div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="card text-center">
+              <div class="card-body">
+                <h5 class="card-title">{{ totals[5]['BNB'] }} <small>BNB</small></h5>
+                <p class="card-text">{{ totals[5]['USDT'] }} USDT</p>
+              </div>
+              <div class="card-footer text-muted">
+                Total fees
+              </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-header text-muted">
+                    Profit by day
+                  </div>
+                <canvas id="lineChart" height="400"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-header text-muted">
+                    Profit by coin
+                  </div>
+                <canvas id="barChart" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+
+<script>
+
+const data = {
+  labels: {{ data[1][0] | safe }},
+  datasets: [{
+    axis: 'y',
+    label: 'Profit $',
+    data: {{ data[1][1] }},
+    fill: false,
+    borderWidth: 1
+  }]
+};
+
+const config = {
+  type: 'bar',
+  data: data,
+  options: {
+    indexAxis: 'y',
+    plugins:{   
+        legend: {
+            display: false
+        },
+    }
+  }
+};
+
+var myChart = new Chart(
+    document.getElementById('barChart'),
+    config
+);
+    
+const data2 = {
+  labels: {{ data[0][1] | safe }},
+  datasets: [{
+    label: 'Profit',
+    data: {{ data[0][0] }},
+    fill: false,
+    borderColor: 'rgb(75, 192, 192)',
+    tension: 0.1
+  }]
+};
+const config2 = {
+  type: 'line',
+  data: data2,
+  options: {
+    plugins:{   
+        legend: {
+            display: false
+        },
+    }
+  }
+};
+    
+var myChart = new Chart(
+    document.getElementById('lineChart'),
+    config2
+);
+</script>
+{% endblock %}
