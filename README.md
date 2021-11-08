@@ -18,7 +18,7 @@ Currently only Binance and Futures are supported.
 
 - Reminder: Binance API allows you to consume up to `1200 weight / minute / IP`.
 - Account: Fetching account information costs `5` weight per run
-- Income: Fetching income information costs `30` weight per 1000
+- Income: Fetching income information costs `30` weight per 1000 (initial run will build database, afterwards only new income will be fetched)
 - Orders: Fetching open order information costs `40` weight per run
 - The scraper will sleep for a minute when the rate exceeds `800 within a minute`
 
