@@ -101,7 +101,7 @@ def index_page():
     )
     temp = [[], []]
     for each in by_date:
-        temp[0].append(each[1])
+        temp[0].append(round(float(each[1]),2))
         temp[1].append(each[0])
     by_date = temp
 
@@ -112,7 +112,7 @@ def index_page():
     temp = [[], []]
     for each in by_symbol:
         temp[0].append(each[1])
-        temp[1].append(each[0])
+        temp[1].append(round(float(each[0]),2))
     by_symbol = temp
 
     balance = float(balance[0])
@@ -182,7 +182,7 @@ def dashboard(timeframe):
     )
     temp = [[], []]
     for each in by_date:
-        temp[0].append(each[1])
+        temp[0].append(round(float(each[1]),2))
         temp[1].append(each[0])
     by_date = temp
 
@@ -193,7 +193,7 @@ def dashboard(timeframe):
     temp = [[], []]
     for each in by_symbol:
         temp[0].append(each[1])
-        temp[1].append(each[0])
+        temp[1].append(round(float(each[0]),2))
     by_symbol = temp
 
     balance = float(balance[0])
@@ -318,7 +318,7 @@ def show_individual_coin(coin):
         )
         temp = [[], []]
         for each in by_date:
-            temp[0].append(each[1])
+            temp[0].append(round(each[1],2))
             temp[1].append(each[0])
         by_date = temp
     return render_template(
@@ -393,7 +393,7 @@ def show_individual_coin_timeframe(coin, timeframe):
         for order in allorders:
             order = list(order)
             order[7] = datetime.fromtimestamp(order[7] / 1000.0).strftime(
-                "%Y-%-%d %H:%M:%S"
+                "%Y-%m-%d %H:%M:%S"
             )
             temp.append(order)
         allorders = temp
@@ -425,7 +425,7 @@ def show_individual_coin_timeframe(coin, timeframe):
         )
         temp = [[], []]
         for each in by_date:
-            temp[0].append(each[1])
+            temp[0].append(round(each[1],2))
             temp[1].append(each[0])
         by_date = temp
     return render_template(

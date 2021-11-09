@@ -65,8 +65,8 @@
         <div class="col-sm-2">
             <div class="card text-center">
               <div class="card-body">
-                <h5 class="card-title">{{ totals[7][0] }}</h5>
-                <p class="card-text">{{ totals[7][1] }}</p>
+                <h5 class="card-title">${{ totals[7][0] }}</h5>
+                <p class="card-text">${{ totals[7][1] }}</p>
               </div>
               <div class="card-footer text-muted">
                 Unrealised PnL
@@ -106,7 +106,7 @@
     </div>
 
 <script>
-
+Chart.register(ChartDataLabels);
 const data = {
   labels: {{ data[1][0] | safe }},
   datasets: [{
@@ -122,14 +122,22 @@ const config = {
   type: 'bar',
   data: data,
   options: {
-    indexAxis: 'y',
-    plugins:{   
-        legend: {
-            display: false
+      onClick: graphClickEvent,
+      indexAxis: 'y',
+      plugins:{   
+          legend: {
+              display: false
         },
     }
   }
 };
+    
+function graphClickEvent(event, array){
+    if(array[0]){
+        const value = data.labels[array[0].index];
+        location.href = "../../coins/" + value;
+    }
+}
 
 var myChart = new Chart(
     document.getElementById('barChart'),
@@ -150,7 +158,12 @@ const config2 = {
   type: 'line',
   data: data2,
   options: {
-    plugins:{   
+    plugins:{
+        datalabels: {
+            anchor: 'end',
+            align: 'top',
+            offset: 5,
+        },
         legend: {
             display: false
         },

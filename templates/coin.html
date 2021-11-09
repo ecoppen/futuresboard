@@ -65,8 +65,8 @@
         <div class="col-sm-2">
             <div class="card text-center">
               <div class="card-body">
-                <h5 class="card-title">{{ totals[7][0] }}</h5>
-                <p class="card-text">{{ totals[7][1] }}</p>
+                <h5 class="card-title">${{ totals[7][0] }}</h5>
+                <p class="card-text">${{ totals[7][1] }}</p>
               </div>
               <div class="card-footer text-muted">
                 Unrealised PnL
@@ -124,7 +124,7 @@
     </div>
 
 <script>
-    
+Chart.register(ChartDataLabels);
 const data2 = {
   labels: {{ data[0][1] | safe }},
   datasets: [{
@@ -140,6 +140,11 @@ const config2 = {
   data: data2,
   options: {
     plugins:{   
+        datalabels: {
+            anchor: 'end',
+            align: 'top',
+            offset: 5,
+        },
         legend: {
             display: false
         },
