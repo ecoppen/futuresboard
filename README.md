@@ -4,14 +4,14 @@ A python based scraper and dashboard to monitor the performance of your Binance 
 ## Getting started
 
 - Create a fresh new API on Binance, with only read rights.
-- Install the flask library: `pip install flask`
+- Install the flask and requests libraries: `pip install flask requests`
 - Clone this repository: `git clone https://github.com/ecoppen/futuresboard.git`
 - Navigate to the futuresboard directory: `cd futuresboard`
 - Edit the config.json file, adding in your new api key and secret: `nano config.json`
 - Run the scraper if you want to monitor the weight usage (see below): `python scraper.py`
 - Setup the scraper on a crontab or alternative to keep the database up-to-date: `crontab -e` then `*/5 * * * * /usr/bin/python ~/futuresboard/scraper.py` (example is every 5 minutes, change to your needs)
 - Start a screen or alternative if you want the webserver to persist: `screen -S futuresboard`
-- Start flask: `flask run`
+- Start flask: `flask run` or if in a docker environment `flask run --host=0.0.0.0`
 - Navigate to the IP address shown e.g. `http://127.0.0.1:5000/`
 
 Currently only Binance and Futures are supported.
