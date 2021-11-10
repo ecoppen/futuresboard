@@ -15,8 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## 2021-11-09
 ### Added
 - Added recommended command for docker in `README.md` [@MiKE0#7135]
-- Added hyperlinks to the bar charts to show details for that specific coin
-- Added numeric values on top of the line and bar charts
+- Added hyperlinks to the bar charts to redirect to the page for that specific coin
+- Added numeric values on top of the line and within bar charts
 
 ### Changed
 - Changed the required libraries to include `requests` in `README.md` [@MiKE0#7135]
