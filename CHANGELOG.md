@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Change position/orders on coin page to use datatables
 - Create a route for all incomes. Add datatables to page for filtering, sorting and exporting
 
-## 2021-11-09
+## 2021-11-10
 ### Added
 - Added this `CHANGELOG.md` 
 
