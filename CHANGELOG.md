@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Create a route for all incomes. Add datatables to page for filtering, sorting and exporting
 - Merge the scraper into the app through the asyncio library [@s0undt3ch](https://github.com/s0undt3ch)
 - Match all of the details from [passivbot](https://github.com/enarjord/passivbot)s telegram commands `/position` and `/open_orders` commands
+- Add DCA tracker / warnings when running out of buys
 
 ## 2021-11-10
 ### Added
