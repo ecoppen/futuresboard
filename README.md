@@ -1,6 +1,8 @@
 # futuresboard
 A python based scraper and dashboard to monitor the performance of your Binance Futures account.
 
+[Change log](https://github.com/ecoppen/futuresboard/blob/main/CHANGELOG.md)
+
 ## Getting started
 
 - Create a fresh new API on Binance, with only read rights.
