@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Add DCA tracker / warnings when running out of buys
 - Store total BNB value from wallet and notify if it falls below a threshold
 - Show current coin price on coin page
+- Store and display historical unrealized PnL
 
 ## 2021-11-10
 ### Added
