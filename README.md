@@ -29,8 +29,8 @@ Currently only Binance and Futures are supported.
 - The scraper will sleep for a minute when the rate exceeds `800 within a minute`
 
 ## Screenshots
-<img width="1346" alt="futuresboard1" src="https://user-images.githubusercontent.com/51025241/140821486-ead40b35-d4c2-4282-986d-76fe62f295a7.png">
-<img width="1346" alt="futuresboard2" src="https://user-images.githubusercontent.com/51025241/140821400-4fb0efdd-fdba-4c0b-bc49-6a997775bbab.png">
+<img width="1351" alt="dashboard1" src="https://user-images.githubusercontent.com/51025241/141358095-a6578160-1d8f-4e5f-90ab-9d7599e9ee4c.png">
+<img width="1351" alt="dashboard2" src="https://user-images.githubusercontent.com/51025241/141358103-5befc35c-d61e-4064-adc6-869c7c5ec9df.png">
 
 ## Alternative dashboards
 
