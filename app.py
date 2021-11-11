@@ -89,26 +89,38 @@ def index_page():
         [ranges[2]],
         one=True,
     )
-    result = query_db(
+    
+    unrealized = query_db("SELECT SUM(unrealizedProfit) FROM positions", one=True)
+    lastupdate = query_db("SELECT time FROM orders ORDER BY time DESC LIMIT 0, 1", one=True)
+    if lastupdate is None:
+        lastupdate = "-"
+    else:
+        lastupdate = datetime.fromtimestamp(lastupdate[0] / 1000.0).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
+
+    all_fees = query_db(
         'SELECT SUM(income), asset FROM income WHERE incomeType ="COMMISSION" GROUP BY asset'
     )
-    unrealized = query_db("SELECT SUM(unrealizedProfit) FROM positions", one=True)
-    fees = {"USDT": 0, "BNB": 0}
 
     by_date = query_db(
         'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? GROUP BY Date',
         [ranges[1]],
     )
+
+    by_symbol = query_db(
+        'SELECT SUM(income) AS inc, symbol FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? GROUP BY symbol ORDER BY inc DESC',
+        [ranges[1]],
+    )
+
+    fees = {"USDT": 0, "BNB": 0}
+
     temp = [[], []]
     for each in by_date:
         temp[0].append(round(float(each[1]),2))
         temp[1].append(each[0])
     by_date = temp
 
-    by_symbol = query_db(
-        'SELECT SUM(income) AS inc, symbol FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? GROUP BY symbol ORDER BY inc DESC',
-        [ranges[1]],
-    )
     temp = [[], []]
     for each in by_symbol:
         temp[0].append(each[1])
@@ -122,8 +134,9 @@ def index_page():
         round(zero_value(month[0]) / balance * 100, 2),
         round(zero_value(total[0]) / balance * 100, 2),
     ]
-    for row in result:
+    for row in all_fees:
         fees[row[1]] = abs(round(zero_value(row[0]), 4))
+        
     pnl = [round(zero_value(unrealized[0]), 2), round(balance, 2)]
     totals = [
         round(zero_value(total[0]), 2),
@@ -141,6 +154,7 @@ def index_page():
         totals=totals,
         data=[by_date, by_symbol],
         timeframe="week",
+        lastupdate=lastupdate,
     )
 
 
@@ -170,26 +184,39 @@ def dashboard(timeframe):
         [ranges[2]],
         one=True,
     )
-    result = query_db(
+    
+    unrealized = query_db("SELECT SUM(unrealizedProfit) FROM positions", one=True)
+    lastupdate = query_db("SELECT time FROM orders ORDER BY time DESC LIMIT 0, 1", one=True)
+
+    all_fees = query_db(
         'SELECT SUM(income), asset FROM income WHERE incomeType ="COMMISSION" GROUP BY asset'
     )
-    unrealized = query_db("SELECT SUM(unrealizedProfit) FROM positions", one=True)
-    fees = {"USDT": 0, "BNB": 0}
 
     by_date = query_db(
         'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? GROUP BY Date',
         [ranges[times[timeframe]]],
     )
+
+    by_symbol = query_db(
+        'SELECT SUM(income) AS inc, symbol FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? GROUP BY symbol ORDER BY inc DESC',
+        [ranges[times[timeframe]]],
+    )
+    
+    if lastupdate is None:
+        lastupdate = "-"
+    else:
+        lastupdate = datetime.fromtimestamp(lastupdate[0] / 1000.0).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
+    
+    fees = {"USDT": 0, "BNB": 0}
+
     temp = [[], []]
     for each in by_date:
         temp[0].append(round(float(each[1]),2))
         temp[1].append(each[0])
     by_date = temp
 
-    by_symbol = query_db(
-        'SELECT SUM(income) AS inc, symbol FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? GROUP BY symbol ORDER BY inc DESC',
-        [ranges[times[timeframe]]],
-    )
     temp = [[], []]
     for each in by_symbol:
         temp[0].append(each[1])
@@ -203,7 +230,7 @@ def dashboard(timeframe):
         round(zero_value(month[0]) / balance * 100, 2),
         round(zero_value(total[0]) / balance * 100, 2),
     ]
-    for row in result:
+    for row in all_fees:
         fees[row[1]] = abs(round(zero_value(row[0]), 4))
     pnl = [round(zero_value(unrealized[0]), 2), round(balance, 2)]
     totals = [
@@ -222,6 +249,7 @@ def dashboard(timeframe):
         totals=totals,
         timeframe=timeframe,
         data=[by_date, by_symbol],
+        lastupdate = lastupdate,
     )
 
 
@@ -282,6 +310,14 @@ def show_individual_coin(coin):
             [coin],
         )
 
+        lastupdate = query_db("SELECT time FROM orders ORDER BY time DESC LIMIT 0, 1", one=True)
+        if lastupdate is None:
+            lastupdate = "-"
+        else:
+            lastupdate = datetime.fromtimestamp(lastupdate[0] / 1000.0).strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                )
+
         temp = []
         for order in allorders:
             order = list(order)
@@ -330,6 +366,7 @@ def show_individual_coin(coin):
         timeframe="week",
         data=[by_date],
         orders=[allpositions, allorders],
+        lastupdate=lastupdate,
     )
 
 
@@ -389,6 +426,14 @@ def show_individual_coin_timeframe(coin, timeframe):
             "SELECT * FROM orders WHERE symbol = ? ORDER BY side, price, origQty",
             [coin],
         )
+
+        lastupdate = query_db("SELECT time FROM orders ORDER BY time DESC LIMIT 0, 1", one=True)
+        if lastupdate is None:
+            lastupdate = "-"
+        else:
+            lastupdate = datetime.fromtimestamp(lastupdate[0] / 1000.0).strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                    )
         temp = []
         for order in allorders:
             order = list(order)
@@ -437,6 +482,7 @@ def show_individual_coin_timeframe(coin, timeframe):
         timeframe=timeframe,
         data=[by_date],
         orders=[allpositions, allorders],
+        lastupdate=lastupdate,
     )
 
 
