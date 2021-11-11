@@ -4,7 +4,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
-- Add last update time to main template
 - Create a route for unrealized PnL that shows all positions in one place. Add hyperlinks from sidebar, dashboard and coin pages
 - Change position/orders on coin page to use datatables
 - Create a route for all incomes. Add datatables to page for filtering, sorting and exporting
@@ -18,6 +17,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## 2021-11-10
 ### Added
 - Added `favicon.ico` and referenced in base template
+- Add last update time to `dashboard` and `coin` pages (pulls the last order creation time)
+
+### Changed
+- Renamed variable `result` to `all_fees` in `app.py`
 
 ## 2021-11-10
 ### Added
