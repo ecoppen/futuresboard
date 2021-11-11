@@ -208,7 +208,7 @@ def create_orders(conn, orders):
     cur.execute(sql, orders)
 
 
-def scrape():
+def scrape(auto_scrape=False):
     start = time.time()
     db_setup(app.config["DATABASE"])
 
@@ -326,8 +326,9 @@ def scrape():
                 conn.commit()
 
     elapsed = time.time() - start
-    print(
-        "Orders updated: {}\nPositions updated: {} (new: {})\nTrades processed: {}\nTime elapsed: {}\nSleeps: {}".format(
+    if auto_scrape is True:
+        app.logger.info(
+            "Orders updated: %s; Positions updated: %s (new: %s); Trades processed: %s; Time elapsed: %s; Sleeps: %s",
             updated_orders,
             updated_positions,
             new_positions,
@@ -335,4 +336,14 @@ def scrape():
             timedelta(seconds=elapsed),
             sleeps,
         )
-    )
+    else:
+        print(
+            "Orders updated: {}\nPositions updated: {} (new: {})\nTrades processed: {}\nTime elapsed: {}\nSleeps: {}".format(
+                updated_orders,
+                updated_positions,
+                new_positions,
+                processed,
+                timedelta(seconds=elapsed),
+                sleeps,
+            )
+        )

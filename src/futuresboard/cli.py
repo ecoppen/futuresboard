@@ -14,9 +14,9 @@ log = logging.getLogger(__name__)
 
 def auto_scrape():
     while True:
-        log.info("Auto scrape routines starting")
-        scraper.scrape()
-        log.info("Auto scrape routines terninated")
+        app.logger.info("Auto scrape routines starting")
+        scraper.scrape(auto_scrape=True)
+        app.logger.info("Auto scrape routines terninated. Sleeping %s seconds...", app.config["AUTO_SCRAPE_INTERVAL"])
         time.sleep(app.config["AUTO_SCRAPE_INTERVAL"])
 
 
@@ -42,6 +42,8 @@ def main():
         help="Disable the routines which scrape while the webservice is running"
     )
     args = parser.parse_args()
+
+    app.logger.setLevel(logging.INFO)
     if args.config_dir is None:
         args.config_dir = pathlib.Path.cwd() / "config"
     else:
