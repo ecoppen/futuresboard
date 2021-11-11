@@ -4,26 +4,18 @@ import hmac
 import time
 import hashlib
 import requests
-import json
 import datetime
 import sqlite3
 
 from datetime import timedelta
 from sqlite3 import Error
 from urllib.parse import urlencode
-
-with open("config.json") as json_file:
-    data = json.load(json_file)
-
-KEY = data["api_key"]
-SECRET = data["api_secret"]
-BASE_URL = "https://fapi.binance.com"  # production base url
-# BASE_URL = 'https://testnet.binancefuture.com' # testnet base url
+from futuresboard.app import app
 
 
 def hashing(query_string):
     return hmac.new(
-        SECRET.encode("utf-8"), query_string.encode("utf-8"), hashlib.sha256
+        app.config["API_SECRET"].encode("utf-8"), query_string.encode("utf-8"), hashlib.sha256
     ).hexdigest()
 
 
@@ -34,7 +26,7 @@ def get_timestamp():
 def dispatch_request(http_method):
     session = requests.Session()
     session.headers.update(
-        {"Content-Type": "application/json;charset=utf-8", "X-MBX-APIKEY": KEY}
+        {"Content-Type": "application/json;charset=utf-8", "X-MBX-APIKEY": app.config["API_KEY"]}
     )
     return {
         "GET": session.get,
@@ -55,7 +47,7 @@ def send_signed_request(http_method, url_path, payload={}):
         query_string = "timestamp={}".format(get_timestamp())
 
     url = (
-        BASE_URL + url_path + "?" + query_string + "&signature=" + hashing(query_string)
+        app.config["API_BASE_URL"] + url_path + "?" + query_string + "&signature=" + hashing(query_string)
     )
     # print("{} {}".format(http_method, url))
     params = {"url": url, "params": {}}
@@ -66,7 +58,7 @@ def send_signed_request(http_method, url_path, payload={}):
 # used for sending public data request
 def send_public_request(url_path, payload={}):
     query_string = urlencode(payload, True)
-    url = BASE_URL + url_path
+    url = app.config["API_BASE_URL"] + url_path
     if query_string:
         url = url + "?" + query_string
     # print("{}".format(url))
@@ -216,10 +208,9 @@ def create_orders(conn, orders):
     cur.execute(sql, orders)
 
 
-if __name__ == "__main__":
+def scrape():
     start = time.time()
-    database = r"futures.db"
-    db_setup(database)
+    db_setup(app.config["DATABASE"])
 
     up_to_date = False
     weightused = 0
@@ -230,8 +221,7 @@ if __name__ == "__main__":
         responseHeader, responseJSON = send_signed_request("GET", "/fapi/v1/openOrders")
         weightused = int(responseHeader["X-MBX-USED-WEIGHT-1M"])
 
-        conn = create_connection(database)
-        with conn:
+        with create_connection(app.config["DATABASE"]) as conn:
             delete_all_orders(conn)
             for order in responseJSON:
                 updated_orders += 1
@@ -252,8 +242,7 @@ if __name__ == "__main__":
     weightused = int(responseHeader["X-MBX-USED-WEIGHT-1M"])
     positions = responseJSON["positions"]
 
-    conn = create_connection(database)
-    with conn:
+    with create_connection(app.config["DATABASE"]) as conn:
         row = (
             float(responseJSON["totalWalletBalance"]),
             float(responseJSON["totalUnrealizedProfit"]),
@@ -297,8 +286,7 @@ if __name__ == "__main__":
             sleeps += 1
             time.sleep(60)
 
-        conn = create_connection(database)
-        with conn:
+        with create_connection(app.config["DATABASE"]) as conn:
             startTime = select_latest_income(conn)
             if startTime == None:
                 startTime = int(
