@@ -7,7 +7,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Create a route for unrealized PnL that shows all positions in one place. Add hyperlinks from sidebar, dashboard and coin pages
 - Change position/orders on coin page to use datatables
 - Create a route for all incomes. Add datatables to page for filtering, sorting and exporting
-- Merge the scraper into the app through the asyncio library [@s0undt3ch](https://github.com/s0undt3ch)
 - Match all of the details from [passivbot](https://github.com/enarjord/passivbot)s telegram commands `/position` and `/open_orders` commands
 - Add DCA tracker / warnings when running out of buys
 - Store total BNB value from wallet and notify if it falls below a threshold
@@ -21,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Changed
 - Renamed variable `result` to `all_fees` in `app.py`
+- Merge the scraper into the app through the asyncio library - completed in PR by [@s0undt3ch](https://github.com/s0undt3ch)
 
 ## 2021-11-10
 ### Added
