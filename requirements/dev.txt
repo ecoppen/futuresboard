@@ -1,0 +1,7 @@
+-r base.txt
+flake8>=4.0.1
+flake8-mypy-fork
+flake8-typing-imports
+mypy>=0.910
+pre-commit>=2.4.0
+types-setuptools

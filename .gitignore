@@ -1,0 +1,3 @@
+src/futuresboard/version.py
+config/futures.db
+config/config.json
