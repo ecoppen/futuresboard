@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## 2021-11-12
 ### Changed
 - Auto refresh after 60 seconds now on a page by page basis rather than whole site
+- Line charts now have padding at the top for when you hit ATH profits and can't see the numbers because the chart cuts off
 
 ## 2021-11-11
 ### Added
