@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block autoreload %}<meta http-equiv="refresh" content="60">{% endblock %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -158,16 +159,21 @@ const config2 = {
   type: 'line',
   data: data2,
   options: {
-    plugins:{
-        datalabels: {
-            anchor: 'end',
-            align: 'top',
-            offset: 5,
+        layout: {
+            padding: {
+                top: 20
+            }
         },
-        legend: {
-            display: false
-        },
-    }
+        plugins:{
+            datalabels: {
+                anchor: 'end',
+                align: 'top',
+                offset: 5,
+            },
+            legend: {
+                display: false
+            },
+        }
   }
 };
     
