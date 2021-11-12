@@ -102,29 +102,53 @@
                      Position / orders
                 </div>
                 
-              <ul class="list-group list-group-flush">
+              <table id="orders" class='table table-sm table-bordered text-center'>
+				<thead class="thead-dark">
+					<tr>
+						<th>Type</th>
+						<th>Volume</th>
+						<th>Price</th>
+						<th>Date</th>
+					</tr>
+				</thead>
+				<tbody>
                   {% for position in orders[0] %}
-                    <li class="list-group-item">
-                        <span class="badge bg-primary">{{position[5]}} {{position[3]}}x</span>
-                        {{position[6]}} @ {{position[4]}}
-                    </li>
+				  <tr class="table-primary">
+                        <td>{{position[5]}} {{position[3]}}x</td>
+                        <td>{{position[6]}}</td> 
+						<td>{{position[4]}}</td>
+						<td></td>
+                  </tr>
                   {% endfor %}
                   {% for order in orders[1] %}
-                    <li class="list-group-item">
                         {% if order[3] == "BUY" %}
-                            <span class="badge bg-success">
+                            <tr class="table-success">
                         {% else %}
-                            <span class="badge bg-danger">
+							<tr class="table-danger">
                         {% endif %}
-                                {{order[3]}} {{order[8]}} {{order[4]}}</span> {{order[1]}} @ {{order[2]}} <div class="float-end text-muted">{{ order[7] }}</div>
-                    </li>
+                        <td>{{order[3]}} {{order[8]}} {{order[4]}}</td> 
+						
+						<td>{{order[1]}}</td>
+						<td>{{order[2]}}</td>
+						<td>{{ order[7] }}</td>
+                    </tr>
                   {% endfor %}
-              </ul>
+              </table>
             </div>
         </div>
     </div>
 
 <script>
+
+$(document).ready( function () {
+    $('#orders').DataTable({
+		"paging": false,
+		"searching": false,
+		"order": [],
+		"info": false,
+	});
+} );
+
 Chart.register(ChartDataLabels);
 const data2 = {
   labels: {{ data[0][1] | safe }},
