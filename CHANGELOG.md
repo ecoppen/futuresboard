@@ -13,7 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Show current coin price on coin page
 - Store and display historical unrealized PnL
 
-## 2021-11-10
+
+## 2021-11-12
+### Changed
+- Auto refresh after 60 seconds now on a page by page basis rather than whole site
+
+## 2021-11-11
 ### Added
 - Added `favicon.ico` and referenced in base template
 - Add last update time to `dashboard` and `coin` pages (pulls the last order creation time)
