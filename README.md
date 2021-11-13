@@ -1,7 +1,6 @@
 # futuresboard
-A python based scraper and dashboard to monitor the performance of your Binance Futures account. 
-
-Note: A local sqlite3 database `config/futures.db` will be created and automatically updated by the scraper every 5 minutes.
+A python based scraper and dashboard to monitor the performance of your Binance Futures account.<br>
+<sub>Note: A local sqlite3 database `config/futures.db` will be created and automatically updated by the scraper every 5 minutes.</sub>
 
 [Change log](https://github.com/ecoppen/futuresboard/blob/main/CHANGELOG.md)
 
