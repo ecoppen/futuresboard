@@ -1,5 +1,5 @@
 # futuresboard
-A python based scraper and dashboard to monitor the performance of your Binance Futures account.
+A python based scraper and dashboard to monitor the performance of your Binance Futures account. A local sqlite3 database `config/futures.db` will be created and automatically updated by the scraper every 5 minutes.
 
 [Change log](https://github.com/ecoppen/futuresboard/blob/main/CHANGELOG.md)
 
@@ -29,8 +29,8 @@ Currently only Binance and Futures are supported.
 - The scraper will sleep for a minute when the rate exceeds `800 within a minute`
 
 ## Screenshots
-<img width="1351" alt="dashboard1" src="https://user-images.githubusercontent.com/51025241/141358095-a6578160-1d8f-4e5f-90ab-9d7599e9ee4c.png">
-<img width="1351" alt="dashboard2" src="https://user-images.githubusercontent.com/51025241/141358103-5befc35c-d61e-4064-adc6-869c7c5ec9df.png">
+<img width="1346" alt="dashboard1" src="https://user-images.githubusercontent.com/51025241/141650366-a7f667c3-5699-4445-9e7f-b4fabf24278f.png">
+<img width="1346" alt="dashboard2" src="https://user-images.githubusercontent.com/51025241/141650367-930947f8-8449-4ced-a46f-8abc6e93f79f.png">
 
 ## Alternative dashboards
 
