@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import sqlite3
 from flask import g
 from datetime import datetime, date, timedelta
+import requests
 
 app = Flask(__name__)
 
@@ -28,13 +29,37 @@ def query_db(query, args=(), one=False):
 
 
 def get_coins():
-    result = query_db(
+    all_symbols_with_pnl = query_db(
         'SELECT DISTINCT(symbol) FROM income WHERE incomeType ="REALIZED_PNL" AND symbol <> "" ORDER BY symbol ASC'
     )
-    coins = []
-    for row in result:
-        coins.append(row[0])
+    coins = {"active": {}, "inactive": [], "totals": {"active": 0, "inactive": 0}}
+
+    for symbol in all_symbols_with_pnl:
+        buyorders = query_db(
+            'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "BUY"', [symbol[0]], one=True
+        )
+        sellorders = query_db(
+            'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "SELL"',
+            [symbol[0]],
+            one=True,
+        )
+        if buyorders is None or sellorders is None:
+            coins["inactive"].append(symbol[0])
+            coins["totals"]["inactive"] += 1
+        elif int(buyorders[0]) + int(sellorders[0]) == 0:
+            coins["inactive"].append(symbol[0])
+            coins["totals"]["inactive"] += 1
+        else:
+            coins["active"][symbol[0]] = [int(buyorders[0]), int(sellorders[0])]
+            coins["totals"]["active"] += 1
     return coins
+
+
+def get_lastupdate():
+    lastupdate = query_db("SELECT MAX(time) FROM orders", one=True)
+    if lastupdate is None:
+        return "-"
+    return datetime.fromtimestamp(lastupdate[0] / 1000.0).strftime("%Y-%m-%d %H:%M:%S")
 
 
 def zero_value(x):
@@ -44,6 +69,10 @@ def zero_value(x):
         return x
 
 
+def format_dp(value, dp=2):
+    return "{:.{}f}".format(value, dp)
+
+
 def timeranges():
     today = date.today()
     midnight_today = datetime.combine(today, datetime.min.time())
@@ -51,9 +80,7 @@ def timeranges():
     midnight_quarter = midnight_today - timedelta(days=3 * 30)
     midnight_start = midnight_today - timedelta(days=3 * 365)
     start_of_month = datetime.combine(today.replace(day=1), datetime.min.time())
-    start_of_year = datetime.combine(
-        today.replace(day=1).replace(month=1), datetime.min.time()
-    )
+    start_of_year = datetime.combine(today.replace(day=1).replace(month=1), datetime.min.time())
     return [
         midnight_today.timestamp() * 1000,
         midnight_7days.timestamp() * 1000,
@@ -69,9 +96,7 @@ def timeranges():
 def index_page():
     ranges = timeranges()
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
-    total = query_db(
-        'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL"', one=True
-    )
+    total = query_db('SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL"', one=True)
     today = query_db(
         'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ?',
         [ranges[0]],
@@ -89,13 +114,6 @@ def index_page():
     )
 
     unrealized = query_db("SELECT SUM(unrealizedProfit) FROM positions", one=True)
-    lastupdate = query_db("SELECT time FROM orders ORDER BY time DESC LIMIT 0, 1", one=True)
-    if lastupdate is None:
-        lastupdate = "-"
-    else:
-        lastupdate = datetime.fromtimestamp(lastupdate[0] / 1000.0).strftime(
-                "%Y-%m-%d %H:%M:%S"
-            )
 
     all_fees = query_db(
         'SELECT SUM(income), asset FROM income WHERE incomeType ="COMMISSION" GROUP BY asset'
@@ -115,32 +133,33 @@ def index_page():
 
     temp = [[], []]
     for each in by_date:
-        temp[0].append(round(float(each[1]),2))
+        temp[0].append(round(float(each[1]), 2))
         temp[1].append(each[0])
     by_date = temp
 
     temp = [[], []]
     for each in by_symbol:
         temp[0].append(each[1])
-        temp[1].append(round(float(each[0]),2))
+        temp[1].append(round(float(each[0]), 2))
     by_symbol = temp
 
     balance = float(balance[0])
     percentages = [
-        round(zero_value(today[0]) / balance * 100, 2),
-        round(zero_value(week[0]) / balance * 100, 2),
-        round(zero_value(month[0]) / balance * 100, 2),
-        round(zero_value(total[0]) / balance * 100, 2),
+        format_dp(zero_value(today[0]) / balance * 100),
+        format_dp(zero_value(week[0]) / balance * 100),
+        format_dp(zero_value(month[0]) / balance * 100),
+        format_dp(zero_value(total[0]) / balance * 100),
     ]
-    for row in all_fees:
-        fees[row[1]] = abs(round(zero_value(row[0]), 4))
 
-    pnl = [round(zero_value(unrealized[0]), 2), round(balance, 2)]
+    for row in all_fees:
+        fees[row[1]] = format_dp(abs(zero_value(row[0])), 4)
+
+    pnl = [format_dp(zero_value(unrealized[0])), format_dp(balance)]
     totals = [
-        round(zero_value(total[0]), 2),
-        round(zero_value(today[0]), 2),
-        round(zero_value(week[0]), 2),
-        round(zero_value(month[0]), 2),
+        format_dp(zero_value(total[0])),
+        format_dp(zero_value(today[0])),
+        format_dp(zero_value(week[0])),
+        format_dp(zero_value(month[0])),
         ranges[3],
         fees,
         percentages,
@@ -152,21 +171,19 @@ def index_page():
         totals=totals,
         data=[by_date, by_symbol],
         timeframe="week",
-        lastupdate=lastupdate,
+        lastupdate=get_lastupdate(),
     )
 
 
 @app.route("/dashboard/<timeframe>")
 def dashboard(timeframe):
     if timeframe not in ["today", "week", "month", "quarter", "year", "all"]:
-        return render_template("error.html"), 404
+        return render_template("error.html", coin_list=get_coins()), 404
 
     ranges = timeranges()
     times = {"today": 0, "week": 1, "month": 2, "quarter": 4, "year": 5, "all": 6}
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
-    total = query_db(
-        'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL"', one=True
-    )
+    total = query_db('SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL"', one=True)
     today = query_db(
         'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ?',
         [ranges[0]],
@@ -184,7 +201,6 @@ def dashboard(timeframe):
     )
 
     unrealized = query_db("SELECT SUM(unrealizedProfit) FROM positions", one=True)
-    lastupdate = query_db("SELECT time FROM orders ORDER BY time DESC LIMIT 0, 1", one=True)
 
     all_fees = query_db(
         'SELECT SUM(income), asset FROM income WHERE incomeType ="COMMISSION" GROUP BY asset'
@@ -200,42 +216,35 @@ def dashboard(timeframe):
         [ranges[times[timeframe]]],
     )
 
-    if lastupdate is None:
-        lastupdate = "-"
-    else:
-        lastupdate = datetime.fromtimestamp(lastupdate[0] / 1000.0).strftime(
-                "%Y-%m-%d %H:%M:%S"
-            )
-
     fees = {"USDT": 0, "BNB": 0}
 
     temp = [[], []]
     for each in by_date:
-        temp[0].append(round(float(each[1]),2))
+        temp[0].append(round(float(each[1]), 2))
         temp[1].append(each[0])
     by_date = temp
 
     temp = [[], []]
     for each in by_symbol:
         temp[0].append(each[1])
-        temp[1].append(round(float(each[0]),2))
+        temp[1].append(round(float(each[0]), 2))
     by_symbol = temp
 
     balance = float(balance[0])
     percentages = [
-        round(zero_value(today[0]) / balance * 100, 2),
-        round(zero_value(week[0]) / balance * 100, 2),
-        round(zero_value(month[0]) / balance * 100, 2),
-        round(zero_value(total[0]) / balance * 100, 2),
+        format_dp(zero_value(today[0]) / balance * 100),
+        format_dp(zero_value(week[0]) / balance * 100),
+        format_dp(zero_value(month[0]) / balance * 100),
+        format_dp(zero_value(total[0]) / balance * 100),
     ]
     for row in all_fees:
-        fees[row[1]] = abs(round(zero_value(row[0]), 4))
-    pnl = [round(zero_value(unrealized[0]), 2), round(balance, 2)]
+        fees[row[1]] = format_dp(abs(zero_value(row[0])), 4)
+    pnl = [format_dp(zero_value(unrealized[0])), format_dp(balance)]
     totals = [
-        round(zero_value(total[0]), 2),
-        round(zero_value(today[0]), 2),
-        round(zero_value(week[0]), 2),
-        round(zero_value(month[0]), 2),
+        format_dp(zero_value(total[0])),
+        format_dp(zero_value(today[0])),
+        format_dp(zero_value(week[0])),
+        format_dp(zero_value(month[0])),
         ranges[3],
         fees,
         percentages,
@@ -247,7 +256,7 @@ def dashboard(timeframe):
         totals=totals,
         timeframe=timeframe,
         data=[by_date, by_symbol],
-        lastupdate = lastupdate,
+        lastupdate=get_lastupdate(),
     )
 
 
@@ -262,8 +271,20 @@ def list_all_coins():
 @app.route("/coins/<coin>")
 def show_individual_coin(coin):
     # show the selected coin stats
-    if coin not in get_coins():
-        return render_template("error.html"), 404
+    coins = get_coins()
+    if coin not in coins["inactive"] and coin not in coins["active"]:
+        return render_template("error.html", coin_list=get_coins()), 404
+
+    try:
+        response = requests.get(
+            "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=1
+        )
+        if response:
+            markPrice = round(float(response.json()["markPrice"]), 5)
+        else:
+            markPrice = "-"
+    except:
+        markPrice = "-"
 
     ranges = timeranges()
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
@@ -308,39 +329,36 @@ def show_individual_coin(coin):
             [coin],
         )
 
-        lastupdate = query_db("SELECT time FROM orders ORDER BY time DESC LIMIT 0, 1", one=True)
-        if lastupdate is None:
-            lastupdate = "-"
-        else:
-            lastupdate = datetime.fromtimestamp(lastupdate[0] / 1000.0).strftime(
-                    "%Y-%m-%d %H:%M:%S"
-                )
+        temp = []
+        for position in allpositions:
+            position = list(position)
+            position[4] = round(float(position[4]), 5)
+            temp.append(position)
+        allpositions = temp
 
         temp = []
         for order in allorders:
             order = list(order)
-            order[7] = datetime.fromtimestamp(order[7] / 1000.0).strftime(
-                "%Y-%m-%d %H:%M:%S"
-            )
+            order[7] = datetime.fromtimestamp(order[7] / 1000.0).strftime("%Y-%m-%d %H:%M:%S")
             temp.append(order)
         allorders = temp
 
         fees = {"USDT": 0, "BNB": 0}
         balance = float(balance[0])
         percentages = [
-            round(zero_value(today[0]) / balance * 100, 2),
-            round(zero_value(week[0]) / balance * 100, 2),
-            round(zero_value(month[0]) / balance * 100, 2),
-            round(zero_value(total[0]) / balance * 100, 2),
+            format_dp(zero_value(today[0]) / balance * 100),
+            format_dp(zero_value(week[0]) / balance * 100),
+            format_dp(zero_value(month[0]) / balance * 100),
+            format_dp(zero_value(total[0]) / balance * 100),
         ]
         for row in result:
-            fees[row[1]] = abs(round(zero_value(row[0]), 4))
-        pnl = [round(zero_value(unrealized[0]), 2), round(balance, 2)]
+            fees[row[1]] = format_dp(abs(zero_value(row[0])), 4)
+        pnl = [format_dp(zero_value(unrealized[0])), format_dp(balance)]
         totals = [
-            round(zero_value(total[0]), 2),
-            round(zero_value(today[0]), 2),
-            round(zero_value(week[0]), 2),
-            round(zero_value(month[0]), 2),
+            format_dp(zero_value(total[0])),
+            format_dp(zero_value(today[0])),
+            format_dp(zero_value(week[0])),
+            format_dp(zero_value(month[0])),
             ranges[3],
             fees,
             percentages,
@@ -352,7 +370,7 @@ def show_individual_coin(coin):
         )
         temp = [[], []]
         for each in by_date:
-            temp[0].append(round(each[1],2))
+            temp[0].append(round(float(each[1]), 2))
             temp[1].append(each[0])
         by_date = temp
     return render_template(
@@ -364,14 +382,15 @@ def show_individual_coin(coin):
         timeframe="week",
         data=[by_date],
         orders=[allpositions, allorders],
-        lastupdate=lastupdate,
+        lastupdate=get_lastupdate(),
+        markprice=markPrice,
     )
 
 
 @app.route("/coins/<coin>/<timeframe>")
 def show_individual_coin_timeframe(coin, timeframe):
-    # show the selected coin stats
-    if coin not in get_coins() or timeframe not in [
+    coins = get_coins()
+    if (coin not in coins["inactive"] and coin not in coins["active"]) or timeframe not in [
         "today",
         "week",
         "month",
@@ -379,7 +398,18 @@ def show_individual_coin_timeframe(coin, timeframe):
         "year",
         "all",
     ]:
-        return render_template("error.html"), 404
+        return render_template("error.html", coin_list=get_coins()), 404
+
+    try:
+        response = requests.get(
+            "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=1
+        )
+        if response:
+            markPrice = round(float(response.json()["markPrice"]), 5)
+        else:
+            markPrice = "-"
+    except:
+        markPrice = "-"
 
     ranges = timeranges()
     times = {"today": 0, "week": 1, "month": 2, "quarter": 4, "year": 5, "all": 6}
@@ -425,37 +455,35 @@ def show_individual_coin_timeframe(coin, timeframe):
             [coin],
         )
 
-        lastupdate = query_db("SELECT time FROM orders ORDER BY time DESC LIMIT 0, 1", one=True)
-        if lastupdate is None:
-            lastupdate = "-"
-        else:
-            lastupdate = datetime.fromtimestamp(lastupdate[0] / 1000.0).strftime(
-                    "%Y-%m-%d %H:%M:%S"
-                    )
+        temp = []
+        for position in allpositions:
+            position = list(position)
+            position[4] = round(float(position[4]), 5)
+            temp.append(position)
+        allpositions = temp
+
         temp = []
         for order in allorders:
             order = list(order)
-            order[7] = datetime.fromtimestamp(order[7] / 1000.0).strftime(
-                "%Y-%m-%d %H:%M:%S"
-            )
+            order[7] = datetime.fromtimestamp(order[7] / 1000.0).strftime("%Y-%m-%d %H:%M:%S")
             temp.append(order)
         allorders = temp
         fees = {"USDT": 0, "BNB": 0}
         balance = float(balance[0])
         percentages = [
-            round(zero_value(today[0]) / balance * 100, 2),
-            round(zero_value(week[0]) / balance * 100, 2),
-            round(zero_value(month[0]) / balance * 100, 2),
-            round(zero_value(total[0]) / balance * 100, 2),
+            format_dp(zero_value(today[0]) / balance * 100),
+            format_dp(zero_value(week[0]) / balance * 100),
+            format_dp(zero_value(month[0]) / balance * 100),
+            format_dp(zero_value(total[0]) / balance * 100),
         ]
         for row in result:
-            fees[row[1]] = abs(round(zero_value(row[0]), 4))
-        pnl = [round(zero_value(unrealized[0]), 2), round(balance, 2)]
+            fees[row[1]] = format_dp(abs(zero_value(row[0])), 4)
+        pnl = [format_dp(zero_value(unrealized[0])), format_dp(balance)]
         totals = [
-            round(zero_value(total[0]), 2),
-            round(zero_value(today[0]), 2),
-            round(zero_value(week[0]), 2),
-            round(zero_value(month[0]), 2),
+            format_dp(zero_value(total[0])),
+            format_dp(zero_value(today[0])),
+            format_dp(zero_value(week[0])),
+            format_dp(zero_value(month[0])),
             ranges[3],
             fees,
             percentages,
@@ -468,7 +496,7 @@ def show_individual_coin_timeframe(coin, timeframe):
         )
         temp = [[], []]
         for each in by_date:
-            temp[0].append(round(each[1],2))
+            temp[0].append(round(float(each[1]), 2))
             temp[1].append(each[0])
         by_date = temp
     return render_template(
@@ -480,18 +508,17 @@ def show_individual_coin_timeframe(coin, timeframe):
         timeframe=timeframe,
         data=[by_date],
         orders=[allpositions, allorders],
-        lastupdate=lastupdate,
+        lastupdate=get_lastupdate(),
+        markprice=markPrice,
     )
 
 
 @app.route("/orders/")
 def list_all_orders():
     # show the selected coin stats
-    return render_template(
-        "showall.html", coin_list=get_coins(), metric="orders", showall=[]
-    )
+    return render_template("showall.html", coin_list=get_coins(), metric="orders", showall=[])
 
 
 @app.errorhandler(404)
 def not_found(error):
-    return render_template("error.html"), 404
+    return render_template("error.html", coin_list=get_coins()), 404
