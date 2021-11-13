@@ -9,9 +9,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Match all of the details from [passivbot](https://github.com/enarjord/passivbot)s telegram commands `/position` and `/open_orders` commands
 - Add DCA tracker / warnings when running out of buys
 - Store total BNB value from wallet and notify if it falls below a threshold
-- Show current coin price on coin page
 - Store and display historical unrealized PnL
+- Tidy up repeated code into functions
 
+## 2021-11-13
+### Added
+- Buy and sell position indicators for each active coin in the menu
+- Mark price now displays on the active coin pages
+
+### Changed
+- SQL for latest order switched from `ORDER BY / LIMIT` to `MAX()`
+- Repeated code removed for lastupdate and put into `get_lastupdate()`
+- All of the headline values for profit will display with 2dp i.e. `4.00` instead of `4.0`
+- Rounded the position price on coins page to 5dp maximum
+- Split the coin menu into `active` and `inactive`
 
 ## 2021-11-12
 ### Changed
