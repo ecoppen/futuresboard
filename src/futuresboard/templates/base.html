@@ -36,12 +36,29 @@
                 </a>
               </li>
               <li class="mb-1">
-                <button class="btn btn-toggle align-items-center rounded {{ 'collapsed' if 'coin' not in request.path }}" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="{{ 'true' if 'coin' in request.path else 'false'}}">
-                  Coins
+                <button class="btn btn-toggle align-items-center rounded" data-bs-toggle="collapse" data-bs-target="#activecoins-collapse" aria-expanded="true">
+                  Active coins ({{ coin_list['totals']['active'] }})
                 </button>
-                <div class="collapse {{ 'show' if 'coin' in request.path }}" id="dashboard-collapse" style="">
+                <div class="collapse show" id="activecoins-collapse" style="">
                   <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        {% for item in coin_list %}
+                      <table class="table table-sm">
+                        {% for item in coin_list['active'] %}
+                            <tr><td><a href="../../coins/{{ item }}" class="link-dark rounded">{{ item }}</a></td>
+                                <td class="table-success text-center">{{ coin_list['active'][item][0] }}</td>
+                                <td class="table-danger text-center">{{ coin_list['active'][item][1] }}</td>
+                            </tr>
+                        {% endfor %}
+                      </table>
+                  </ul>
+                </div>
+              </li>
+              <li class="mb-1">
+                <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#inactivecoins-collapse" aria-expanded="false">
+                  Inactive coins ({{ coin_list['totals']['inactive'] }})
+                </button>
+                <div class="collapse" id="inactivecoins-collapse" style="">
+                  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        {% for item in coin_list['inactive'] %}
                             <li><a href="../../coins/{{ item }}" class="link-dark rounded">{{ item }}</a></li>
                         {% endfor %}
                   </ul>
