@@ -9,6 +9,16 @@ import os
 app = Flask(__name__)
 
 
+def zero_value(x):
+    if x is None:
+        return 0
+    else:
+        return x
+
+
+def format_dp(value, dp=2):
+    return "{:.{}f}".format(value, dp)
+
 def get_db():
     db = getattr(g, "_database", None)
     if db is None:
@@ -29,13 +39,22 @@ def query_db(query, args=(), one=False):
     cur.close()
     return (rv[0] if rv else None) if one else rv
 
+def calc_pbr(volume, price, side, balance):
+    if price > 0.0:
+        if side == "SHORT":
+            return abs(volume / price) / balance
+        elif side == "LONG":
+            return abs(volume * price) / balance
+    return 0.0
 
 def get_coins():
     all_symbols_with_pnl = query_db(
         'SELECT DISTINCT(symbol) FROM income WHERE incomeType ="REALIZED_PNL" AND symbol <> "" ORDER BY symbol ASC'
     )
-    coins = {"active": {}, "inactive": [], "totals": {"active": 0, "inactive": 0}}
-
+    coins = {"active": {}, "inactive": [], "totals": {"active": 0, "inactive": 0, "buys":0, "sells":0, "pbr":0}}
+    
+    balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
+    
     for symbol in all_symbols_with_pnl:
         buyorders = query_db(
             'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "BUY"', [symbol[0]], one=True
@@ -45,6 +64,7 @@ def get_coins():
             [symbol[0]],
             one=True,
         )
+        
         if buyorders is None or sellorders is None:
             coins["inactive"].append(symbol[0])
             coins["totals"]["inactive"] += 1
@@ -52,8 +72,19 @@ def get_coins():
             coins["inactive"].append(symbol[0])
             coins["totals"]["inactive"] += 1
         else:
-            coins["active"][symbol[0]] = [int(buyorders[0]), int(sellorders[0])]
+            allpositions = query_db(
+                "SELECT entryPrice, positionSide, positionAmt FROM positions WHERE symbol = ? AND positionAmt > 0",
+                [symbol[0]],
+            )
+                
+            pbr = round(calc_pbr(allpositions[0][2],allpositions[0][0], allpositions[0][1], float(balance[0])),2)
+            
+            coins["active"][symbol[0]] = [int(buyorders[0]), int(sellorders[0]), pbr]
             coins["totals"]["active"] += 1
+            coins["totals"]["buys"] += int(buyorders[0])
+            coins["totals"]["sells"] += int(sellorders[0])
+            coins["totals"]["pbr"] += pbr
+    coins["totals"]["pbr"] = format_dp(coins["totals"]["pbr"])
     return coins
 
 
@@ -62,18 +93,6 @@ def get_lastupdate():
     if lastupdate is None:
         return "-"
     return datetime.fromtimestamp(lastupdate[0] / 1000.0).strftime("%Y-%m-%d %H:%M:%S")
-
-
-def zero_value(x):
-    if x is None:
-        return 0
-    else:
-        return x
-
-
-def format_dp(value, dp=2):
-    return "{:.{}f}".format(value, dp)
-
 
 def timeranges():
     today = date.today()
