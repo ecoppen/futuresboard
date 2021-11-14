@@ -3,6 +3,8 @@ import sqlite3
 from flask import g
 from datetime import datetime, date, timedelta
 import requests
+import csv
+import os
 
 app = Flask(__name__)
 
@@ -499,6 +501,7 @@ def show_individual_coin_timeframe(coin, timeframe):
             temp[0].append(round(float(each[1]), 2))
             temp[1].append(each[0])
         by_date = temp
+        
     return render_template(
         "coin.html",
         coin_list=get_coins(),
@@ -513,11 +516,80 @@ def show_individual_coin_timeframe(coin, timeframe):
     )
 
 
-@app.route("/orders/")
-def list_all_orders():
-    # show the selected coin stats
-    return render_template("showall.html", coin_list=get_coins(), metric="orders", showall=[])
+@app.route("/history/")
+def show_history():
+    ranges = timeranges()
+    times = {"today": 0, "week": 1, "month": 2, "quarter": 4, "year": 5, "all": 6}
+    history = {"today": {"total":0}, "week": {"total":0}, "month": {"total":0}, "quarter": {"total":0}, "year": {"total":0}, "all": {"total":0}, "columns":[]}
+    
+    for timeframe in times: 
+        incomesummary = query_db(
+            'SELECT incomeType, COUNT(IID) FROM income WHERE time >= ? GROUP BY incomeType',
+            [ranges[times[timeframe]]],
+        )
+        for totals in incomesummary:
+            history[timeframe][totals[0]] = int(totals[1])
+            history[timeframe]["total"] += int(totals[1])
+            if totals[0] not in history["columns"]:
+                history["columns"].append(totals[0])
+    for timeframe in times:
+        for column in history["columns"]:
+            if column not in history[timeframe]:
+                history[timeframe][column] = 0
+                
+    history["columns"].sort()
 
+    return render_template("history.html", coin_list=get_coins(), timeframe="-", history=history, filename="-")
+
+@app.route("/history/<timeframe>")
+def show_all_history(timeframe):
+    if timeframe not in ["today", "week", "month", "quarter", "year", "all"]:
+        return render_template("error.html", coin_list=get_coins()), 404
+
+    ranges = timeranges()
+    times = {"today": 0, "week": 1, "month": 2, "quarter": 4, "year": 5, "all": 6}
+    
+    history = query_db(
+        'SELECT * FROM income WHERE time >= ? ORDER BY time desc',
+        [ranges[times[timeframe]]],
+    )
+
+    temp = []
+    for inc in history:
+        inc = list(inc)
+        inc[7] = datetime.fromtimestamp(inc[7] / 1000.0).strftime("%Y-%m-%d %H:%M:%S")
+        temp.append(inc)
+    history = temp  
+    
+    filename = datetime.now().strftime("%Y-%m-%dT%H%M%S") + "_income_"+timeframe + ".csv"
+    
+    with open(os.path.join(app.root_path, 'static', 'csv', filename), 'w', newline='') as csvfile:
+        spamwriter = csv.writer(csvfile, delimiter=',')
+        spamwriter.writerow(["sqliteID", "TransactionId", "Symbol", "IncomeType", "Income", "Asset", "Info", "Time", "TradeId"])
+        spamwriter.writerows(history)
+
+    history = {"today": {"total":0}, "week": {"total":0}, "month": {"total":0}, "quarter": {"total":0}, "year": {"total":0}, "all": {"total":0}, "columns":[]}
+    
+    for timeframe in times: 
+        incomesummary = query_db(
+            'SELECT incomeType, COUNT(IID) FROM income WHERE time >= ? GROUP BY incomeType',
+            [ranges[times[timeframe]]],
+        )
+        for totals in incomesummary:
+            history[timeframe][totals[0]] = int(totals[1])
+            history[timeframe]["total"] += int(totals[1])
+            if totals[0] not in history["columns"]:
+                history["columns"].append(totals[0])
+    for timeframe in times:
+        for column in history["columns"]:
+            if column not in history[timeframe]:
+                history[timeframe][column] = 0
+                
+    history["columns"].sort()
+    
+    filename = "csv/" + filename
+    
+    return render_template("history.html", coin_list=get_coins(), timeframe=timeframe, history=history,fname=filename)
 
 @app.errorhandler(404)
 def not_found(error):
