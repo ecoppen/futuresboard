@@ -587,7 +587,9 @@ def show_all_history(timeframe):
                 
     history["columns"].sort()
     
-    return render_template("history.html", coin_list=get_coins(), timeframe=timeframe, history=history,filename=filename)
+    filename = "csv/" + filename
+    
+    return render_template("history.html", coin_list=get_coins(), timeframe=timeframe, history=history,fname=filename)
 
 @app.errorhandler(404)
 def not_found(error):
