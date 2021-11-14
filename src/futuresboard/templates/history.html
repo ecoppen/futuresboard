@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col-md-12">
             {% if filename != "-" %}
-                <div class="alert alert-info" role="alert"><i class="fas fa-file-download"></i> Your file has been saved to <code>csv/{{ filename }}</code> which can be downloaded by clicking <a href= "{{ url_for('static',filename='csv/{{ filename }}') }}">here</a></div><br>
+                <div class="alert alert-info" role="alert"><i class="fas fa-file-download"></i> Your file has been saved to <code>{{ fname }}</code> which can be downloaded by clicking <a href= "{{ url_for('static',filename=fname) }}">here</a></div><br>
             {% endif %}
             <div class="card">
                 <table id="orders" class='table table-sm table-bordered text-center'>
