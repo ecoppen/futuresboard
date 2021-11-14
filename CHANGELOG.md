@@ -5,12 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 - Create a route for unrealized PnL that shows all positions in one place. Add hyperlinks from sidebar, dashboard and coin pages
-- Create a route for all incomes. Add datatables to page for filtering, sorting and exporting
 - Match all of the details from [passivbot](https://github.com/enarjord/passivbot)s telegram commands `/position` and `/open_orders` commands
 - Add DCA tracker / warnings when running out of buys
 - Store total BNB value from wallet and notify if it falls below a threshold
 - Store and display historical unrealized PnL
 - Tidy up repeated code into functions
+
+## 2021-11-13
+### Added
+- Income history page added, allows you to pull CSVs out of the income database table depending on the common timeframes used (today, week...)
 
 ## 2021-11-13
 ### Added
