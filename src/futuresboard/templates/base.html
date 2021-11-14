@@ -49,10 +49,17 @@
                       <table class="table table-sm">
                         {% for item in coin_list['active'] %}
                             <tr><td><a href="../../coins/{{ item }}" class="link-dark rounded">{{ item }}</a></td>
+                                <td class="text-center">{{ coin_list['active'][item][2] }}</td>
                                 <td class="table-success text-center">{{ coin_list['active'][item][0] }}</td>
                                 <td class="table-danger text-center">{{ coin_list['active'][item][1] }}</td>
                             </tr>
                         {% endfor %}
+                          <tr class="table-secondary">
+                              <td class="text-center">Total</td>
+                              <td class="text-center">{{ coin_list['totals']['pbr'] }}</td>
+                              <td class="text-center">{{ coin_list['totals']['buys'] }}</td>
+                              <td class="text-center">{{ coin_list['totals']['sells'] }}</td>
+                          </tr>
                       </table>
                   </ul>
                 </div>
