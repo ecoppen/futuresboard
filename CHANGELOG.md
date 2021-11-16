@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Store and display historical unrealized PnL
 - Tidy up repeated code into functions
 
+## 2021-11-16
+### Changed
+- Fixed issue highlighted by [@ltorres6](https://github.com/ltorres6) where coins wouldn't show as active unless there was an open buy/sell order and realised PNL
+
 ## 2021-11-14
 ### Added
 - Income history page added, allows you to pull CSVs out of the income database table depending on the common timeframes used (today, week...)
