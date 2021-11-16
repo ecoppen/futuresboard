@@ -84,7 +84,7 @@ def get_coins():
         if sellorders is not None:
             sell = int(sellorders[0])
             
-        coins["active"][position[0]] = [int(buy), int(sell), pbr]
+        coins["active"][position[0]] = [buy, sell, pbr]
         coins["totals"]["active"] += 1
         coins["totals"]["buys"] += buy
         coins["totals"]["sells"] += sell
