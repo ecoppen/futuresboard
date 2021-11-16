@@ -48,42 +48,53 @@ def calc_pbr(volume, price, side, balance):
     return 0.0
 
 def get_coins():
+    coins = {"active": {}, "inactive": [], "totals": {"active": 0, "inactive": 0, "buys":0, "sells":0, "pbr":0}}
+    
+    all_active_positions = query_db(
+        'SELECT symbol, entryPrice, positionSide, positionAmt FROM positions WHERE positionAmt > 0 ORDER BY symbol ASC'
+    )
+    
     all_symbols_with_pnl = query_db(
         'SELECT DISTINCT(symbol) FROM income WHERE incomeType ="REALIZED_PNL" AND symbol <> "" ORDER BY symbol ASC'
     )
-    coins = {"active": {}, "inactive": [], "totals": {"active": 0, "inactive": 0, "buys":0, "sells":0, "pbr":0}}
     
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     
-    for symbol in all_symbols_with_pnl:
+    active_symbols = []
+    
+    for position in all_active_positions:
+        active_symbols.append(position[0])
+        
+        pbr = round(calc_pbr(position[3], position[1], position[2], float(balance[0])),2)
+        
+        buy, sell = 0, 0
+        
         buyorders = query_db(
-            'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "BUY"', [symbol[0]], one=True
+            'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "BUY"', [position[0]], one=True
         )
+        
         sellorders = query_db(
             'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "SELL"',
-            [symbol[0]],
+            [position[0]],
             one=True,
         )
         
-        if buyorders is None or sellorders is None:
-            coins["inactive"].append(symbol[0])
-            coins["totals"]["inactive"] += 1
-        elif int(buyorders[0]) + int(sellorders[0]) == 0:
-            coins["inactive"].append(symbol[0])
-            coins["totals"]["inactive"] += 1
-        else:
-            allpositions = query_db(
-                "SELECT entryPrice, positionSide, positionAmt FROM positions WHERE symbol = ? AND positionAmt > 0",
-                [symbol[0]],
-            )
-                
-            pbr = round(calc_pbr(allpositions[0][2],allpositions[0][0], allpositions[0][1], float(balance[0])),2)
+        if buyorders is not None:
+            buy = int(buyorders[0])
+        if sellorders is not None:
+            sell = int(sellorders[0])
             
-            coins["active"][symbol[0]] = [int(buyorders[0]), int(sellorders[0]), pbr]
-            coins["totals"]["active"] += 1
-            coins["totals"]["buys"] += int(buyorders[0])
-            coins["totals"]["sells"] += int(sellorders[0])
-            coins["totals"]["pbr"] += pbr
+        coins["active"][position[0]] = [buy, sell, pbr]
+        coins["totals"]["active"] += 1
+        coins["totals"]["buys"] += buy
+        coins["totals"]["sells"] += sell
+        coins["totals"]["pbr"] += pbr
+    
+    for symbol in all_symbols_with_pnl:
+        if symbol[0] not in active_symbols:
+            coins["inactive"].append(symbol[0])
+            coins["totals"]["inactive"] += 1
+
     coins["totals"]["pbr"] = format_dp(coins["totals"]["pbr"])
     return coins
 
