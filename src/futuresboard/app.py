@@ -49,7 +49,7 @@ def calc_pbr(volume, price, side, balance):
 
 def get_coins():
     all_symbols_with_pnl = query_db(
-        'SELECT DISTINCT(symbol) FROM income WHERE incomeType ="REALIZED_PNL" AND symbol <> "" ORDER BY symbol ASC'
+        'SELECT DISTINCT(symbol) FROM positions WHERE entryPrice > 0.0 ORDER BY symbol ASC'
     )
     coins = {"active": {}, "inactive": [], "totals": {"active": 0, "inactive": 0, "buys":0, "sells":0, "pbr":0}}
     
