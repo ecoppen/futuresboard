@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Tidy up repeated code into functions
 
 ## 2021-11-18
-###Added
+### Added
 - Tooltips added on left menu for PBR, BUY, SELL by [@s0undt3ch](https://github.com/s0undt3ch)
 
 ### Changed
