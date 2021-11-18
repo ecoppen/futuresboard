@@ -291,15 +291,6 @@ def dashboard(timeframe):
         lastupdate=get_lastupdate(),
     )
 
-
-@app.route("/coins/")
-def list_all_coins():
-    # show the selected coin stats
-    return render_template(
-        "showall.html", coin_list=get_coins(), metric="coins", showall=get_coins()
-    )
-
-
 @app.route("/coins/<coin>")
 def show_individual_coin(coin):
     # show the selected coin stats
