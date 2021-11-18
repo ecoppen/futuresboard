@@ -12,9 +12,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Tidy up repeated code into functions
 
 ## 2021-11-18
+###Added
+- Tooltips added on left menu for PBR, BUY, SELL by [@s0undt3ch](https://github.com/s0undt3ch)
+
 ### Changed
 - Fixed issue highlighted by [@hungud](https://github.com/hungud) with no longer used route for `/coins/`
 - Fixed issue with calculation for profit not including `FUNDING_FEES` so now if a coin is stuck and funding fees, it will show negative impact
+- Changed the tooltips to use the bootstrap theme
 
 ## 2021-11-16
 ### Changed
