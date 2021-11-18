@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Store and display historical unrealized PnL
 - Tidy up repeated code into functions
 
+## 2021-11-18
+### Changed
+- Fixed issue highlighted by [@hungud](https://github.com/hungud) with no longer used route for `/coins/`
+- Fixed issue with calculation for profit not including `FUNDING_FEES` so now if a coin is stuck and funding fees, it will show negative impact
+
 ## 2021-11-16
 ### Changed
 - Fixed issue highlighted by [@ltorres6](https://github.com/ltorres6) where coins wouldn't show as active unless there was an open buy/sell order and realised PNL
