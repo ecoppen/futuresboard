@@ -49,16 +49,16 @@
                       <table class="table table-sm">
                         {% for item in coin_list['active'] %}
                             <tr><td><a href="../../coins/{{ item }}" class="link-dark rounded">{{ item }}</a></td>
-                                <td class="text-center" title="PBR">{{ coin_list['active'][item][2] }}</td>
-                                <td class="table-success text-center" title="Buy Orders">{{ coin_list['active'][item][0] }}</td>
-                                <td class="table-danger text-center" title="Sell Orders">{{ coin_list['active'][item][1] }}</td>
+                                <td class="text-center" data-toggle="tooltip" title="PBR">{{ coin_list['active'][item][2] }}</td>
+                                <td class="table-success text-center" data-toggle="tooltip" title="Buy Orders">{{ coin_list['active'][item][0] }}</td>
+                                <td class="table-danger text-center" data-toggle="tooltip" title="Sell Orders">{{ coin_list['active'][item][1] }}</td>
                             </tr>
                         {% endfor %}
                           <tr class="table-secondary">
                               <td class="text-center">Total</td>
-                              <td class="text-center" title="Total PBR">{{ coin_list['totals']['pbr'] }}</td>
-                              <td class="text-center" title="Total Buy Orders">{{ coin_list['totals']['buys'] }}</td>
-                              <td class="text-center" title="Total Sell Orders">{{ coin_list['totals']['sells'] }}</td>
+                              <td class="text-center" data-toggle="tooltip" title="Total PBR">{{ coin_list['totals']['pbr'] }}</td>
+                              <td class="text-center" data-toggle="tooltip" title="Total Buy Orders">{{ coin_list['totals']['buys'] }}</td>
+                              <td class="text-center" data-toggle="tooltip" title="Total Sell Orders">{{ coin_list['totals']['sells'] }}</td>
                           </tr>
                       </table>
                   </ul>
@@ -104,5 +104,10 @@
     {% endblock %}
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<script>
+$(document).ready(function() {
+    $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+});
+</script>
 </body>
 </html>
