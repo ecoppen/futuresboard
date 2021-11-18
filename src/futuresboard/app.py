@@ -48,53 +48,42 @@ def calc_pbr(volume, price, side, balance):
     return 0.0
 
 def get_coins():
-    coins = {"active": {}, "inactive": [], "totals": {"active": 0, "inactive": 0, "buys":0, "sells":0, "pbr":0}}
-    
-    all_active_positions = query_db(
-        'SELECT symbol, entryPrice, positionSide, positionAmt FROM positions WHERE positionAmt > 0 ORDER BY symbol ASC'
-    )
-    
     all_symbols_with_pnl = query_db(
-        'SELECT DISTINCT(symbol) FROM income WHERE incomeType ="REALIZED_PNL" AND symbol <> "" ORDER BY symbol ASC'
+        'SELECT DISTINCT(symbol) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND symbol <> "" ORDER BY symbol ASC'
     )
+    coins = {"active": {}, "inactive": [], "totals": {"active": 0, "inactive": 0, "buys":0, "sells":0, "pbr":0}}
     
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     
-    active_symbols = []
-    
-    for position in all_active_positions:
-        active_symbols.append(position[0])
-        
-        pbr = round(calc_pbr(position[3], position[1], position[2], float(balance[0])),2)
-        
-        buy, sell = 0, 0
-        
+    for symbol in all_symbols_with_pnl:
         buyorders = query_db(
-            'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "BUY"', [position[0]], one=True
+            'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "BUY"', [symbol[0]], one=True
         )
-        
         sellorders = query_db(
             'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "SELL"',
-            [position[0]],
+            [symbol[0]],
             one=True,
         )
         
-        if buyorders is not None:
-            buy = int(buyorders[0])
-        if sellorders is not None:
-            sell = int(sellorders[0])
-            
-        coins["active"][position[0]] = [buy, sell, pbr]
-        coins["totals"]["active"] += 1
-        coins["totals"]["buys"] += buy
-        coins["totals"]["sells"] += sell
-        coins["totals"]["pbr"] += pbr
-    
-    for symbol in all_symbols_with_pnl:
-        if symbol[0] not in active_symbols:
+        if buyorders is None or sellorders is None:
             coins["inactive"].append(symbol[0])
             coins["totals"]["inactive"] += 1
-
+        elif int(buyorders[0]) + int(sellorders[0]) == 0:
+            coins["inactive"].append(symbol[0])
+            coins["totals"]["inactive"] += 1
+        else:
+            allpositions = query_db(
+                "SELECT entryPrice, positionSide, positionAmt FROM positions WHERE symbol = ? AND positionAmt > 0",
+                [symbol[0]],
+            )
+                
+            pbr = round(calc_pbr(allpositions[0][2],allpositions[0][0], allpositions[0][1], float(balance[0])),2)
+            
+            coins["active"][symbol[0]] = [int(buyorders[0]), int(sellorders[0]), pbr]
+            coins["totals"]["active"] += 1
+            coins["totals"]["buys"] += int(buyorders[0])
+            coins["totals"]["sells"] += int(sellorders[0])
+            coins["totals"]["pbr"] += pbr
     coins["totals"]["pbr"] = format_dp(coins["totals"]["pbr"])
     return coins
 
@@ -128,19 +117,19 @@ def timeranges():
 def index_page():
     ranges = timeranges()
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
-    total = query_db('SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL"', one=True)
+    total = query_db('SELECT SUM(income) FROM income WHERE incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE"', one=True)
     today = query_db(
-        'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ?',
+        'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ?',
         [ranges[0]],
         one=True,
     )
     week = query_db(
-        'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ?',
+        'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ?',
         [ranges[1]],
         one=True,
     )
     month = query_db(
-        'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ?',
+        'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ?',
         [ranges[2]],
         one=True,
     )
@@ -152,12 +141,12 @@ def index_page():
     )
 
     by_date = query_db(
-        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? GROUP BY Date',
+        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? GROUP BY Date',
         [ranges[1]],
     )
 
     by_symbol = query_db(
-        'SELECT SUM(income) AS inc, symbol FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? GROUP BY symbol ORDER BY inc DESC',
+        'SELECT SUM(income) AS inc, symbol FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? GROUP BY symbol ORDER BY inc DESC',
         [ranges[1]],
     )
 
@@ -215,19 +204,19 @@ def dashboard(timeframe):
     ranges = timeranges()
     times = {"today": 0, "week": 1, "month": 2, "quarter": 4, "year": 5, "all": 6}
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
-    total = query_db('SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL"', one=True)
+    total = query_db('SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE")', one=True)
     today = query_db(
-        'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ?',
+        'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ?',
         [ranges[0]],
         one=True,
     )
     week = query_db(
-        'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ?',
+        'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ?',
         [ranges[1]],
         one=True,
     )
     month = query_db(
-        'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ?',
+        'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ?',
         [ranges[2]],
         one=True,
     )
@@ -239,12 +228,12 @@ def dashboard(timeframe):
     )
 
     by_date = query_db(
-        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? GROUP BY Date',
+        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? GROUP BY Date',
         [ranges[times[timeframe]]],
     )
 
     by_symbol = query_db(
-        'SELECT SUM(income) AS inc, symbol FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? GROUP BY symbol ORDER BY inc DESC',
+        'SELECT SUM(income) AS inc, symbol FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? GROUP BY symbol ORDER BY inc DESC',
         [ranges[times[timeframe]]],
     )
 
@@ -291,6 +280,7 @@ def dashboard(timeframe):
         lastupdate=get_lastupdate(),
     )
 
+
 @app.route("/coins/<coin>")
 def show_individual_coin(coin):
     # show the selected coin stats
@@ -315,22 +305,22 @@ def show_individual_coin(coin):
         totals = ["-", "-", "-", "-", "-", {"USDT": 0, "BNB": 0}, ["-", "-", "-", "-"]]
     else:
         total = query_db(
-            'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND symbol = ?',
             [coin],
             one=True,
         )
         today = query_db(
-            'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ?',
             [ranges[0], coin],
             one=True,
         )
         week = query_db(
-            'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ?',
             [ranges[1], coin],
             one=True,
         )
         month = query_db(
-            'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ?',
             [ranges[2], coin],
             one=True,
         )
@@ -388,7 +378,7 @@ def show_individual_coin(coin):
             pnl,
         ]
         by_date = query_db(
-            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? AND symbol = ? GROUP BY Date',
+            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ? GROUP BY Date',
             [ranges[1], coin],
         )
         temp = [[], []]
@@ -441,22 +431,22 @@ def show_individual_coin_timeframe(coin, timeframe):
         totals = ["-", "-", "-", "-", "-", {"USDT": 0, "BNB": 0}, ["-", "-", "-", "-"]]
     else:
         total = query_db(
-            'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND symbol = ?',
             [coin],
             one=True,
         )
         today = query_db(
-            'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ?',
             [ranges[0], coin],
             one=True,
         )
         week = query_db(
-            'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ?',
             [ranges[1], coin],
             one=True,
         )
         month = query_db(
-            'SELECT SUM(income) FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ?',
             [ranges[2], coin],
             one=True,
         )
@@ -514,7 +504,7 @@ def show_individual_coin_timeframe(coin, timeframe):
         ]
 
         by_date = query_db(
-            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE incomeType ="REALIZED_PNL" AND time >= ? AND symbol = ? GROUP BY Date',
+            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ? GROUP BY Date',
             [ranges[times[timeframe]], coin],
         )
         temp = [[], []]
