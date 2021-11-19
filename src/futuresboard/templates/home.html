@@ -147,18 +147,31 @@ var myChart = new Chart(
     
 const data2 = {
   labels: {{ data[0][1] | safe }},
-  datasets: [{
-    label: 'Profit',
-    data: {{ data[0][0] }},
-    fill: false,
-    borderColor: 'rgb(75, 192, 192)',
-    tension: 0.1
-  }]
+  datasets: [
+	  {
+		label: 'Profit',
+		data: {{ data[0][0] }},
+		fill: false,
+		borderColor: 'rgb(75, 192, 192)',
+		tension: 0.1,
+		yAxisID: 'y',
+	  },
+	  {
+		label: 'Balance',
+		data: {{ data[2][0] }},
+		fill: true,
+		borderColor: 'rgb(240, 234, 151)',
+		backgroundColor: 'rgba(240, 234, 151, 0.3)',
+		tension: 0.1,
+		yAxisID: 'y1',
+	  },	  
+  ]
 };
 const config2 = {
   type: 'line',
   data: data2,
   options: {
+		responsive: true,
         layout: {
             padding: {
                 top: 20
@@ -173,8 +186,26 @@ const config2 = {
             legend: {
                 display: false
             },
-        }
-  }
+        },
+		scales: {
+			y: {
+				type: 'linear',
+				display: true,
+				position: 'left',
+			},
+			y1: {
+				type: 'linear',
+				display: true,
+				position: 'right',
+				grid: {
+				  drawOnChartArea: false, // only want the grid lines for one axis to show up
+				},
+				ticks: {
+					display: false,
+				  }
+			}
+		}
+	}
 };
     
 var myChart = new Chart(
