@@ -152,11 +152,20 @@ def index_page():
 
     fees = {"USDT": 0, "BNB": 0}
 
+    balance = float(balance[0])
+    
+    temptotal = [[],[]]
+    profit_period = balance - zero_value(week[0])
+
     temp = [[], []]
     for each in by_date:
         temp[0].append(round(float(each[1]), 2))
         temp[1].append(each[0])
+        temptotal[1].append(each[0])
+        temptotal[0].append(round(profit_period + float(each[1]),2))
+        profit_period += float(each[1])
     by_date = temp
+    total_by_date = temptotal
 
     temp = [[], []]
     for each in by_symbol:
@@ -164,7 +173,6 @@ def index_page():
         temp[1].append(round(float(each[0]), 2))
     by_symbol = temp
 
-    balance = float(balance[0])
     percentages = [
         format_dp(zero_value(today[0]) / balance * 100),
         format_dp(zero_value(week[0]) / balance * 100),
