@@ -20,59 +20,69 @@
     </div>
     <div class="row">
         <div class="col-sm-2">
-            <div class="card text-center">
-              <div class="card-body">
-                <h5 class="card-title">{{ totals[6][0] }}%</h5>
-                <p class="card-text">${{ totals[1] }}</p>
-              </div>
-              <div class="card-footer text-muted">
-                Profit today
-              </div>
-            </div>
+            <a href="../../dashboard/today">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ totals[6][0] }}%</h5>
+                    <p class="card-text">${{ totals[1] }}</p>
+                  </div>
+                  <div class="card-footer text-muted">
+                    Profit today
+                  </div>
+                </div>
+            </a>
         </div>
         <div class="col-sm-2">
-            <div class="card text-center">
-              <div class="card-body">
-                <h5 class="card-title">{{ totals[6][1] }}%</h5>
-                <p class="card-text">${{ totals[2] }}</p>
-              </div>
-              <div class="card-footer text-muted">
-                Profit past 7 days
-              </div>
-            </div>
+            <a href="../../dashboard/week">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ totals[6][1] }}%</h5>
+                    <p class="card-text">${{ totals[2] }}</p>
+                  </div>
+                  <div class="card-footer text-muted">
+                    Profit past 7 days
+                  </div>
+                </div>
+            </a>
         </div>
         <div class="col-sm-2">
-            <div class="card text-center">
-              <div class="card-body">
-                <h5 class="card-title">{{ totals[6][2] }}%</h5>
-                <p class="card-text">${{ totals[3] }}</p>
-              </div>
-              <div class="card-footer text-muted">
-                Profit {{ totals[4] }}
-              </div>
-            </div>
+            <a href="../../dashboard/month">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ totals[6][2] }}%</h5>
+                    <p class="card-text">${{ totals[3] }}</p>
+                  </div>
+                  <div class="card-footer text-muted">
+                    Profit {{ totals[4] }}
+                  </div>
+                </div>
+            </a>
         </div>
         <div class="col-sm-2">
-            <div class="card text-center">
-              <div class="card-body">
-                <h5 class="card-title">{{ totals[6][3] }}%</h5>
-                <p class="card-text">${{ totals[0] }}</p>
-              </div>
-              <div class="card-footer text-muted">
-                Total profit
-              </div>
-            </div>
+            <a href="../../dashboard/all">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ totals[6][3] }}%</h5>
+                    <p class="card-text">${{ totals[0] }}</p>
+                  </div>
+                  <div class="card-footer text-muted">
+                    Total profit
+                  </div>
+                </div>
+            </a>
         </div>
         <div class="col-sm-2">
-            <div class="card text-center">
-              <div class="card-body">
-                <h5 class="card-title">${{ totals[7][0] }}</h5>
-                <p class="card-text">${{ totals[7][1] }}</p>
-              </div>
-              <div class="card-footer text-muted">
-                Unrealised PnL
-              </div>
-            </div>
+            <a href="../../positions">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h5 class="card-title">${{ totals[7][0] }}</h5>
+                    <p class="card-text">${{ totals[7][1] }}</p>
+                  </div>
+                  <div class="card-footer text-muted">
+                    Unrealised PnL
+                  </div>
+                </div>
+            </a>
         </div>
         <div class="col-sm-2">
             <div class="card text-center">
