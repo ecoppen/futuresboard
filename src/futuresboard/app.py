@@ -299,6 +299,43 @@ def dashboard(timeframe):
         lastupdate=get_lastupdate(),
     )
 
+@app.route("/positions")
+def positions_page():
+    coins = get_coins()
+    positions = {}
+    for coin in coins['active']:
+        
+        allpositions = query_db(
+            "SELECT * FROM positions WHERE symbol = ?",
+            [coin],
+        )
+        allorders = query_db(
+            "SELECT * FROM orders WHERE symbol = ? ORDER BY side, price, origQty",
+            [coin],
+        )
+
+        temp = []
+        for position in allpositions:
+            position = list(position)
+            position[4] = round(float(position[4]), 5)
+            temp.append(position)
+        allpositions = temp
+
+        temp = []
+        for order in allorders:
+            order = list(order)
+            order[7] = datetime.fromtimestamp(order[7] / 1000.0).strftime("%Y-%m-%d %H:%M:%S")
+            temp.append(order)
+        allorders = temp
+        
+        positions[coin] = [allpositions, allorders]
+
+    return render_template(
+        "positions.html",
+        coin_list=get_coins(),
+        positions = positions
+    )
+    
 
 @app.route("/coins/<coin>")
 def show_individual_coin(coin):
