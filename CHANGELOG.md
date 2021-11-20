@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## 2021-11-20
 ### Added
 - Table on history page to show all of the previously saved CSV files
+- favicon2 (warning emoji) will replace favicon (rocket emoji) when no buys are left on an active coin
+
+### Changed
+- Active coins now have a red background if there are no buys left on an active coin
 
 ## 2021-11-19
 ### Added
