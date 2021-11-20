@@ -4,7 +4,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
-- Create a route for unrealized PnL that shows all positions in one place. Add hyperlinks from sidebar, dashboard and coin pages
 - Match all of the details from [passivbot](https://github.com/enarjord/passivbot)s telegram commands `/position` and `/open_orders` commands
 - Add DCA tracker / warnings when running out of buys
 - Store total BNB value from wallet and notify if it falls below a threshold
@@ -15,9 +14,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Added
 - Table on history page to show all of the previously saved CSV files
 - favicon2 (warning emoji) will replace favicon (rocket emoji) when no buys are left on an active coin
+- New route added for `All positions` that shows every coin in one place. Accordian can be opened to see the orders relating to each position.
 
 ### Changed
 - Active coins now have a red background if there are no buys left on an active coin
+- Cards on the front page (profit for today, week, month and PnL) are now hyperlinked to their respective pages
 
 ## 2021-11-19
 ### Added
