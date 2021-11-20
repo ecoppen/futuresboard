@@ -40,6 +40,33 @@
             </div>
         </div>
     </div>
+    <br><hr><br>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <table id="oldfiles" class='table table-sm table-bordered text-center'>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Download</th>
+                            <th>Filename</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for file in files %}
+                            <tr>
+                                <td><a class="btn btn-outline-primary btn-sm" href="../../history/{{ file }}" role="button">Download</a></td>
+                                <td>{{ file }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+        
+
 
 <script>
 $(document).ready( function () {
@@ -48,6 +75,12 @@ $(document).ready( function () {
 		"searching": false,
 		"order": [],
 		"info": false,
+	});
+    $('#oldfiles').DataTable({
+        "paging": true,
+		"searching": true,
+		"order": [[ 1, 'desc' ]],
+		"info": true,
 	});
 } );
 </script>

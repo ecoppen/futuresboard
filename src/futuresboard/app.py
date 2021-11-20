@@ -565,8 +565,13 @@ def show_history():
                 history[timeframe][column] = 0
                 
     history["columns"].sort()
+    
+    previous_files = []
+    for file in os.listdir(os.path.join(app.root_path, 'static', 'csv')):
+        if file.endswith(".csv"):
+            previous_files.append(file)
 
-    return render_template("history.html", coin_list=get_coins(), timeframe="-", history=history, filename="-")
+    return render_template("history.html", coin_list=get_coins(), timeframe="-", history=history, filename="-", files=previous_files)
 
 @app.route("/history/<timeframe>")
 def show_all_history(timeframe):
@@ -616,7 +621,12 @@ def show_all_history(timeframe):
     
     filename = "csv/" + filename
     
-    return render_template("history.html", coin_list=get_coins(), timeframe=timeframe, history=history,fname=filename)
+    previous_files = []
+    for file in os.listdir(os.path.join(app.root_path, 'static', 'csv')):
+        if file.endswith(".csv"):
+            previous_files.append(file)
+    
+    return render_template("history.html", coin_list=get_coins(), timeframe=timeframe, history=history, fname=filename, files=previous_files)
 
 @app.errorhandler(404)
 def not_found(error):
