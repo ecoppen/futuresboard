@@ -51,7 +51,7 @@ def get_coins():
     all_symbols_with_pnl = query_db(
         'SELECT DISTINCT(symbol) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND symbol <> "" ORDER BY symbol ASC'
     )
-    coins = {"active": {}, "inactive": [], "totals": {"active": 0, "inactive": 0, "buys":0, "sells":0, "pbr":0}}
+    coins = {"active": {}, "inactive": [], "totals": {"active": 0, "inactive": 0, "buys":0, "sells":0, "pbr":0}, "warning":False}
     
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     
@@ -78,6 +78,9 @@ def get_coins():
             )
                 
             pbr = round(calc_pbr(allpositions[0][2],allpositions[0][0], allpositions[0][1], float(balance[0])),2)
+            
+            if int(buyorders[0]) == 0:
+                coins["warning"] = True
             
             coins["active"][symbol[0]] = [int(buyorders[0]), int(sellorders[0]), pbr]
             coins["totals"]["active"] += 1
