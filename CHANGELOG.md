@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Store and display historical unrealized PnL
 - Tidy up repeated code into functions
 
+## 2021-11-20
+### Added
+- Table on history page to show all of the previously saved CSV files
+
 ## 2021-11-19
 ### Added
 - Balance now displays on profit chart as requested by [@s0undt3ch](https://github.com/s0undt3ch)
