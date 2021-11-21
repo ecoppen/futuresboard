@@ -139,7 +139,14 @@ const config = {
           legend: {
               display: false
         },
-    }
+      },
+	  scales: {
+		y: {
+			ticks: {
+				autoSkip: false,
+			}
+		}
+	  }
   }
 };
     
@@ -207,6 +214,9 @@ const config2 = {
 				type: 'linear',
 				display: true,
 				position: 'left',
+				ticks: {
+					autoSkip: false,
+				}
 			},
 			y1: {
 				type: 'linear',
