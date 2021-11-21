@@ -10,10 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Store and display historical unrealized PnL
 - Tidy up repeated code into functions
 
-## 2021-11-20
-
+## 2021-11-21
 ### Changed
 - Fixed issue that was reintroduced (new positions wouldn't show unless a buy/sell was present)
+- Fixed issue where `positions` were not returned by API causing error which is now handled more gracefully
+- Fixed issue where some coins were automatically hidden on the graph when too many were present - now resizes to fit
 
 ## 2021-11-20
 ### Added
