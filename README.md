@@ -1,5 +1,5 @@
 # futuresboard
-A python based scraper and dashboard to monitor the performance of your Binance Futures account.<br>
+A python (3.7+) based scraper and dashboard to monitor the performance of your Binance Futures account.<br>
 <sub>Note: A local sqlite3 database `config/futures.db` will be created and automatically updated by the scraper every 5 minutes.</sub>
 
 [Change log](https://github.com/ecoppen/futuresboard/blob/main/CHANGELOG.md)
@@ -17,7 +17,7 @@ A python based scraper and dashboard to monitor the performance of your Binance 
   In this case, don't forget to pass `--disable-auto-scraper`.
 - Start a screen or alternative if you want the webserver to persist: `screen -S futuresboard`
 - Start the futuresboard web application `futuresboard`
-- Navigate to the IP address shown e.g. `http://127.0.0.1:5000/`
+- Navigate to the IP address shown e.g. `http://127.0.0.1:5000/`. These settings can be changed by passing `--host` and/or `--port` when running the above command
 
 Currently only Binance and Futures are supported.
 
