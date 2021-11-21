@@ -237,44 +237,50 @@ def scrape(auto_scrape=False):
                 )
                 create_orders(conn, row)
             conn.commit()
-
+    
     responseHeader, responseJSON = send_signed_request("GET", "/fapi/v2/account")
     weightused = int(responseHeader["X-MBX-USED-WEIGHT-1M"])
-    positions = responseJSON["positions"]
 
-    with create_connection(app.config["DATABASE"]) as conn:
-        row = (
-            float(responseJSON["totalWalletBalance"]),
-            float(responseJSON["totalUnrealizedProfit"]),
-            float(responseJSON["totalMarginBalance"]),
-            float(responseJSON["availableBalance"]),
-            float(responseJSON["maxWithdrawAmount"]),
-            1,
-        )
-        accountCheck = select_account(conn)
-        if accountCheck is None:
-            create_account(conn, row)
-        elif float(accountCheck[0]) != float(responseJSON["totalWalletBalance"]):
-            update_account(conn, row)
-
-        for position in positions:
+    overweight = False
+    try:
+        positions = responseJSON["positions"]
+    except:
+        overweight = True
+    
+    if not overweight:
+        with create_connection(app.config["DATABASE"]) as conn:
             row = (
-                float(position["unrealizedProfit"]),
-                int(position["leverage"]),
-                float(position["entryPrice"]),
-                float(position["positionAmt"]),
-                position["symbol"],
-                position["positionSide"],
+                float(responseJSON["totalWalletBalance"]),
+                float(responseJSON["totalUnrealizedProfit"]),
+                float(responseJSON["totalMarginBalance"]),
+                float(responseJSON["availableBalance"]),
+                float(responseJSON["maxWithdrawAmount"]),
+                1,
             )
-            unrealizedProfit = select_position(conn, position["symbol"])
-            if unrealizedProfit is None:
-                create_position(conn, row)
-                new_positions += 1
-            elif float(unrealizedProfit[0]) != float(position["unrealizedProfit"]):
-                update_position(conn, row)
-                updated_positions += 1
+            accountCheck = select_account(conn)
+            if accountCheck is None:
+                create_account(conn, row)
+            elif float(accountCheck[0]) != float(responseJSON["totalWalletBalance"]):
+                update_account(conn, row)
 
-        conn.commit()
+            for position in positions:
+                row = (
+                    float(position["unrealizedProfit"]),
+                    int(position["leverage"]),
+                    float(position["entryPrice"]),
+                    float(position["positionAmt"]),
+                    position["symbol"],
+                    position["positionSide"],
+                )
+                unrealizedProfit = select_position(conn, position["symbol"])
+                if unrealizedProfit is None:
+                    create_position(conn, row)
+                    new_positions += 1
+                elif float(unrealizedProfit[0]) != float(position["unrealizedProfit"]):
+                    update_position(conn, row)
+                    updated_positions += 1
+
+            conn.commit()
 
     while not up_to_date:
         if weightused > 800:
@@ -285,7 +291,7 @@ def scrape(auto_scrape=False):
             )
             sleeps += 1
             time.sleep(60)
-
+            
         with create_connection(app.config["DATABASE"]) as conn:
             startTime = select_latest_income(conn)
             if startTime == None:
