@@ -55,7 +55,7 @@ def get_coins():
     )
 
     all_symbols_with_pnl = query_db(
-        'SELECT DISTINCT(symbol) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND symbol <> "" ORDER BY symbol ASC'
+        'SELECT DISTINCT(symbol) FROM income WHERE asset <> "BNB" AND symbol <> "" AND incomeType <> "TRANSFER" ORDER BY symbol ASC'
     )
     
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
@@ -130,19 +130,19 @@ def timeranges():
 def index_page():
     ranges = timeranges()
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
-    total = query_db('SELECT SUM(income) FROM income WHERE incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE"', one=True)
+    total = query_db('SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER"', one=True)
     today = query_db(
-        'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
         [ranges[0]],
         one=True,
     )
     week = query_db(
-        'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
         [ranges[1]],
         one=True,
     )
     month = query_db(
-        'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
         [ranges[2]],
         one=True,
     )
@@ -154,12 +154,12 @@ def index_page():
     )
 
     by_date = query_db(
-        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? GROUP BY Date',
+        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? GROUP BY Date',
         [ranges[1]],
     )
 
     by_symbol = query_db(
-        'SELECT SUM(income) AS inc, symbol FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? GROUP BY symbol ORDER BY inc DESC',
+        'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? GROUP BY symbol ORDER BY inc DESC',
         [ranges[1]],
     )
 
@@ -225,19 +225,19 @@ def dashboard(timeframe):
     ranges = timeranges()
     times = {"today": 0, "week": 1, "month": 2, "quarter": 4, "year": 5, "all": 6}
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
-    total = query_db('SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE")', one=True)
+    total = query_db('SELECT SUM(income) FROM income WHERE asset <> "BNB"', one=True)
     today = query_db(
-        'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
         [ranges[0]],
         one=True,
     )
     week = query_db(
-        'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
         [ranges[1]],
         one=True,
     )
     month = query_db(
-        'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
         [ranges[2]],
         one=True,
     )
@@ -249,12 +249,12 @@ def dashboard(timeframe):
     )
 
     by_date = query_db(
-        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? GROUP BY Date',
+        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? GROUP BY Date',
         [ranges[times[timeframe]]],
     )
 
     by_symbol = query_db(
-        'SELECT SUM(income) AS inc, symbol FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? GROUP BY symbol ORDER BY inc DESC',
+        'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? GROUP BY symbol ORDER BY inc DESC',
         [ranges[times[timeframe]]],
     )
 
@@ -371,22 +371,22 @@ def show_individual_coin(coin):
         totals = ["-", "-", "-", "-", "-", {"USDT": 0, "BNB": 0}, ["-", "-", "-", "-"]]
     else:
         total = query_db(
-            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND symbol = ?',
             [coin],
             one=True,
         )
         today = query_db(
-            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ?',
             [ranges[0], coin],
             one=True,
         )
         week = query_db(
-            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ?',
             [ranges[1], coin],
             one=True,
         )
         month = query_db(
-            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ?',
             [ranges[2], coin],
             one=True,
         )
@@ -444,7 +444,7 @@ def show_individual_coin(coin):
             pnl,
         ]
         by_date = query_db(
-            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ? GROUP BY Date',
+            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ? GROUP BY Date',
             [ranges[1], coin],
         )
         temp = [[], []]
@@ -497,22 +497,22 @@ def show_individual_coin_timeframe(coin, timeframe):
         totals = ["-", "-", "-", "-", "-", {"USDT": 0, "BNB": 0}, ["-", "-", "-", "-"]]
     else:
         total = query_db(
-            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND symbol = ?',
             [coin],
             one=True,
         )
         today = query_db(
-            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ?',
             [ranges[0], coin],
             one=True,
         )
         week = query_db(
-            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ?',
             [ranges[1], coin],
             one=True,
         )
         month = query_db(
-            'SELECT SUM(income) FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ?',
             [ranges[2], coin],
             one=True,
         )
@@ -570,7 +570,7 @@ def show_individual_coin_timeframe(coin, timeframe):
         ]
 
         by_date = query_db(
-            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE (incomeType = "REALIZED_PNL" OR incomeType = "FUNDING_FEE") AND time >= ? AND symbol = ? GROUP BY Date',
+            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ? GROUP BY Date',
             [ranges[times[timeframe]], coin],
         )
         temp = [[], []]
