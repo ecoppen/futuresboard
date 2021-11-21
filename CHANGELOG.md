@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Tidy up repeated code into functions
 
 ## 2021-11-20
+
+### Changed
+- Fixed issue that was reintroduced (new positions wouldn't show unless a buy/sell was present)
+
+## 2021-11-20
 ### Added
 - Table on history page to show all of the previously saved CSV files
 - favicon2 (warning emoji) will replace favicon (rocket emoji) when no buys are left on an active coin
