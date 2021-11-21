@@ -224,6 +224,7 @@ def dashboard(timeframe):
 
     ranges = timeranges()
     times = {"today": 0, "week": 1, "month": 2, "quarter": 4, "year": 5, "all": 6}
+    balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     total = query_db('SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER"', one=True)
     today = query_db(
         'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
