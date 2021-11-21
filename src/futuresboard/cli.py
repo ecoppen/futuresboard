@@ -41,6 +41,18 @@ def main():
         action="store_true",
         help="Disable the routines which scrape while the webservice is running"
     )
+    server_settings = parser.add_argument_group("Server Settings")
+    server_settings.add_argument(
+        "--host",
+        default="0.0.0.0",
+        help="Server host. Default: %default"
+    )
+    server_settings.add_argument(
+        "--port",
+        type=int,
+        default=5000,
+        help="Server port. Default: %default"
+    )
     args = parser.parse_args()
 
     app.logger.setLevel(logging.INFO)
@@ -77,4 +89,4 @@ def main():
         thread.start()
 
     # Run the application
-    app.run()
+    app.run(host=args.host, port=args.port)
