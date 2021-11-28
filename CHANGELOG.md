@@ -11,6 +11,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Tidy up repeated code into functions
 
 ## 2021-11-21
+### Added
+- Route added for balance projection over 365 days at fixed and average %, this can be accessed from the main dashboard page above the line chart
+
+### Changed
+- Changed 'Week' to be previous 7 days rather than 8
+
+## 2021-11-21
 ### Changed
 - Fixed issue that was reintroduced (new positions wouldn't show unless a buy/sell was present)
 - Fixed issue where `positions` were not returned by API causing error which is now handled more gracefully
