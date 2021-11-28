@@ -682,9 +682,9 @@ def show_all_history(timeframe):
 def projection():
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     if balance[0] is None:
-        projections = [[[], []],[[], []],[[], []],[[], []]]
+        projections = [[[], []], [[], []],[[], []],[[], []],[[], []]]
     else:
-        projections = [[[], []],[[], []],[[], []],[[], []]]
+        projections = [[[], []], [[], []],[[], []],[[], []],[[], []]]
         
         ranges = timeranges()
                        
@@ -694,7 +694,7 @@ def projection():
             one=True,
         )
         custom = round(week[0] / balance[0]*100/7, 2)
-        projections[3].append(custom)               
+        projections[4].append(custom)               
         today= date.today()
         x = 1
         while x < 365:
@@ -707,25 +707,31 @@ def projection():
                 newbalance = balance[0]
             else:
                 newbalance = projections[0][0][-1]
-            projections[0][0].append(newbalance*1.005)
+            projections[0][0].append(newbalance*1.003)
             
             if len(projections[1][0]) < 1:
                 newbalance = balance[0]
             else:
                 newbalance = projections[1][0][-1]
-            projections[1][0].append(newbalance*1.01)
+            projections[1][0].append(newbalance*1.005)
             
             if len(projections[2][0]) < 1:
                 newbalance = balance[0]
             else:
                 newbalance = projections[2][0][-1]
-            projections[2][0].append(newbalance*1.015)
+            projections[2][0].append(newbalance*1.01)
             
             if len(projections[3][0]) < 1:
                 newbalance = balance[0]
             else:
                 newbalance = projections[3][0][-1]
-            projections[3][0].append(newbalance * (1+(week[0] / balance[0])/7))   
+            projections[3][0].append(newbalance*1.015)
+            
+            if len(projections[4][0]) < 1:
+                newbalance = balance[0]
+            else:
+                newbalance = projections[4][0][-1]
+            projections[4][0].append(newbalance * (1+(week[0] / balance[0])/7))   
             
             x+=1
         
