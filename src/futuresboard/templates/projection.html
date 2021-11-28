@@ -36,7 +36,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>0.5%</td>
+                            <td>0.3%</td>
                             <td>{{ data[0][0][30]|round(2) }}</td>
                             <td>{{ data[0][0][60]|round(2) }}</td>
                             <td>{{ data[0][0][90]|round(2) }}</td>
@@ -45,7 +45,7 @@
                             <td>{{ data[0][0][-1]|round(2) }}</td>
                         </tr>
                         <tr>
-                            <td>1%</td>
+                            <td>0.5%</td>
                             <td>{{ data[1][0][30]|round(2) }}</td>
                             <td>{{ data[1][0][60]|round(2) }}</td>
                             <td>{{ data[1][0][90]|round(2) }}</td>
@@ -54,7 +54,7 @@
                             <td>{{ data[1][0][-1]|round(2) }}</td>
                         </tr>
                         <tr>
-                            <td>1.5%</td>
+                            <td>1%</td>
                             <td>{{ data[2][0][30]|round(2) }}</td>
                             <td>{{ data[2][0][60]|round(2) }}</td>
                             <td>{{ data[2][0][90]|round(2) }}</td>
@@ -63,13 +63,22 @@
                             <td>{{ data[2][0][-1]|round(2) }}</td>
                         </tr>
                         <tr>
-                            <td>{{ data[3][2] }}% (avg past 7 days)</td>
+                            <td>1.5%</td>
                             <td>{{ data[3][0][30]|round(2) }}</td>
                             <td>{{ data[3][0][60]|round(2) }}</td>
                             <td>{{ data[3][0][90]|round(2) }}</td>
                             <td>{{ data[3][0][120]|round(2) }}</td>
                             <td>{{ data[3][0][240]|round(2) }}</td>
                             <td>{{ data[3][0][-1]|round(2) }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ data[4][2] }}% (avg past 7 days)</td>
+                            <td>{{ data[4][0][30]|round(2) }}</td>
+                            <td>{{ data[4][0][60]|round(2) }}</td>
+                            <td>{{ data[4][0][90]|round(2) }}</td>
+                            <td>{{ data[4][0][120]|round(2) }}</td>
+                            <td>{{ data[4][0][240]|round(2) }}</td>
+                            <td>{{ data[4][0][-1]|round(2) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -94,29 +103,36 @@ const data = {
   labels: {{ data[0][1] | safe }},
   datasets: [
 	  {
-		label: '0.50%',
+		label: '0.30%',
 		data: {{ data[0][0] }},
+		fill: false,
+		borderColor: 'rgba(153, 102, 255, 0.3)',
+		tension: 0.1,
+	  },
+	  {
+		label: '0.50%',
+		data: {{ data[1][0] }},
 		fill: false,
 		borderColor: 'rgba(255, 99, 132, 0.3)',
 		tension: 0.1,
 	  },
  	  {
 		label: '1%',
-		data: {{ data[1][0] }},
+		data: {{ data[2][0] }},
 		fill: false,
 		borderColor: 'rgba(255, 159, 64, 0.3)',
 		tension: 0.1,
 	  },
 	  {
 		label: '1.5%',
-		data: {{ data[2][0] }},
+		data: {{ data[3][0] }},
 		fill: false,
 		borderColor: 'rgba(240, 234, 151, 0.3)',
 		tension: 0.1,
 	  },
 	  {
-		label: '{{ data[3][2] }}%',
-		data: {{ data[3][0] }},
+		label: '{{ data[4][2] }}%',
+		data: {{ data[4][0] }},
 		fill: false,
 		borderColor: 'rgba(75, 192, 192, 0.3)',
 		tension: 0.1,
