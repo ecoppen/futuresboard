@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## 2021-11-28
 ### Added
 - Route added for balance projection over 365 days at fixed and average %, this can be accessed from the main dashboard page above the line chart
+- Average down calculator now available on coin page (only shows when a coin has no more buy positions)
 
 ### Changed
 - Changed 'Week' to be previous 7 days rather than 8
