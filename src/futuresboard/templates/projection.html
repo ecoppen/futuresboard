@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block title %}Projection{% endblock %}
+{% block content %}
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h3><i class="fas fa-chart-line"></i> Projection</h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card text-center">
+                <div class="card-header text-muted">
+                    Balance projection visualised
+                  </div>
+                <canvas id="lineChart" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+<br>
+
+<div class="row">
+        <div class="col-md-12">
+            <div class="card text-center">
+                <div class="card-header text-muted">
+                    Balance projection breakdown
+                  </div>
+                <table id="hype" class='table table-sm table-bordered text-center'>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Daily %</th>
+                            <th>30 days</th>
+                            <th>60 days</th>
+                            <th>90 days</th>
+                            <th>120 days</th>
+                            <th>240 days</th>
+                            <th>365 days</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>0.5%</td>
+                            <td>{{ data[0][0][30]|round(2) }}</td>
+                            <td>{{ data[0][0][60]|round(2) }}</td>
+                            <td>{{ data[0][0][90]|round(2) }}</td>
+                            <td>{{ data[0][0][120]|round(2) }}</td>
+                            <td>{{ data[0][0][240]|round(2) }}</td>
+                            <td>{{ data[0][0][-1]|round(2) }}</td>
+                        </tr>
+                        <tr>
+                            <td>1%</td>
+                            <td>{{ data[1][0][30]|round(2) }}</td>
+                            <td>{{ data[1][0][60]|round(2) }}</td>
+                            <td>{{ data[1][0][90]|round(2) }}</td>
+                            <td>{{ data[1][0][120]|round(2) }}</td>
+                            <td>{{ data[1][0][240]|round(2) }}</td>
+                            <td>{{ data[1][0][-1]|round(2) }}</td>
+                        </tr>
+                        <tr>
+                            <td>1.5%</td>
+                            <td>{{ data[2][0][30]|round(2) }}</td>
+                            <td>{{ data[2][0][60]|round(2) }}</td>
+                            <td>{{ data[2][0][90]|round(2) }}</td>
+                            <td>{{ data[2][0][120]|round(2) }}</td>
+                            <td>{{ data[2][0][240]|round(2) }}</td>
+                            <td>{{ data[2][0][-1]|round(2) }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ data[3][2] }}% (avg past 7 days)</td>
+                            <td>{{ data[3][0][30]|round(2) }}</td>
+                            <td>{{ data[3][0][60]|round(2) }}</td>
+                            <td>{{ data[3][0][90]|round(2) }}</td>
+                            <td>{{ data[3][0][120]|round(2) }}</td>
+                            <td>{{ data[3][0][240]|round(2) }}</td>
+                            <td>{{ data[3][0][-1]|round(2) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<script>
+    
+$(document).ready( function () {
+    $('#hype').DataTable({
+		"paging": false,
+		"searching": false,
+		"order": [],
+		"info": false,
+	});
+} );
+    
+Chart.register(ChartDataLabels);
+    
+const data = {
+  labels: {{ data[0][1] | safe }},
+  datasets: [
+	  {
+		label: '0.50%',
+		data: {{ data[0][0] }},
+		fill: false,
+		borderColor: 'rgba(255, 99, 132, 0.3)',
+		tension: 0.1,
+	  },
+ 	  {
+		label: '1%',
+		data: {{ data[1][0] }},
+		fill: false,
+		borderColor: 'rgba(255, 159, 64, 0.3)',
+		tension: 0.1,
+	  },
+	  {
+		label: '1.5%',
+		data: {{ data[2][0] }},
+		fill: false,
+		borderColor: 'rgba(240, 234, 151, 0.3)',
+		tension: 0.1,
+	  },
+	  {
+		label: '{{ data[3][2] }}%',
+		data: {{ data[3][0] }},
+		fill: false,
+		borderColor: 'rgba(75, 192, 192, 0.3)',
+		tension: 0.1,
+	  },
+  ]
+};
+const config2 = {
+  type: 'line',
+  data: data,
+  options: {
+		responsive: true,
+        layout: {
+            padding: {
+                top: 20
+            }
+        },
+        plugins:{
+            datalabels: {
+                display: false
+            },
+        },
+		scales: {
+			y: {
+				type: 'linear',
+				ticks: {
+					autoSkip: false,
+				}
+			}
+		}
+	}
+};
+    
+var myChart = new Chart(
+    document.getElementById('lineChart'),
+    config2
+);
+</script>
+{% endblock %}
