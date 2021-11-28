@@ -145,12 +145,65 @@
                     </tr>
                   {% endfor %}
               </table>
+                {% if coin in coin_list['active'] %}
+                    {% if coin_list['active'][coin][0] == 0 %}
+                        <hr>
+                        <table class='table table-sm table-bordered text-center'>
+                            <thead class="thead-dark">
+                                <tr>
+                                    <td colspan="3" class="text-center">Average Down Calculator</td>
+                                </tr>
+                                <tr>
+                                    <td>Type</td>
+                                    <td>Volume</td>
+                                    <td>$</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for position in orders[0] %}
+                                <tr class="table-secondary">
+                                    <td>Position</td>
+                                    <td><input class="form-control form-control-sm" id="positionsize" value="{{position[6]}}" readonly></td>
+                                    <td><input class="form-control form-control-sm" id="positionvalue" value="{{position[4]}}" readonly></td>
+                                </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td>Custom</td>
+                                    <td><input type="number" class="form-control form-control-sm" id="customsize" onchange="averageDown()" min="0" step="any"></td>
+                                    <td><input type="number" class="form-control form-control-sm" id="customvalue" onchange="averageDown()" min="0" step="any"></td>
+                                </tr>
+                                <tr class="table-secondary">
+                                    <td>Averaged</td>
+                                    <td><input class="form-control form-control-sm" id="averagesize" readonly></td>
+                                    <td><input class="form-control form-control-sm" id="averagevalue" readonly></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                    {% endif %}
+                {% endif %}
+                
             </div>
         </div>
     </div>
 
 <script>
-
+function averageDown() {
+    var positionsize = document.getElementById("positionsize").value;
+    var customsize = document.getElementById("customsize").value;
+    var positionvalue = document.getElementById("positionvalue").value;
+    var customvalue = document.getElementById("customvalue").value;
+    
+    if (customsize.length > 0 && customvalue.length > 0){
+        positionsize = parseFloat(positionsize);
+        positionvalue = parseFloat(positionvalue);
+        customsize = parseFloat(customsize);
+        customvalue = parseFloat(customvalue);
+        document.getElementById("averagesize").value = positionsize + customsize;
+        document.getElementById("averagevalue").value = ((positionsize * positionvalue) + (customsize * customvalue)) / (positionsize + customsize);
+    }
+}
+    
 $(document).ready( function () {
     $('#orders').DataTable({
 		"paging": false,
