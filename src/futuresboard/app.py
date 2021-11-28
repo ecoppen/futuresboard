@@ -110,7 +110,7 @@ def get_lastupdate():
 def timeranges():
     today = date.today()
     midnight_today = datetime.combine(today, datetime.min.time())
-    midnight_7days = midnight_today - timedelta(days=7)
+    midnight_7days = midnight_today - timedelta(days=6)
     midnight_quarter = midnight_today - timedelta(days=3 * 30)
     midnight_start = midnight_today - timedelta(days=3 * 365)
     start_of_month = datetime.combine(today.replace(day=1), datetime.min.time())
@@ -677,6 +677,59 @@ def show_all_history(timeframe):
             previous_files.append(file)
     
     return render_template("history.html", coin_list=get_coins(), timeframe=timeframe, history=history, fname=filename, files=previous_files)
+
+@app.route("/projection")
+def projection():
+    balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
+    if balance[0] is None:
+        projections = [[[], []],[[], []],[[], []],[[], []]]
+    else:
+        projections = [[[], []],[[], []],[[], []],[[], []]]
+        
+        ranges = timeranges()
+                       
+        week = query_db(
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
+            [ranges[1]],
+            one=True,
+        )
+        custom = round(week[0] / balance[0]*100/7, 2)
+        projections[3].append(custom)               
+        today= date.today()
+        x = 1
+        while x < 365:
+            nextday = today + timedelta(days=x)
+            projections[0][1].append(nextday.strftime("%Y-%m-%d"))
+            #projections[1][1].append(nextday.strftime("%Y-%m-%d"))
+            #projections[2][1].append(nextday.strftime("%Y-%m-%d"))
+            #projections[3][1].append(nextday.strftime("%Y-%m-%d"))
+            if len(projections[0][0]) < 1:
+                newbalance = balance[0]
+            else:
+                newbalance = projections[0][0][-1]
+            projections[0][0].append(newbalance*1.005)
+            
+            if len(projections[1][0]) < 1:
+                newbalance = balance[0]
+            else:
+                newbalance = projections[1][0][-1]
+            projections[1][0].append(newbalance*1.01)
+            
+            if len(projections[2][0]) < 1:
+                newbalance = balance[0]
+            else:
+                newbalance = projections[2][0][-1]
+            projections[2][0].append(newbalance*1.015)
+            
+            if len(projections[3][0]) < 1:
+                newbalance = balance[0]
+            else:
+                newbalance = projections[3][0][-1]
+            projections[3][0].append(newbalance * (1+(week[0] / balance[0])/7))   
+            
+            x+=1
+        
+    return render_template("projection.html", coin_list=get_coins(), data=projections)
 
 @app.errorhandler(404)
 def not_found(error):
