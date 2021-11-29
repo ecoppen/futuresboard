@@ -263,7 +263,14 @@ def dashboard(timeframe):
     balance = float(balance[0])
     
     temptotal = [[],[]]
-    profit_period = balance - zero_value(week[0])
+    
+    customframe = query_db(
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
+        [ranges[times[timeframe]]],
+        one=True,
+    )
+    
+    profit_period = balance - zero_value(customframe[0])
 
     temp = [[], []]
     for each in by_date:
@@ -452,6 +459,7 @@ def show_individual_coin(coin):
             temp[0].append(round(float(each[1]), 2))
             temp[1].append(each[0])
         by_date = temp
+        
     return render_template(
         "coin.html",
         coin_list=get_coins(),
