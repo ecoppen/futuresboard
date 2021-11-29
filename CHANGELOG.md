@@ -9,6 +9,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Store and display historical unrealized PnL
 - Tidy up repeated code into functions
 
+## 2021-11-29
+
+### Changed
+- Added a fix for the graph on the dashboard that would only calculate the total - profit over a week and not the other tiemframes
+
 ## 2021-11-28
 ### Added
 - Route added for balance projection over 365 days at fixed and average %, this can be accessed from the main dashboard page above the line chart
