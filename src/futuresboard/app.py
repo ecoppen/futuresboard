@@ -1,6 +1,5 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, g
 import sqlite3
-from flask import g
 from datetime import datetime, date, timedelta
 import requests
 import csv
@@ -109,41 +108,77 @@ def get_lastupdate():
 
 def timeranges():
     today = date.today()
-    midnight_today = datetime.combine(today, datetime.min.time())
-    midnight_7days = midnight_today - timedelta(days=6)
-    midnight_quarter = midnight_today - timedelta(days=3 * 30)
-    midnight_start = midnight_today - timedelta(days=3 * 365)
-    start_of_month = datetime.combine(today.replace(day=1), datetime.min.time())
-    start_of_year = datetime.combine(today.replace(day=1).replace(month=1), datetime.min.time())
+    yesterday_start = today - timedelta(days=1)
+    
+    this_week_start = today - timedelta(days=today.weekday())
+    last_week_start = this_week_start - timedelta(days=7)
+    last_week_end = this_week_start - timedelta(days=1)
+    
+    this_month_start = today.replace(day=1)
+    last_month_start = (this_month_start - timedelta(days=1)).replace(day=1)
+    last_month_end = this_month_start - timedelta(days=1)
+    
+    this_year_start = today.replace(day=1).replace(month=1)
+    last_year_start = (this_year_start - timedelta(days=1)).replace(day=1).replace(month=1)
+    last_year_end = this_year_start - timedelta(days=1)
+    
+    two_year_start = (last_year_start - timedelta(days=1)).replace(day=1).replace(month=1)
+    
     return [
-        midnight_today.timestamp() * 1000,
-        midnight_7days.timestamp() * 1000,
-        start_of_month.timestamp() * 1000,
-        datetime.now().strftime("%B"),
-        midnight_quarter.timestamp() * 1000,
-        start_of_year.timestamp() * 1000,
-        midnight_start.timestamp() * 1000,
+        [today.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d')],
+        [yesterday_start.strftime('%Y-%m-%d'), yesterday_start.strftime('%Y-%m-%d')],
+        [this_week_start.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d')],
+        [last_week_start.strftime('%Y-%m-%d'), last_week_end.strftime('%Y-%m-%d')],
+        [this_month_start.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d')],
+        [last_month_start.strftime('%Y-%m-%d'), last_month_end.strftime('%Y-%m-%d')],
+        [this_year_start.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d')],
+        [last_year_start.strftime('%Y-%m-%d'), last_year_end.strftime('%Y-%m-%d')],
+        [last_year_start.strftime('%Y-%m-%d'), today.strftime('%Y-%m-%d')]
     ]
 
-
-@app.route("/")
+@app.route("/", methods=['GET'])
 def index_page():
+    daterange = request.args.get('daterange')
     ranges = timeranges()
+    
+    todaystart = datetime.combine(datetime.fromisoformat(ranges[0][0]), datetime.min.time()).timestamp() * 1000
+    todayend = datetime.combine(datetime.fromisoformat(ranges[0][1]), datetime.max.time()).timestamp() * 1000
+    weekstart = datetime.combine(datetime.fromisoformat(ranges[2][0]), datetime.min.time()).timestamp() * 1000
+    weekend = datetime.combine(datetime.fromisoformat(ranges[2][1]), datetime.max.time()).timestamp() * 1000
+    monthstart = datetime.combine(datetime.fromisoformat(ranges[4][0]), datetime.min.time()).timestamp() * 1000
+    monthend = datetime.combine(datetime.fromisoformat(ranges[4][1]), datetime.max.time()).timestamp() * 1000
+    
+    if daterange is None:
+        start = datetime.combine(datetime.fromisoformat(ranges[0][0]), datetime.min.time()).timestamp() * 1000
+        end = datetime.combine(datetime.fromisoformat(ranges[0][1]), datetime.max.time()).timestamp() * 1000 
+        startdate, enddate = ranges[0][0], ranges[0][1]
+    else:
+        daterange = daterange.split(" - ")
+        if len(daterange) == 2:
+            start = datetime.combine(datetime.fromisoformat(daterange[0]), datetime.min.time()).timestamp() * 1000
+            end = datetime.combine(datetime.fromisoformat(daterange[1]), datetime.max.time()).timestamp() * 1000
+            startdate, enddate = daterange[0], daterange[1]
+        else:
+            start = datetime.combine(datetime.fromisoformat(ranges[0][0]), datetime.min.time()).timestamp() * 1000 
+            end = datetime.combine(datetime.fromisoformat(ranges[0][1]), datetime.max.time()).timestamp() * 1000 
+            startdate, enddate = ranges[0][0], ranges[0][1]
+    
+    
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     total = query_db('SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER"', one=True)
     today = query_db(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
-        [ranges[0]],
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+        [todaystart, todayend],
         one=True,
     )
     week = query_db(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
-        [ranges[1]],
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+        [weekstart, weekend],
         one=True,
     )
     month = query_db(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
-        [ranges[2]],
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+        [monthstart, monthend],
         one=True,
     )
 
@@ -154,13 +189,13 @@ def index_page():
     )
 
     by_date = query_db(
-        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? GROUP BY Date',
-        [ranges[1]],
+        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?  AND time <= ? GROUP BY Date',
+        [start, end],
     )
 
     by_symbol = query_db(
-        'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? GROUP BY symbol ORDER BY inc DESC',
-        [ranges[1]],
+        'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? GROUP BY symbol ORDER BY inc DESC',
+        [start, end],
     )
 
     fees = {"USDT": 0, "BNB": 0}
@@ -214,6 +249,9 @@ def index_page():
         data=[by_date, by_symbol, total_by_date],
         timeframe="week",
         lastupdate=get_lastupdate(),
+        startdate=startdate,
+        enddate=enddate,
+        timeranges=ranges
     )
 
 
