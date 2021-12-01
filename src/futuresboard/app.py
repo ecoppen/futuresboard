@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, g
+from flask import Flask, render_template, request, g, redirect
 import sqlite3
 from datetime import datetime, date, timedelta
 import requests
@@ -141,28 +141,27 @@ def index_page():
     daterange = request.args.get('daterange')
     ranges = timeranges()
     
+    if daterange is not None:
+        daterange = daterange.split(" - ")
+        if len(daterange) == 2:
+            try:
+                start = datetime.combine(datetime.fromisoformat(daterange[0]), datetime.min.time()).timestamp() * 1000
+                end = datetime.combine(datetime.fromisoformat(daterange[1]), datetime.max.time()).timestamp() * 1000
+                startdate, enddate = daterange[0], daterange[1]
+                return redirect('/dashboard/' + startdate + "/" + enddate)
+            except:
+                pass
+
     todaystart = datetime.combine(datetime.fromisoformat(ranges[0][0]), datetime.min.time()).timestamp() * 1000
     todayend = datetime.combine(datetime.fromisoformat(ranges[0][1]), datetime.max.time()).timestamp() * 1000
     weekstart = datetime.combine(datetime.fromisoformat(ranges[2][0]), datetime.min.time()).timestamp() * 1000
     weekend = datetime.combine(datetime.fromisoformat(ranges[2][1]), datetime.max.time()).timestamp() * 1000
     monthstart = datetime.combine(datetime.fromisoformat(ranges[4][0]), datetime.min.time()).timestamp() * 1000
-    monthend = datetime.combine(datetime.fromisoformat(ranges[4][1]), datetime.max.time()).timestamp() * 1000
-    
-    if daterange is None:
-        start = datetime.combine(datetime.fromisoformat(ranges[0][0]), datetime.min.time()).timestamp() * 1000
-        end = datetime.combine(datetime.fromisoformat(ranges[0][1]), datetime.max.time()).timestamp() * 1000 
-        startdate, enddate = ranges[0][0], ranges[0][1]
-    else:
-        daterange = daterange.split(" - ")
-        if len(daterange) == 2:
-            start = datetime.combine(datetime.fromisoformat(daterange[0]), datetime.min.time()).timestamp() * 1000
-            end = datetime.combine(datetime.fromisoformat(daterange[1]), datetime.max.time()).timestamp() * 1000
-            startdate, enddate = daterange[0], daterange[1]
-        else:
-            start = datetime.combine(datetime.fromisoformat(ranges[0][0]), datetime.min.time()).timestamp() * 1000 
-            end = datetime.combine(datetime.fromisoformat(ranges[0][1]), datetime.max.time()).timestamp() * 1000 
-            startdate, enddate = ranges[0][0], ranges[0][1]
-    
+    monthend = datetime.combine(datetime.fromisoformat(ranges[4][1]), datetime.max.time()).timestamp() * 1000            
+            
+    start = datetime.combine(datetime.fromisoformat(ranges[2][0]), datetime.min.time()).timestamp() * 1000 
+    end = datetime.combine(datetime.fromisoformat(ranges[2][1]), datetime.max.time()).timestamp() * 1000 
+    startdate, enddate = ranges[2][0], ranges[2][1]
     
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     total = query_db('SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER"', one=True)
@@ -255,28 +254,54 @@ def index_page():
     )
 
 
-@app.route("/dashboard/<timeframe>")
-def dashboard(timeframe):
-    if timeframe not in ["today", "week", "month", "quarter", "year", "all"]:
-        return render_template("error.html", coin_list=get_coins()), 404
-
+@app.route("/dashboard/<start>/<end>", methods=['GET'])
+def dashboard(start, end):
     ranges = timeranges()
+    daterange = request.args.get('daterange')
+    
+    if daterange is not None:
+        daterange = daterange.split(" - ")
+        if len(daterange) == 2:
+            try:
+                start = datetime.combine(datetime.fromisoformat(daterange[0]), datetime.min.time()).timestamp() * 1000
+                end = datetime.combine(datetime.fromisoformat(daterange[1]), datetime.max.time()).timestamp() * 1000
+                startdate, enddate = daterange[0], daterange[1]
+                return redirect('/dashboard/' + startdate + "/" + enddate)
+            except:
+                return redirect('/dashboard/' + start + "/" + end)
+    
+    try:
+        startdate, enddate = start, end
+        start = datetime.combine(datetime.fromisoformat(start), datetime.min.time()).timestamp() * 1000
+        end = datetime.combine(datetime.fromisoformat(end), datetime.max.time()).timestamp() * 1000
+    except:
+        startdate, enddate = ranges[2][0], ranges[2][1]
+        return redirect('/dashboard/' + startdate + "/" + enddate)
+
+    todaystart = datetime.combine(datetime.fromisoformat(ranges[0][0]), datetime.min.time()).timestamp() * 1000
+    todayend = datetime.combine(datetime.fromisoformat(ranges[0][1]), datetime.max.time()).timestamp() * 1000
+    weekstart = datetime.combine(datetime.fromisoformat(ranges[2][0]), datetime.min.time()).timestamp() * 1000
+    weekend = datetime.combine(datetime.fromisoformat(ranges[2][1]), datetime.max.time()).timestamp() * 1000
+    monthstart = datetime.combine(datetime.fromisoformat(ranges[4][0]), datetime.min.time()).timestamp() * 1000
+    monthend = datetime.combine(datetime.fromisoformat(ranges[4][1]), datetime.max.time()).timestamp() * 1000
+    
     times = {"today": 0, "week": 1, "month": 2, "quarter": 4, "year": 5, "all": 6}
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     total = query_db('SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER"', one=True)
+
     today = query_db(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
-        [ranges[0]],
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+        [todaystart, todayend],
         one=True,
     )
     week = query_db(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
-        [ranges[1]],
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+        [weekstart, weekend],
         one=True,
     )
     month = query_db(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
-        [ranges[2]],
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+        [monthstart, monthend],
         one=True,
     )
 
@@ -287,13 +312,13 @@ def dashboard(timeframe):
     )
 
     by_date = query_db(
-        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? GROUP BY Date',
-        [ranges[times[timeframe]]],
+        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?  AND time <= ? GROUP BY Date',
+        [start, end],
     )
 
     by_symbol = query_db(
-        'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? GROUP BY symbol ORDER BY inc DESC',
-        [ranges[times[timeframe]]],
+        'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? GROUP BY symbol ORDER BY inc DESC',
+        [start, end],
     )
 
     fees = {"USDT": 0, "BNB": 0}
@@ -303,8 +328,8 @@ def dashboard(timeframe):
     temptotal = [[],[]]
     
     customframe = query_db(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
-        [ranges[times[timeframe]]],
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+        [start, end],
         one=True,
     )
     
@@ -349,9 +374,11 @@ def dashboard(timeframe):
         "home.html",
         coin_list=get_coins(),
         totals=totals,
-        timeframe=timeframe,
         data=[by_date, by_symbol, total_by_date],
         lastupdate=get_lastupdate(),
+        startdate=startdate,
+        enddate=enddate,
+        timeranges=ranges
     )
 
 @app.route("/positions")
@@ -415,26 +442,35 @@ def show_individual_coin(coin):
     if balance[0] is None:
         totals = ["-", "-", "-", "-", "-", {"USDT": 0, "BNB": 0}, ["-", "-", "-", "-"]]
     else:
+        
+        todaystart = datetime.combine(datetime.fromisoformat(ranges[0][0]), datetime.min.time()).timestamp() * 1000
+        todayend = datetime.combine(datetime.fromisoformat(ranges[0][1]), datetime.max.time()).timestamp() * 1000
+        weekstart = datetime.combine(datetime.fromisoformat(ranges[2][0]), datetime.min.time()).timestamp() * 1000
+        weekend = datetime.combine(datetime.fromisoformat(ranges[2][1]), datetime.max.time()).timestamp() * 1000
+        monthstart = datetime.combine(datetime.fromisoformat(ranges[4][0]), datetime.min.time()).timestamp() * 1000
+        monthend = datetime.combine(datetime.fromisoformat(ranges[4][1]), datetime.max.time()).timestamp() * 1000            
+            
         total = query_db(
             'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND symbol = ?',
             [coin],
             one=True,
         )
         today = query_db(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ?',
-            [ranges[0], coin],
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ?',
+            [todaystart, todayend, coin],
             one=True,
         )
         week = query_db(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ?',
-            [ranges[1], coin],
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ?',
+            [weekstart, weekend, coin],
             one=True,
         )
         month = query_db(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ?',
-            [ranges[2], coin],
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ?',
+            [monthstart, monthend, coin],
             one=True,
         )
+        
         result = query_db(
             'SELECT SUM(income), asset FROM income WHERE incomeType ="COMMISSION" AND symbol = ? GROUP BY asset',
             [coin],
@@ -489,8 +525,8 @@ def show_individual_coin(coin):
             pnl,
         ]
         by_date = query_db(
-            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ? GROUP BY Date',
-            [ranges[1], coin],
+            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ? GROUP BY Date',
+            [weekstart, weekend, coin],
         )
         temp = [[], []]
         for each in by_date:
@@ -504,7 +540,6 @@ def show_individual_coin(coin):
         coin=coin,
         totals=totals,
         summary=[],
-        timeframe="week",
         data=[by_date],
         orders=[allpositions, allorders],
         lastupdate=get_lastupdate(),
@@ -733,10 +768,13 @@ def projection():
         projections = [[[], []], [[], []],[[], []],[[], []],[[], []]]
         
         ranges = timeranges()
-                       
+        
+        todayend = datetime.combine(datetime.fromisoformat(ranges[0][1]), datetime.max.time()).timestamp() * 1000
+        minus_7_start = datetime.combine(datetime.fromisoformat((date.today() - timedelta(days=7)).strftime('%Y-%m-%d')), datetime.max.time()).timestamp() * 1000
+        
         week = query_db(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?',
-            [ranges[1]],
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+            [minus_7_start, todayend],
             one=True,
         )
         custom = round(week[0] / balance[0]*100/7, 2)
