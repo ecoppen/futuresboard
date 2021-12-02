@@ -422,13 +422,26 @@ def positions_page():
     )
     
 
-@app.route("/coins/<coin>")
+@app.route("/coins/<coin>", methods=['GET'])
 def show_individual_coin(coin):
-    # show the selected coin stats
     coins = get_coins()
     if coin not in coins["inactive"] and coin not in coins["active"]:
         return render_template("error.html", coin_list=get_coins()), 404
 
+    daterange = request.args.get('daterange')
+    ranges = timeranges()
+    
+    if daterange is not None:
+        daterange = daterange.split(" - ")
+        if len(daterange) == 2:
+            try:
+                start = datetime.combine(datetime.fromisoformat(daterange[0]), datetime.min.time()).timestamp() * 1000
+                end = datetime.combine(datetime.fromisoformat(daterange[1]), datetime.max.time()).timestamp() * 1000
+                startdate, enddate = daterange[0], daterange[1]
+                return redirect('/coins/' + coin + '/' + startdate + '/' + enddate)
+            except:
+                pass    
+    
     try:
         response = requests.get(
             "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=1
@@ -440,7 +453,6 @@ def show_individual_coin(coin):
     except:
         markPrice = "-"
 
-    ranges = timeranges()
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     if balance[0] is None:
         totals = ["-", "-", "-", "-", "-", {"USDT": 0, "BNB": 0}, ["-", "-", "-", "-"]]
@@ -452,7 +464,9 @@ def show_individual_coin(coin):
         weekend = datetime.combine(datetime.fromisoformat(ranges[2][1]), datetime.max.time()).timestamp() * 1000
         monthstart = datetime.combine(datetime.fromisoformat(ranges[4][0]), datetime.min.time()).timestamp() * 1000
         monthend = datetime.combine(datetime.fromisoformat(ranges[4][1]), datetime.max.time()).timestamp() * 1000            
-            
+        
+        startdate, enddate = ranges[2][0], ranges[2][1]
+        
         total = query_db(
             'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND symbol = ?',
             [coin],
@@ -554,19 +568,41 @@ def show_individual_coin(coin):
     )
 
 
-@app.route("/coins/<coin>/<timeframe>")
-def show_individual_coin_timeframe(coin, timeframe):
+@app.route("/coins/<coin>/<start>/<end>")
+def show_individual_coin_timeframe(coin, start, end):
     coins = get_coins()
-    if (coin not in coins["inactive"] and coin not in coins["active"]) or timeframe not in [
-        "today",
-        "week",
-        "month",
-        "quarter",
-        "year",
-        "all",
-    ]:
+    if (coin not in coins["inactive"] and coin not in coins["active"]):
         return render_template("error.html", coin_list=get_coins()), 404
 
+    ranges = timeranges()
+    daterange = request.args.get('daterange')
+    
+    if daterange is not None:
+        daterange = daterange.split(" - ")
+        if len(daterange) == 2:
+            try:
+                start = datetime.combine(datetime.fromisoformat(daterange[0]), datetime.min.time()).timestamp() * 1000
+                end = datetime.combine(datetime.fromisoformat(daterange[1]), datetime.max.time()).timestamp() * 1000
+                startdate, enddate = daterange[0], daterange[1]
+                return redirect('/coins/' + coin + '/' + startdate + '/' + enddate)
+            except:
+                return redirect('/coins/' + coin + '/' + start + '/' + end)
+    
+    try:
+        startdate, enddate = start, end
+        start = datetime.combine(datetime.fromisoformat(start), datetime.min.time()).timestamp() * 1000
+        end = datetime.combine(datetime.fromisoformat(end), datetime.max.time()).timestamp() * 1000
+    except:
+        startdate, enddate = ranges[2][0], ranges[2][1]
+        return redirect('/coins/' + coin + '/' + startdate + '/' + enddate)
+
+    todaystart = datetime.combine(datetime.fromisoformat(ranges[0][0]), datetime.min.time()).timestamp() * 1000
+    todayend = datetime.combine(datetime.fromisoformat(ranges[0][1]), datetime.max.time()).timestamp() * 1000
+    weekstart = datetime.combine(datetime.fromisoformat(ranges[2][0]), datetime.min.time()).timestamp() * 1000
+    weekend = datetime.combine(datetime.fromisoformat(ranges[2][1]), datetime.max.time()).timestamp() * 1000
+    monthstart = datetime.combine(datetime.fromisoformat(ranges[4][0]), datetime.min.time()).timestamp() * 1000
+    monthend = datetime.combine(datetime.fromisoformat(ranges[4][1]), datetime.max.time()).timestamp() * 1000               
+    
     try:
         response = requests.get(
             "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=1
@@ -578,8 +614,6 @@ def show_individual_coin_timeframe(coin, timeframe):
     except:
         markPrice = "-"
 
-    ranges = timeranges()
-    times = {"today": 0, "week": 1, "month": 2, "quarter": 4, "year": 5, "all": 6}
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     if balance[0] is None:
         totals = ["-", "-", "-", "-", "-", {"USDT": 0, "BNB": 0}, ["-", "-", "-", "-"]]
@@ -590,18 +624,18 @@ def show_individual_coin_timeframe(coin, timeframe):
             one=True,
         )
         today = query_db(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ?',
-            [ranges[0], coin],
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ?',
+            [todaystart, todayend, coin],
             one=True,
         )
         week = query_db(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ?',
-            [ranges[1], coin],
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ?',
+            [weekstart, weekend, coin],
             one=True,
         )
         month = query_db(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ?',
-            [ranges[2], coin],
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ?',
+            [monthstart, monthend, coin],
             one=True,
         )
         result = query_db(
@@ -659,8 +693,8 @@ def show_individual_coin_timeframe(coin, timeframe):
         ]
 
         by_date = query_db(
-            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND symbol = ? GROUP BY Date',
-            [ranges[times[timeframe]], coin],
+            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ? GROUP BY Date',
+            [start, end, coin],
         )
         temp = [[], []]
         for each in by_date:
@@ -674,7 +708,6 @@ def show_individual_coin_timeframe(coin, timeframe):
         coin=coin,
         totals=totals,
         summary=[],
-        timeframe=timeframe,
         data=[by_date],
         orders=[allpositions, allorders],
         lastupdate=get_lastupdate(),
@@ -688,44 +721,54 @@ def show_individual_coin_timeframe(coin, timeframe):
 @app.route("/history/")
 def show_history():
     ranges = timeranges()
-    times = {"today": 0, "week": 1, "month": 2, "quarter": 4, "year": 5, "all": 6}
-    history = {"today": {"total":0}, "week": {"total":0}, "month": {"total":0}, "quarter": {"total":0}, "year": {"total":0}, "all": {"total":0}, "columns":[]}
+    history = {"columns":[]}
     
-    for timeframe in times: 
+    for timeframe in ranges: 
+        start = datetime.combine(datetime.fromisoformat(timeframe[0]), datetime.min.time()).timestamp() * 1000
+        end = datetime.combine(datetime.fromisoformat(timeframe[1]), datetime.max.time()).timestamp() * 1000
         incomesummary = query_db(
-            'SELECT incomeType, COUNT(IID) FROM income WHERE time >= ? GROUP BY incomeType',
-            [ranges[times[timeframe]]],
+            'SELECT incomeType, COUNT(IID) FROM income WHERE time >= ? AND time <= ? GROUP BY incomeType',
+            [start, end],
         )
+        temp = timeframe[0] + "/" +timeframe[1]
+        if temp not in history:
+            history[temp] = {}
+            history[temp]['total'] = 0
+            
         for totals in incomesummary:
-            history[timeframe][totals[0]] = int(totals[1])
-            history[timeframe]["total"] += int(totals[1])
+            history[temp][totals[0]] = int(totals[1])
+            history[temp]["total"] += int(totals[1])
             if totals[0] not in history["columns"]:
                 history["columns"].append(totals[0])
-    for timeframe in times:
+    for timeframe in ranges:
+        temp = timeframe[0] + "/" +timeframe[1]
         for column in history["columns"]:
-            if column not in history[timeframe]:
-                history[timeframe][column] = 0
+            if column not in history[temp]:
+                history[temp][column] = 0
                 
     history["columns"].sort()
     
     previous_files = []
     for file in os.listdir(os.path.join(app.root_path, 'static', 'csv')):
         if file.endswith(".csv"):
-            previous_files.append(file)
+            previous_files.append("csv/" + file)
 
-    return render_template("history.html", coin_list=get_coins(), timeframe="-", history=history, filename="-", files=previous_files)
+    return render_template("history.html", coin_list=get_coins(), history=history, filename="-", files=previous_files)
 
-@app.route("/history/<timeframe>")
-def show_all_history(timeframe):
-    if timeframe not in ["today", "week", "month", "quarter", "year", "all"]:
-        return render_template("error.html", coin_list=get_coins()), 404
+@app.route("/history/<start>/<end>")
+def show_all_history(start,end):
+    try:
+        startdate, enddate = start, end
+        start = datetime.combine(datetime.fromisoformat(start), datetime.min.time()).timestamp() * 1000
+        end = datetime.combine(datetime.fromisoformat(end), datetime.max.time()).timestamp() * 1000
+    except:
+        return redirect('/history/')    
 
     ranges = timeranges()
-    times = {"today": 0, "week": 1, "month": 2, "quarter": 4, "year": 5, "all": 6}
     
     history = query_db(
-        'SELECT * FROM income WHERE time >= ? ORDER BY time desc',
-        [ranges[times[timeframe]]],
+        'SELECT * FROM income WHERE time >= ? AND time <= ? ORDER BY time desc',
+        [start, end],
     )
 
     temp = []
@@ -735,29 +778,37 @@ def show_all_history(timeframe):
         temp.append(inc)
     history = temp  
     
-    filename = datetime.now().strftime("%Y-%m-%dT%H%M%S") + "_income_"+timeframe + ".csv"
+    filename = datetime.now().strftime("%Y-%m-%dT%H%M%S") + "_income_" + startdate + "_" + enddate + ".csv"
     
     with open(os.path.join(app.root_path, 'static', 'csv', filename), 'w', newline='') as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=',')
         spamwriter.writerow(["sqliteID", "TransactionId", "Symbol", "IncomeType", "Income", "Asset", "Info", "Time", "TradeId"])
         spamwriter.writerows(history)
 
-    history = {"today": {"total":0}, "week": {"total":0}, "month": {"total":0}, "quarter": {"total":0}, "year": {"total":0}, "all": {"total":0}, "columns":[]}
+    history = {"columns":[]}
     
-    for timeframe in times: 
+    for timeframe in ranges: 
+        start = datetime.combine(datetime.fromisoformat(timeframe[0]), datetime.min.time()).timestamp() * 1000
+        end = datetime.combine(datetime.fromisoformat(timeframe[1]), datetime.max.time()).timestamp() * 1000
         incomesummary = query_db(
-            'SELECT incomeType, COUNT(IID) FROM income WHERE time >= ? GROUP BY incomeType',
-            [ranges[times[timeframe]]],
+            'SELECT incomeType, COUNT(IID) FROM income WHERE time >= ? AND time <= ? GROUP BY incomeType',
+            [start, end],
         )
+        temp = timeframe[0] + "/" +timeframe[1]
+        if temp not in history:
+            history[temp] = {}
+            history[temp]['total'] = 0
+            
         for totals in incomesummary:
-            history[timeframe][totals[0]] = int(totals[1])
-            history[timeframe]["total"] += int(totals[1])
+            history[temp][totals[0]] = int(totals[1])
+            history[temp]["total"] += int(totals[1])
             if totals[0] not in history["columns"]:
                 history["columns"].append(totals[0])
-    for timeframe in times:
+    for timeframe in ranges:
+        temp = timeframe[0] + "/" +timeframe[1]
         for column in history["columns"]:
-            if column not in history[timeframe]:
-                history[timeframe][column] = 0
+            if column not in history[temp]:
+                history[temp][column] = 0
                 
     history["columns"].sort()
     
@@ -766,9 +817,9 @@ def show_all_history(timeframe):
     previous_files = []
     for file in os.listdir(os.path.join(app.root_path, 'static', 'csv')):
         if file.endswith(".csv"):
-            previous_files.append(file)
+            previous_files.append("csv/" + file)
     
-    return render_template("history.html", coin_list=get_coins(), timeframe=timeframe, history=history, fname=filename, files=previous_files)
+    return render_template("history.html", coin_list=get_coins(), history=history, fname=filename, files=previous_files)
 
 @app.route("/projection")
 def projection():
@@ -820,7 +871,7 @@ def projection():
                 newbalance = balance[0]
             else:
                 newbalance = projections[3][0][-1]
-            projections[3][0].append(newbalance*1.02)
+            projections[3][0].append(newbalance*1.012)
             
             if len(projections[4][0]) < 1:
                 newbalance = balance[0]
