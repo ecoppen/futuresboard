@@ -42,7 +42,7 @@
     </div>
     <br><hr><br>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-7">
             <div class="card">
                 <table id="oldfiles" class='table table-sm table-bordered text-center'>
                     <thead class="thead-dark">
@@ -54,7 +54,7 @@
                     <tbody>
                         {% for file in files %}
                             <tr>
-                                <td><a class="btn btn-outline-primary btn-sm" href="../../history/{{ file }}" role="button">Download</a></td>
+                                <td><a class="btn btn-outline-primary btn-sm" href="{{ url_for('static',filename=file) }}" role="button">Download</a></td>
                                 <td>{{ file }}</td>
                             </tr>
                         {% endfor %}

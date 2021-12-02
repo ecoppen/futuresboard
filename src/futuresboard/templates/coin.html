@@ -5,14 +5,14 @@
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h3><i class="fas fa-coins"></i> {{ coin }}</h3><span class="badge bg-secondary"><i class="far fa-clock"></i> LAST CHANGE: {{ lastupdate }}</span>
         <div class="btn-toolbar mb-2 mb-md-0">
-          <div class="btn-group me-2">
-            <a type="button" class="btn btn-sm {{ 'btn-secondary' if timeframe == 'today' else 'btn-outline-secondary' }}" href="../../coins/{{ coin }}/today">Today</a>
-            <a type="button" class="btn btn-sm {{ 'btn-secondary' if timeframe == 'week' else 'btn-outline-secondary' }}" href="../../coins/{{ coin }}/week">Week</a>
-            <a type="button" class="btn btn-sm {{ 'btn-secondary' if timeframe == 'month' else 'btn-outline-secondary' }}" href="../../coins/{{ coin }}/month">Month</a>
-            <a type="button" class="btn btn-sm {{ 'btn-secondary' if timeframe == 'quarter' else 'btn-outline-secondary' }}" href="../../coins/{{ coin }}/quarter">Quarter</a>
-            <a type="button" class="btn btn-sm {{ 'btn-secondary' if timeframe == 'year' else 'btn-outline-secondary' }}" href="../../coins/{{ coin }}/year">Year</a>
-            <a type="button" class="btn btn-sm {{ 'btn-secondary' if timeframe == 'all' else 'btn-outline-secondary' }}" href="../../coins/{{ coin }}/all">All</a>
-          </div>
+            <div class="btn-group me-2">
+                <form method="GET" name="daterangeform">
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                    <input type="text" class="form-control" name="daterange" size="22" />
+                  </div>
+                </form>
+            </div>
           <a type="button" class="btn btn-sm btn-outline-secondary" href="https://www.binance.com/en/futures/{{ coin }}" target="_blank">
             <i class="fas fa-external-link-alt"></i> View on Binance 
           </a>
@@ -20,7 +20,7 @@
     </div>
     <div class="row">
         <div class="col-sm-2">
-            <a href="../../coins/{{ coin }}/today">
+            <a href="../../../coins/{{ coin }}/{{timeranges[0][0]}}/{{timeranges[0][1]}}">
                 <div class="card text-center">
                   <div class="card-body">
                     <h5 class="card-title">{{ totals[6][0] }}%</h5>
@@ -33,33 +33,33 @@
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="../../coins/{{ coin }}/week">
+            <a href="../../../coins/{{ coin }}/{{timeranges[2][0]}}/{{timeranges[2][1]}}">
                 <div class="card text-center">
                   <div class="card-body">
                     <h5 class="card-title">{{ totals[6][1] }}%</h5>
                     <p class="card-text">${{ totals[2] }}</p>
                   </div>
                   <div class="card-footer text-muted">
-                    Profit past 7 days
+                    Profit from Monday
                   </div>
                 </div>
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="../../coins/{{ coin }}/month">
+            <a href="../../../coins/{{ coin }}/{{timeranges[4][0]}}/{{timeranges[4][1]}}">
                 <div class="card text-center">
                   <div class="card-body">
                     <h5 class="card-title">{{ totals[6][2] }}%</h5>
                     <p class="card-text">${{ totals[3] }}</p>
                   </div>
                   <div class="card-footer text-muted">
-                    Profit {{ totals[4] }}
+                    Profit in {{ totals[8] }}
                   </div>
                 </div>
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="../../coins/{{ coin }}/all">
+            <a href="../../../coins/{{ coin }}/{{timeranges[8][0]}}/{{timeranges[8][1]}}">
                 <div class="card text-center">
                   <div class="card-body">
                     <h5 class="card-title">{{ totals[6][3] }}%</h5>
@@ -72,7 +72,7 @@
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="../../positions">
+            <a href="../../../positions">
                 <div class="card text-center">
                   <div class="card-body">
                     <h5 class="card-title">${{ totals[7][0] }}</h5>
@@ -101,7 +101,7 @@
         <div class="col-md-6">
             <div class="card text-center">
                 <div class="card-header text-muted">
-                    Profit by day
+                    Profit by day between {{ startdate }} and {{ enddate }}
                   </div>
                 <canvas id="lineChart" height="400"></canvas>
             </div>
@@ -188,6 +188,61 @@
     </div>
 
 <script>
+    $('input[name="daterange"]').daterangepicker({
+        "showDropdowns": true,
+        "autoApply": true,
+        ranges: {
+            'Today': ['{{timeranges[0][0]}}', '{{timeranges[0][1]}}'],
+            'Yesterday': ['{{timeranges[1][0]}}', '{{timeranges[1][1]}}'],
+            'This Week': ['{{timeranges[2][0]}}', '{{timeranges[2][1]}}'],
+            'Last Week': ['{{timeranges[3][0]}}', '{{timeranges[3][1]}}'],
+            'This Month': ['{{timeranges[4][0]}}', '{{timeranges[4][1]}}'],
+            'Last Month': ['{{timeranges[5][0]}}', '{{timeranges[5][1]}}'],
+            'This Year': ['{{timeranges[6][0]}}', '{{timeranges[6][1]}}'],
+            'Last Year': ['{{timeranges[7][0]}}', '{{timeranges[7][1]}}'],
+            'All Time': ['{{timeranges[8][0]}}', '{{timeranges[8][1]}}'],
+        },
+        "locale": {
+            "format": "YYYY-MM-DD",
+            "separator": " - ",
+            "fromLabel": "From",
+            "toLabel": "To",
+            "weekLabel": "W",
+            "daysOfWeek": [
+                "Su",
+                "Mo",
+                "Tu",
+                "We",
+                "Th",
+                "Fr",
+                "Sa"
+            ],
+            "monthNames": [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+            ],
+            "firstDay": 1
+        },
+        "alwaysShowCalendars": true,
+        "startDate": "{{startdate}}",
+        "endDate": "{{enddate}}",
+        "opens": "left"
+    });
+    
+    $('input[name="daterange"]').on('apply.daterangepicker', (e, picker) => {
+      document.forms["daterangeform"].submit();
+    });    
+    
 function averageDown() {
     var positionsize = document.getElementById("positionsize").value;
     var customsize = document.getElementById("customsize").value;

@@ -18,9 +18,12 @@
     {% endblock %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js" integrity="sha512-GMGzUEevhWh8Tc/njS0bDpwgxdCJLQBWG3Z2Ct+JGOpVnEmjvNx6ts4v6A2XJf1HOrtOsfhv3hBKpK9kE5z8AQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
 	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <style>
     a { 
         color:black;
@@ -41,17 +44,17 @@
           <div class="flex-shrink-0 p-3 bg-white col-md-2">
             <ul class="list-unstyled ps-0">
               <li>
-                <a href="../../" class="btn align-items-center rounded">
+                <a href="../../../" class="btn align-items-center rounded">
                     Dashboard
                 </a>
               </li>
                 <li>
-                <a href="../../positions" class="btn align-items-center rounded">
+                <a href="../../../positions" class="btn align-items-center rounded">
                     All positions
                 </a>
               </li>
               <li>
-                <a href="../../history" class="btn align-items-center rounded">
+                <a href="../../../history" class="btn align-items-center rounded">
                     Income history
                 </a>
               </li>
@@ -65,7 +68,7 @@
                         {% for item in coin_list['active'] %}
                             <tr>
                                 <td {% if coin_list['active'][item][0] == 0 %} class="table-danger" {% endif %}>
-                                    <a href="../../coins/{{ item }}" class="link-dark rounded">{{ item }}</a></td>
+                                    <a href="../../../coins/{{ item }}" class="link-dark rounded">{{ item }}</a></td>
                                 <td class="text-center">{{ coin_list['active'][item][2] }}</td>
                                 <td class="table-success text-center">{{ coin_list['active'][item][0] }}</td>
                                 <td class="table-danger text-center">{{ coin_list['active'][item][1] }}</td>
@@ -88,7 +91,7 @@
                 <div class="collapse" id="inactivecoins-collapse" style="">
                   <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                         {% for item in coin_list['inactive'] %}
-                            <li><a href="../../coins/{{ item }}" class="link-dark rounded">{{ item }}</a></li>
+                            <li><a href="../../../coins/{{ item }}" class="link-dark rounded">{{ item }}</a></li>
                         {% endfor %}
                   </ul>
                 </div>
