@@ -240,6 +240,7 @@ def index_page():
         fees,
         percentages,
         pnl,
+        datetime.now().strftime("%B"),
     ]
     return render_template(
         "home.html",
@@ -250,7 +251,8 @@ def index_page():
         lastupdate=get_lastupdate(),
         startdate=startdate,
         enddate=enddate,
-        timeranges=ranges
+        timeranges=ranges,
+        
     )
 
 
@@ -369,6 +371,7 @@ def dashboard(start, end):
         fees,
         percentages,
         pnl,
+        datetime.now().strftime("%B")
     ]
     return render_template(
         "home.html",
@@ -523,6 +526,7 @@ def show_individual_coin(coin):
             fees,
             percentages,
             pnl,
+            datetime.now().strftime("%B")
         ]
         by_date = query_db(
             'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ? GROUP BY Date',
@@ -544,6 +548,9 @@ def show_individual_coin(coin):
         orders=[allpositions, allorders],
         lastupdate=get_lastupdate(),
         markprice=markPrice,
+        startdate=startdate,
+        enddate=enddate,
+        timeranges=ranges
     )
 
 
@@ -648,6 +655,7 @@ def show_individual_coin_timeframe(coin, timeframe):
             fees,
             percentages,
             pnl,
+            datetime.now().strftime("%B")
         ]
 
         by_date = query_db(
@@ -671,6 +679,9 @@ def show_individual_coin_timeframe(coin, timeframe):
         orders=[allpositions, allorders],
         lastupdate=get_lastupdate(),
         markprice=markPrice,
+        startdate=startdate,
+        enddate=enddate,
+        timeranges=ranges
     )
 
 
@@ -809,7 +820,7 @@ def projection():
                 newbalance = balance[0]
             else:
                 newbalance = projections[3][0][-1]
-            projections[3][0].append(newbalance*1.015)
+            projections[3][0].append(newbalance*1.02)
             
             if len(projections[4][0]) < 1:
                 newbalance = balance[0]
