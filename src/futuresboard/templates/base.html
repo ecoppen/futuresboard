@@ -44,17 +44,17 @@
           <div class="flex-shrink-0 p-3 bg-white col-md-2">
             <ul class="list-unstyled ps-0">
               <li>
-                <a href="../../" class="btn align-items-center rounded">
+                <a href="../../../" class="btn align-items-center rounded">
                     Dashboard
                 </a>
               </li>
                 <li>
-                <a href="../../positions" class="btn align-items-center rounded">
+                <a href="../../../positions" class="btn align-items-center rounded">
                     All positions
                 </a>
               </li>
               <li>
-                <a href="../../history" class="btn align-items-center rounded">
+                <a href="../../../history" class="btn align-items-center rounded">
                     Income history
                 </a>
               </li>
@@ -68,7 +68,7 @@
                         {% for item in coin_list['active'] %}
                             <tr>
                                 <td {% if coin_list['active'][item][0] == 0 %} class="table-danger" {% endif %}>
-                                    <a href="../../coins/{{ item }}" class="link-dark rounded">{{ item }}</a></td>
+                                    <a href="../../../coins/{{ item }}" class="link-dark rounded">{{ item }}</a></td>
                                 <td class="text-center">{{ coin_list['active'][item][2] }}</td>
                                 <td class="table-success text-center">{{ coin_list['active'][item][0] }}</td>
                                 <td class="table-danger text-center">{{ coin_list['active'][item][1] }}</td>
@@ -91,7 +91,7 @@
                 <div class="collapse" id="inactivecoins-collapse" style="">
                   <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                         {% for item in coin_list['inactive'] %}
-                            <li><a href="../../coins/{{ item }}" class="link-dark rounded">{{ item }}</a></li>
+                            <li><a href="../../../coins/{{ item }}" class="link-dark rounded">{{ item }}</a></li>
                         {% endfor %}
                   </ul>
                 </div>
