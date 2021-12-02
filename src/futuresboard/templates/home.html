@@ -20,7 +20,7 @@
     </div>
     <div class="row">
         <div class="col-sm-2">
-            <a href="../../dashboard/today">
+            <a href="../../dashboard/{{timeranges[0][0]}}/{{timeranges[0][1]}}">
                 <div class="card text-center">
                   <div class="card-body">
                     <h5 class="card-title">{{ totals[6][0] }}%</h5>
@@ -33,33 +33,33 @@
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="../../dashboard/week">
+            <a href="../../dashboard/{{timeranges[2][0]}}/{{timeranges[2][1]}}">
                 <div class="card text-center">
                   <div class="card-body">
                     <h5 class="card-title">{{ totals[6][1] }}%</h5>
                     <p class="card-text">${{ totals[2] }}</p>
                   </div>
                   <div class="card-footer text-muted">
-                    Profit past 7 days
+                    Profit from Monday
                   </div>
                 </div>
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="../../dashboard/month">
+            <a href="../../dashboard/{{timeranges[4][0]}}/{{timeranges[4][1]}}">
                 <div class="card text-center">
                   <div class="card-body">
                     <h5 class="card-title">{{ totals[6][2] }}%</h5>
                     <p class="card-text">${{ totals[3] }}</p>
                   </div>
                   <div class="card-footer text-muted">
-                    Profit {{ totals[4] }}
+                    Profit in {{ totals[8] }}
                   </div>
                 </div>
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="../../dashboard/all">
+            <a href="../../dashboard/{{timeranges[8][0]}}/{{timeranges[8][1]}}">
                 <div class="card text-center">
                   <div class="card-body">
                     <h5 class="card-title">{{ totals[6][3] }}%</h5>
@@ -101,7 +101,7 @@
         <div class="col-md-6">
             <div class="card text-center">
                 <div class="card-header text-muted">
-                    Profit by day <span class="float-end"><a class="btn btn-outline-secondary btn-sm" role="button" href="../../projection">Projection</a></span>
+                    Profit by day between {{ startdate }} and {{ enddate }}<span class="float-end"><a class="btn btn-outline-secondary btn-sm" role="button" href="../../projection">Projection</a></span>
                   </div>
                 <canvas id="lineChart" height="400"></canvas>
             </div>
@@ -109,7 +109,7 @@
         <div class="col-md-6">
             <div class="card text-center">
                 <div class="card-header text-muted">
-                    Profit by coin
+                    Profit by coin between {{ startdate }} and {{ enddate }}
                   </div>
                 <canvas id="barChart" height="400"></canvas>
             </div>
