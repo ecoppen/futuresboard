@@ -220,12 +220,15 @@ def index_page():
         temp[1].append(round(float(each[0]), 2))
     by_symbol = temp
 
-    percentages = [
-        format_dp(zero_value(today[0]) / balance * 100),
-        format_dp(zero_value(week[0]) / balance * 100),
-        format_dp(zero_value(month[0]) / balance * 100),
-        format_dp(zero_value(total[0]) / balance * 100),
-    ]
+    if balance == 0.0:
+        percentages = ["-", "-", "-", "-"]
+    else:
+        percentages = [
+            format_dp(zero_value(today[0]) / balance * 100),
+            format_dp(zero_value(week[0]) / balance * 100),
+            format_dp(zero_value(month[0]) / balance * 100),
+            format_dp(zero_value(total[0]) / balance * 100),
+        ]
 
     for row in all_fees:
         fees[row[1]] = format_dp(abs(zero_value(row[0])), 4)
@@ -353,12 +356,16 @@ def dashboard(start, end):
         temp[1].append(round(float(each[0]), 2))
     by_symbol = temp
 
-    percentages = [
-        format_dp(zero_value(today[0]) / balance * 100),
-        format_dp(zero_value(week[0]) / balance * 100),
-        format_dp(zero_value(month[0]) / balance * 100),
-        format_dp(zero_value(total[0]) / balance * 100),
-    ]
+    if balance == 0.0:
+        percentages = ["-", "-", "-", "-"]
+    else:
+        percentages = [
+            format_dp(zero_value(today[0]) / balance * 100),
+            format_dp(zero_value(week[0]) / balance * 100),
+            format_dp(zero_value(month[0]) / balance * 100),
+            format_dp(zero_value(total[0]) / balance * 100),
+        ]
+        
     for row in all_fees:
         fees[row[1]] = format_dp(abs(zero_value(row[0])), 4)
     pnl = [format_dp(zero_value(unrealized[0])), format_dp(balance)]
@@ -522,12 +529,15 @@ def show_individual_coin(coin):
 
         fees = {"USDT": 0, "BNB": 0}
         balance = float(balance[0])
-        percentages = [
-            format_dp(zero_value(today[0]) / balance * 100),
-            format_dp(zero_value(week[0]) / balance * 100),
-            format_dp(zero_value(month[0]) / balance * 100),
-            format_dp(zero_value(total[0]) / balance * 100),
-        ]
+        if balance == 0.0:
+            percentages = ["-", "-", "-", "-"]
+        else:
+            percentages = [
+                format_dp(zero_value(today[0]) / balance * 100),
+                format_dp(zero_value(week[0]) / balance * 100),
+                format_dp(zero_value(month[0]) / balance * 100),
+                format_dp(zero_value(total[0]) / balance * 100),
+            ]
         for row in result:
             fees[row[1]] = format_dp(abs(zero_value(row[0])), 4)
         pnl = [format_dp(zero_value(unrealized[0])), format_dp(balance)]
@@ -671,12 +681,15 @@ def show_individual_coin_timeframe(coin, start, end):
         allorders = temp
         fees = {"USDT": 0, "BNB": 0}
         balance = float(balance[0])
-        percentages = [
-            format_dp(zero_value(today[0]) / balance * 100),
-            format_dp(zero_value(week[0]) / balance * 100),
-            format_dp(zero_value(month[0]) / balance * 100),
-            format_dp(zero_value(total[0]) / balance * 100),
-        ]
+        if balance == 0.0:
+            percentages = ["-", "-", "-", "-"]
+        else:
+            percentages = [
+                format_dp(zero_value(today[0]) / balance * 100),
+                format_dp(zero_value(week[0]) / balance * 100),
+                format_dp(zero_value(month[0]) / balance * 100),
+                format_dp(zero_value(total[0]) / balance * 100),
+            ]
         for row in result:
             fees[row[1]] = format_dp(abs(zero_value(row[0])), 4)
         pnl = [format_dp(zero_value(unrealized[0])), format_dp(balance)]
