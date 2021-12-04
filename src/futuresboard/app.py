@@ -102,7 +102,7 @@ def get_coins():
 
 def get_lastupdate():
     lastupdate = query_db("SELECT MAX(time) FROM orders", one=True)
-    if lastupdate is None:
+    if lastupdate[0] is None:
         return "-"
     return datetime.fromtimestamp(lastupdate[0] / 1000.0).strftime("%Y-%m-%d %H:%M:%S")
 
