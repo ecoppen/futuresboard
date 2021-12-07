@@ -15,6 +15,19 @@ import requests
 from flask import current_app
 
 
+class HTTPRequestError(Exception):
+    def __init__(self, url, code, msg=None):
+        self.url = url
+        self.code = code
+        self.msg = msg
+
+    def __str__(self) -> str:
+        """
+        Convert the exception into a printable string
+        """
+        return f"Request to {self.url!r} failed. Code: {self.code}; Message: {self.msg}"
+
+
 def auto_scrape(app):
     thread = threading.Thread(target=_auto_scrape, args=(app,))
     thread.daemon = True
@@ -80,7 +93,11 @@ def send_signed_request(http_method, url_path, payload={}):
     # print("{} {}".format(http_method, url))
     params = {"url": url, "params": {}}
     response = dispatch_request(http_method)(**params)
-    return response.headers, response.json()
+    headers = response.headers
+    json_response = response.json()
+    if "code" in json_response:
+        raise HTTPRequestError(url=url, code=json_response["code"], msg=json_response["msg"])
+    return headers, json_response
 
 
 # used for sending public data request
@@ -91,7 +108,11 @@ def send_public_request(url_path, payload={}):
         url = url + "?" + query_string
     # print("{}".format(url))
     response = dispatch_request("GET")(url=url)
-    return response.headers, response.json()
+    headers = response.headers
+    json_response = response.json()
+    if "code" in json_response:
+        raise HTTPRequestError(url=url, code=json_response["code"], msg=json_response["msg"])
+    return headers, json_response
 
 
 def create_connection(db_file):
@@ -235,6 +256,16 @@ def create_orders(conn, orders):
 
 
 def scrape(app=None):
+    try:
+        _scrape(app=app)
+    except HTTPRequestError as exc:
+        if app is None:
+            print(exc)
+        else:
+            app.logger.error(str(exc))
+
+
+def _scrape(app=None):
     start = time.time()
     db_setup(current_app.config["DATABASE"])
 
