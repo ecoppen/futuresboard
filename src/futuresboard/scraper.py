@@ -5,18 +5,37 @@ import datetime
 import hashlib
 import hmac
 import sqlite3
+import threading
 import time
 from datetime import timedelta
 from sqlite3 import Error
 from urllib.parse import urlencode
 
 import requests
-from xyzboard.app import app
+from flask import current_app
+
+
+def auto_scrape(app):
+    thread = threading.Thread(target=_auto_scrape, args=(app,))
+    thread.daemon = True
+    thread.start()
+
+
+def _auto_scrape(app):
+    with app.app_context():
+        interval = app.config["AUTO_SCRAPE_INTERVAL"]
+        while True:
+            app.logger.info("Auto scrape routines starting")
+            scrape(app=app)
+            app.logger.info("Auto scrape routines terninated. Sleeping %s seconds...", interval)
+            time.sleep(interval)
 
 
 def hashing(query_string):
     return hmac.new(
-        app.config["API_SECRET"].encode("utf-8"), query_string.encode("utf-8"), hashlib.sha256
+        current_app.config["API_SECRET"].encode("utf-8"),
+        query_string.encode("utf-8"),
+        hashlib.sha256,
     ).hexdigest()
 
 
@@ -27,7 +46,10 @@ def get_timestamp():
 def dispatch_request(http_method):
     session = requests.Session()
     session.headers.update(
-        {"Content-Type": "application/json;charset=utf-8", "X-MBX-APIKEY": app.config["API_KEY"]}
+        {
+            "Content-Type": "application/json;charset=utf-8",
+            "X-MBX-APIKEY": current_app.config["API_KEY"],
+        }
     )
     return {
         "GET": session.get,
@@ -48,7 +70,7 @@ def send_signed_request(http_method, url_path, payload={}):
         query_string = f"timestamp={get_timestamp()}"
 
     url = (
-        app.config["API_BASE_URL"]
+        current_app.config["API_BASE_URL"]
         + url_path
         + "?"
         + query_string
@@ -64,7 +86,7 @@ def send_signed_request(http_method, url_path, payload={}):
 # used for sending public data request
 def send_public_request(url_path, payload={}):
     query_string = urlencode(payload, True)
-    url = app.config["API_BASE_URL"] + url_path
+    url = current_app.config["API_BASE_URL"] + url_path
     if query_string:
         url = url + "?" + query_string
     # print("{}".format(url))
@@ -212,9 +234,9 @@ def create_orders(conn, orders):
     cur.execute(sql, orders)
 
 
-def scrape(auto_scrape=False):
+def scrape(app=None):
     start = time.time()
-    db_setup(app.config["DATABASE"])
+    db_setup(current_app.config["DATABASE"])
 
     up_to_date = False
     weightused = 0
@@ -225,7 +247,7 @@ def scrape(auto_scrape=False):
         responseHeader, responseJSON = send_signed_request("GET", "/fapi/v1/openOrders")
         weightused = int(responseHeader["X-MBX-USED-WEIGHT-1M"])
 
-        with create_connection(app.config["DATABASE"]) as conn:
+        with create_connection(current_app.config["DATABASE"]) as conn:
             delete_all_orders(conn)
             for order in responseJSON:
                 updated_orders += 1
@@ -252,7 +274,7 @@ def scrape(auto_scrape=False):
         overweight = True
 
     if not overweight:
-        with create_connection(app.config["DATABASE"]) as conn:
+        with create_connection(current_app.config["DATABASE"]) as conn:
             totals_row = (
                 float(responseJSON["totalWalletBalance"]),
                 float(responseJSON["totalUnrealizedProfit"]),
@@ -292,7 +314,7 @@ def scrape(auto_scrape=False):
             sleeps += 1
             time.sleep(60)
 
-        with create_connection(app.config["DATABASE"]) as conn:
+        with create_connection(current_app.config["DATABASE"]) as conn:
             startTime = select_latest_income(conn)
             if startTime is None:
                 startTime = int(
@@ -327,8 +349,8 @@ def scrape(auto_scrape=False):
                 conn.commit()
 
     elapsed = time.time() - start
-    if auto_scrape is True:
-        app.logger.info(
+    if app is not None:
+        current_app.logger.info(
             "Orders updated: %s; Positions updated: %s (new: %s); Trades processed: %s; Time elapsed: %s; Sleeps: %s",
             updated_orders,
             updated_positions,

@@ -32,7 +32,7 @@
         </style>
     </head>
     <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-5" href="{{ url_for("index_page") }}">futuresboard</a>
+        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-5" href="{{ url_for("main.index_page") }}">futuresboard</a>
         <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -44,17 +44,17 @@
                     <div class="flex-shrink-0 p-3 bg-white col-md-2">
                         <ul class="list-unstyled ps-0">
                             <li>
-                                <a href="{{ url_for("index_page") }}" class="btn align-items-center rounded">
+                                <a href="{{ url_for("main.index_page") }}" class="btn align-items-center rounded">
                                     Dashboard
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ url_for("positions_page") }}" class="btn align-items-center rounded">
+                                <a href="{{ url_for("main.positions_page") }}" class="btn align-items-center rounded">
                                     All positions
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ url_for("history_page") }}" class="btn align-items-center rounded">
+                                <a href="{{ url_for("main.history_page") }}" class="btn align-items-center rounded">
                                     Income history
                                 </a>
                             </li>
@@ -68,7 +68,7 @@
                                             {% for item in coin_list['active'] %}
                                                 <tr>
                                                     <td {% if coin_list['active'][item][0] == 0 %} class="table-danger" {% endif %}>
-                                                        <a href="{{ url_for("coin_page", coin=item) }}" class="link-dark rounded">{{ item }}</a></td>
+                                                        <a href="{{ url_for("main.coin_page", coin=item) }}" class="link-dark rounded">{{ item }}</a></td>
                                                     <td class="text-center">{{ coin_list['active'][item][2] }}</td>
                                                     <td class="table-success text-center">{{ coin_list['active'][item][0] }}</td>
                                                     <td class="table-danger text-center">{{ coin_list['active'][item][1] }}</td>
@@ -91,7 +91,7 @@
                                 <div class="collapse" id="inactivecoins-collapse" style="">
                                     <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                                         {% for item in coin_list['inactive'] %}
-                                            <li><a href="{{ url_for("coin_page", coin=item) }}" class="link-dark rounded">{{ item }}</a></li>
+                                            <li><a href="{{ url_for("main.coin_page", coin=item) }}" class="link-dark rounded">{{ item }}</a></li>
                                         {% endfor %}
                                     </ul>
                                 </div>

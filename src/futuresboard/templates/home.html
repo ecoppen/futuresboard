@@ -20,7 +20,7 @@
     </div>
     <div class="row">
         <div class="col-sm-2">
-            <a href="{{ url_for("dashboard_page", start=timeranges[0][0], end=timeranges[0][1]) }}">
+            <a href="{{ url_for("main.dashboard_page", start=timeranges[0][0], end=timeranges[0][1]) }}">
                 <div class="card text-center">
                     <div class="card-body">
                         <h5 class="card-title">{{ totals[6][0] }}%</h5>
@@ -33,7 +33,7 @@
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="{{ url_for("dashboard_page", start=timeranges[2][0], end=timeranges[2][1]) }}">
+            <a href="{{ url_for("main.dashboard_page", start=timeranges[2][0], end=timeranges[2][1]) }}">
                 <div class="card text-center">
                     <div class="card-body">
                         <h5 class="card-title">{{ totals[6][1] }}%</h5>
@@ -46,7 +46,7 @@
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="{{ url_for("dashboard_page", start=timeranges[4][0], end=timeranges[4][1]) }}">
+            <a href="{{ url_for("main.dashboard_page", start=timeranges[4][0], end=timeranges[4][1]) }}">
                 <div class="card text-center">
                     <div class="card-body">
                         <h5 class="card-title">{{ totals[6][2] }}%</h5>
@@ -59,7 +59,7 @@
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="{{ url_for("dashboard_page", start=timeranges[8][0], end=timeranges[8][1]) }}">
+            <a href="{{ url_for("main.dashboard_page", start=timeranges[8][0], end=timeranges[8][1]) }}">
                 <div class="card text-center">
                     <div class="card-body">
                         <h5 class="card-title">{{ totals[6][3] }}%</h5>
@@ -72,7 +72,7 @@
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="{{ url_for("positions_page") }}">
+            <a href="{{ url_for("main.positions_page") }}">
                 <div class="card text-center">
                     <div class="card-body">
                         <h5 class="card-title">${{ totals[7][0] }}</h5>
@@ -101,7 +101,7 @@
         <div class="col-md-6">
             <div class="card text-center">
                 <div class="card-header text-muted">
-                    Profit by day between {{ startdate }} and {{ enddate }}<span class="float-end"><a class="btn btn-outline-secondary btn-sm" role="button" href="{{ url_for("projection_page") }}">Projection</a></span>
+                    Profit by day between {{ startdate }} and {{ enddate }}<span class="float-end"><a class="btn btn-outline-secondary btn-sm" role="button" href="{{ url_for("main.projection_page") }}">Projection</a></span>
                 </div>
                 <canvas id="lineChart" height="400"></canvas>
             </div>

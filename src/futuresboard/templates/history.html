@@ -26,7 +26,7 @@
                         {% for timeframe in history %}
                             {% if timeframe != "columns" %}
                                 <tr>
-                                    <td><a class="btn btn-outline-primary btn-sm" href="{{ url_for("history_page_timeframe", start=timeframe[0], end=timeframe[1]) }}" role="button">Save to file</a></td>
+                                    <td><a class="btn btn-outline-primary btn-sm" href="{{ url_for("main.history_page_timeframe", start=timeframe[0], end=timeframe[1]) }}" role="button">Save to file</a></td>
                                     <td>{{ timeframe }}</td>
                                     <td>{{ history[timeframe]["total"] }}</td>
                                     {% for col in history["columns"] %}
