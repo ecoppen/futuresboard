@@ -4,10 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
-- Change dates from 'week', 'month' to /start/end in the format YYYY-MM-DD/YYYY-MM-DD
 - Match all of the details from [passivbot](https://github.com/enarjord/passivbot)s telegram commands `/position` and `/open_orders` commands
 - Store and display historical unrealized PnL
 - Tidy up repeated code into functions
+
+## 2021-12-07
+### Changed
+- Codebase overhauled by [@s0undt3ch](https://github.com/s0undt3ch) to use a blueprint which allows the multiple dashboards to be served 
+- Hard coded URLs swapped to use `url_for` by  [@s0undt3ch](https://github.com/s0undt3ch)
 
 ## 2021-12-02
 ### Changed
