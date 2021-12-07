@@ -67,7 +67,6 @@ def main():
 
     # Run the application
     app = futuresboard.app.init_app(config)
-    app.logger.setLevel(logging.INFO)
 
     if args.scrape_only:
         with app.app_context():

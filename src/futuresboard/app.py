@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import pathlib
 from typing import Any
 
@@ -50,5 +51,7 @@ def init_app(config: dict[str, Any] | None = None):
 
     if config["DISABLE_AUTO_SCRAPE"] is False:
         futuresboard.scraper.auto_scrape(app)
+
+    app.logger.setLevel(logging.INFO)
 
     return app
