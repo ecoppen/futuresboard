@@ -6,6 +6,7 @@ import sqlite3
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from typing import Any
 
 import requests
 from flask import Flask
@@ -13,8 +14,38 @@ from flask import g
 from flask import redirect
 from flask import render_template
 from flask import request
+from typing_extensions import TypedDict
 
 app = Flask(__name__)
+
+
+class CoinsTotals(TypedDict):
+    active: int
+    inactive: int
+    buys: int
+    sells: int
+    pbr: int
+
+
+class Coins(TypedDict):
+    active: dict[str, tuple[int, int, int]]
+    inactive: list[str]
+    totals: CoinsTotals
+    warning: bool
+
+
+class History(TypedDict):
+    columns: list[dict[str, Any]]
+
+
+class Projections(TypedDict):
+    dates: list[str]
+    p03: list[float]
+    p05: list[float]
+    p10: list[float]
+    p15: list[float]
+    pcustom: list[float]
+    pcustom_value: float
 
 
 def zero_value(x):
@@ -59,7 +90,7 @@ def calc_pbr(volume, price, side, balance):
 
 
 def get_coins():
-    coins = {
+    coins: Coins = {
         "active": {},
         "inactive": [],
         "totals": {"active": 0, "inactive": 0, "buys": 0, "sells": 0, "pbr": 0},
@@ -104,7 +135,7 @@ def get_coins():
         if sellorders is not None:
             sell = int(sellorders[0])
 
-        coins["active"][position[0]] = [buy, sell, pbr]
+        coins["active"][position[0]] = (buy, sell, pbr)
         coins["totals"]["active"] += 1
         coins["totals"]["buys"] += buy
         coins["totals"]["sells"] += sell
@@ -141,8 +172,6 @@ def timeranges():
     this_year_start = today.replace(day=1).replace(month=1)
     last_year_start = (this_year_start - timedelta(days=1)).replace(day=1).replace(month=1)
     last_year_end = this_year_start - timedelta(days=1)
-
-    two_year_start = (last_year_start - timedelta(days=1)).replace(day=1).replace(month=1)
 
     return [
         [today.strftime("%Y-%m-%d"), today.strftime("%Y-%m-%d")],
@@ -258,10 +287,10 @@ def index_page():
 
     balance = float(balance[0])
 
-    temptotal = [[], []]
+    temptotal: tuple[list[float], list[float]] = ([], [])
     profit_period = balance - zero_value(week[0])
 
-    temp = [[], []]
+    temp: tuple[list[float], list[float]] = ([], [])
     for each in by_date:
         temp[0].append(round(float(each[1]), 2))
         temp[1].append(each[0])
@@ -271,7 +300,7 @@ def index_page():
     by_date = temp
     total_by_date = temptotal
 
-    temp = [[], []]
+    temp = ([], [])
     for each in by_symbol:
         temp[0].append(each[1])
         temp[1].append(round(float(each[0]), 2))
@@ -376,7 +405,6 @@ def dashboard(start, end):
         * 1000
     )
 
-    times = {"today": 0, "week": 1, "month": 2, "quarter": 4, "year": 5, "all": 6}
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     total = query_db(
         'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER"', one=True
@@ -418,7 +446,7 @@ def dashboard(start, end):
 
     balance = float(balance[0])
 
-    temptotal = [[], []]
+    temptotal: tuple[list[float], list[float]] = ([], [])
 
     customframe = query_db(
         'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
@@ -428,7 +456,7 @@ def dashboard(start, end):
 
     profit_period = balance - zero_value(customframe[0])
 
-    temp = [[], []]
+    temp: tuple[list[float], list[float]] = ([], [])
     for each in by_date:
         temp[0].append(round(float(each[1]), 2))
         temp[1].append(each[0])
@@ -438,7 +466,7 @@ def dashboard(start, end):
     by_date = temp
     total_by_date = temptotal
 
-    temp = [[], []]
+    temp = ([], [])
     for each in by_symbol:
         temp[0].append(each[1])
         temp[1].append(round(float(each[0]), 2))
@@ -527,13 +555,13 @@ def show_individual_coin(coin):
         daterange = daterange.split(" - ")
         if len(daterange) == 2:
             try:
-                start = (
+                (
                     datetime.combine(
                         datetime.fromisoformat(daterange[0]), datetime.min.time()
                     ).timestamp()
                     * 1000
                 )
-                end = (
+                (
                     datetime.combine(
                         datetime.fromisoformat(daterange[1]), datetime.max.time()
                     ).timestamp()
@@ -548,6 +576,7 @@ def show_individual_coin(coin):
         response = requests.get(
             "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=1
         )
+        markPrice: float | str
         if response:
             markPrice = round(float(response.json()["markPrice"]), 5)
         else:
@@ -760,6 +789,7 @@ def show_individual_coin_timeframe(coin, start, end):
         response = requests.get(
             "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=1
         )
+        markPrice: float | str
         if response:
             markPrice = round(float(response.json()["markPrice"]), 5)
         else:
@@ -877,7 +907,7 @@ def show_individual_coin_timeframe(coin, start, end):
 @app.route("/history/")
 def show_history():
     ranges = timeranges()
-    history = {"columns": []}
+    history: History = {"columns": []}
 
     for timeframe in ranges:
         start = (
@@ -894,19 +924,19 @@ def show_history():
         )
         temp = timeframe[0] + "/" + timeframe[1]
         if temp not in history:
-            history[temp] = {}
-            history[temp]["total"] = 0
+            history[temp] = {}  # type: ignore[misc]
+            history[temp]["total"] = 0  # type: ignore[misc]
 
         for totals in incomesummary:
-            history[temp][totals[0]] = int(totals[1])
-            history[temp]["total"] += int(totals[1])
+            history[temp][totals[0]] = int(totals[1])  # type: ignore[misc]
+            history[temp]["total"] += int(totals[1])  # type: ignore[misc]
             if totals[0] not in history["columns"]:
                 history["columns"].append(totals[0])
     for timeframe in ranges:
         temp = timeframe[0] + "/" + timeframe[1]
         for column in history["columns"]:
-            if column not in history[temp]:
-                history[temp][column] = 0
+            if column not in history[temp]:  # type: ignore[misc]
+                history[temp][column] = 0  # type: ignore[misc]
 
     history["columns"].sort()
 
@@ -1014,10 +1044,16 @@ def show_all_history(start, end):
 @app.route("/projection")
 def projection():
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
-    if balance[0] is None:
-        projections = [[[], []], [[], []], [[], []], [[], []], [[], []]]
-    else:
-        projections = [[[], []], [[], []], [[], []], [[], []], [[], []]]
+    projections: Projections = {
+        "dates": [],
+        "p03": [],
+        "p05": [],
+        "p10": [],
+        "p15": [],
+        "pcustom": [],
+        "pcustom_value": 0.0,
+    }
+    if balance[1] is not None:
 
         ranges = timeranges()
 
@@ -1039,44 +1075,41 @@ def projection():
             one=True,
         )
         custom = round(week[0] / balance[0] * 100 / 7, 2)
-        projections[4].append(custom)
+        projections["pcustom_value"] = custom
         today = date.today()
         x = 1
         while x < 365:
             nextday = today + timedelta(days=x)
-            projections[0][1].append(nextday.strftime("%Y-%m-%d"))
-            # projections[1][1].append(nextday.strftime("%Y-%m-%d"))
-            # projections[2][1].append(nextday.strftime("%Y-%m-%d"))
-            # projections[3][1].append(nextday.strftime("%Y-%m-%d"))
-            if len(projections[0][0]) < 1:
+            projections["dates"].append(nextday.strftime("%Y-%m-%d"))
+            if len(projections["p03"]) < 1:
                 newbalance = balance[0]
             else:
-                newbalance = projections[0][0][-1]
-            projections[0][0].append(newbalance * 1.003)
+                newbalance = projections["p03"][-1]
+            projections["p03"].append(newbalance * 1.003)
 
-            if len(projections[1][0]) < 1:
+            if len(projections["p05"]) < 1:
                 newbalance = balance[0]
             else:
-                newbalance = projections[1][0][-1]
-            projections[1][0].append(newbalance * 1.005)
+                newbalance = projections["p05"][-1]
+            projections["p05"].append(newbalance * 1.005)
 
-            if len(projections[2][0]) < 1:
+            if len(projections["p10"]) < 1:
                 newbalance = balance[0]
             else:
-                newbalance = projections[2][0][-1]
-            projections[2][0].append(newbalance * 1.01)
+                newbalance = projections["p10"][-1]
+            projections["p10"].append(newbalance * 1.01)
 
-            if len(projections[3][0]) < 1:
+            if len(projections["p15"]) < 1:
                 newbalance = balance[0]
             else:
-                newbalance = projections[3][0][-1]
-            projections[3][0].append(newbalance * 1.012)
+                newbalance = projections["p15"][-1]
+            projections["p15"].append(newbalance * 1.012)
 
-            if len(projections[4][0]) < 1:
+            if len(projections["pcustom"]) < 1:
                 newbalance = balance[0]
             else:
-                newbalance = projections[4][0][-1]
-            projections[4][0].append(newbalance * (1 + (week[0] / balance[0]) / 7))
+                newbalance = projections["pcustom"][-1]
+            projections["pcustom"].append(newbalance * (1 + (week[0] / balance[0]) / 7))
 
             x += 1
 

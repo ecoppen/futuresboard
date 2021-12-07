@@ -46,9 +46,9 @@ def main():
         help="Disable the routines which scrape while the webservice is running",
     )
     server_settings = parser.add_argument_group("Server Settings")
-    server_settings.add_argument("--host", default="0.0.0.0", help="Server host. Default: %default")
+    server_settings.add_argument("--host", default="0.0.0.0", help="Server host. Default: 0.0.0.0")
     server_settings.add_argument(
-        "--port", type=int, default=5000, help="Server port. Default: %default"
+        "--port", type=int, default=5000, help="Server port. Default: 5000"
     )
     args = parser.parse_args()
 
