@@ -14,9 +14,11 @@ from flask import g
 from flask import redirect
 from flask import render_template
 from flask import request
+from flask.helpers import url_for
 from typing_extensions import TypedDict
 
 app = Flask(__name__)
+app.url_map.strict_slashes = False
 
 
 class CoinsTotals(TypedDict):
@@ -64,6 +66,13 @@ def get_db():
     if db is None:
         db = g._database = sqlite3.connect(app.config["DATABASE"])
     return db
+
+
+@app.before_request
+def clear_trailing():
+    rp = request.path
+    if rp != "/" and rp.endswith("/"):
+        return redirect(rp[:-1])
 
 
 @app.teardown_appcontext
@@ -189,6 +198,7 @@ def timeranges():
 @app.route("/", methods=["GET"])
 def index_page():
     daterange = request.args.get("daterange")
+    app.logger.warning("INDEX / DATERANGE: %s", daterange)
     ranges = timeranges()
 
     if daterange is not None:
@@ -208,7 +218,7 @@ def index_page():
                     * 1000
                 )
                 startdate, enddate = daterange[0], daterange[1]
-                return redirect("/dashboard/" + startdate + "/" + enddate)
+                return redirect(url_for("dashboard_page", start=startdate, end=enddate))
             except Exception:
                 pass
 
@@ -345,7 +355,7 @@ def index_page():
 
 
 @app.route("/dashboard/<start>/<end>", methods=["GET"])
-def dashboard(start, end):
+def dashboard_page(start, end):
     ranges = timeranges()
     daterange = request.args.get("daterange")
 
@@ -366,9 +376,9 @@ def dashboard(start, end):
                     * 1000
                 )
                 startdate, enddate = daterange[0], daterange[1]
-                return redirect("/dashboard/" + startdate + "/" + enddate)
+                return redirect(url_for("dashboard_page", start=startdate, end=enddate))
             except Exception:
-                return redirect("/dashboard/" + start + "/" + end)
+                return redirect(url_for("dashboard_page", start=start, end=end))
 
     try:
         startdate, enddate = start, end
@@ -378,7 +388,7 @@ def dashboard(start, end):
         end = datetime.combine(datetime.fromisoformat(end), datetime.max.time()).timestamp() * 1000
     except Exception:
         startdate, enddate = ranges[2][0], ranges[2][1]
-        return redirect("/dashboard/" + startdate + "/" + enddate)
+        return redirect(url_for("dashboard_page", start=startdate, end=enddate))
 
     todaystart = (
         datetime.combine(datetime.fromisoformat(ranges[0][0]), datetime.min.time()).timestamp()
@@ -543,7 +553,7 @@ def positions_page():
 
 
 @app.route("/coins/<coin>", methods=["GET"])
-def show_individual_coin(coin):
+def coin_page(coin):
     coins = get_coins()
     if coin not in coins["inactive"] and coin not in coins["active"]:
         return render_template("error.html", coin_list=get_coins()), 404
@@ -568,7 +578,9 @@ def show_individual_coin(coin):
                     * 1000
                 )
                 startdate, enddate = daterange[0], daterange[1]
-                return redirect("/coins/" + coin + "/" + startdate + "/" + enddate)
+                return redirect(
+                    url_for("coin_page_timeframe", coin=coin, start=startdate, end=enddate)
+                )
             except Exception:
                 pass
 
@@ -721,7 +733,7 @@ def show_individual_coin(coin):
 
 
 @app.route("/coins/<coin>/<start>/<end>")
-def show_individual_coin_timeframe(coin, start, end):
+def coin_page_timeframe(coin, start, end):
     coins = get_coins()
     if coin not in coins["inactive"] and coin not in coins["active"]:
         return render_template("error.html", coin_list=get_coins()), 404
@@ -746,9 +758,11 @@ def show_individual_coin_timeframe(coin, start, end):
                     * 1000
                 )
                 startdate, enddate = daterange[0], daterange[1]
-                return redirect("/coins/" + coin + "/" + startdate + "/" + enddate)
+                return redirect(
+                    url_for("coin_page_timeframe", coin=coin, start=startdate, end=enddate)
+                )
             except Exception:
-                return redirect("/coins/" + coin + "/" + start + "/" + end)
+                return redirect(url_for("coin_page_timeframe", coin=coin, start=start, end=end))
 
     try:
         startdate, enddate = start, end
@@ -758,7 +772,7 @@ def show_individual_coin_timeframe(coin, start, end):
         end = datetime.combine(datetime.fromisoformat(end), datetime.max.time()).timestamp() * 1000
     except Exception:
         startdate, enddate = ranges[2][0], ranges[2][1]
-        return redirect("/coins/" + coin + "/" + startdate + "/" + enddate)
+        return redirect(url_for("coin_page_timeframe", coin=coin, start=startdate, end=enddate))
 
     todaystart = (
         datetime.combine(datetime.fromisoformat(ranges[0][0]), datetime.min.time()).timestamp()
@@ -904,8 +918,8 @@ def show_individual_coin_timeframe(coin, start, end):
     )
 
 
-@app.route("/history/")
-def show_history():
+@app.route("/history")
+def history_page():
     ranges = timeranges()
     history: History = {"columns": []}
 
@@ -951,7 +965,7 @@ def show_history():
 
 
 @app.route("/history/<start>/<end>")
-def show_all_history(start, end):
+def history_page_timeframe(start, end):
     try:
         startdate, enddate = start, end
         start = (
@@ -959,7 +973,7 @@ def show_all_history(start, end):
         )
         end = datetime.combine(datetime.fromisoformat(end), datetime.max.time()).timestamp() * 1000
     except Exception:
-        return redirect("/history/")
+        return redirect(url_for("history_page"))
 
     ranges = timeranges()
 
@@ -968,12 +982,12 @@ def show_all_history(start, end):
         [start, end],
     )
 
-    temp = []
+    history_temp = []
     for inc in history:
         inc = list(inc)
         inc[7] = datetime.fromtimestamp(inc[7] / 1000.0).strftime("%Y-%m-%d %H:%M:%S")
-        temp.append(inc)
-    history = temp
+        history_temp.append(inc)
+    history = history_temp
 
     filename = (
         datetime.now().strftime("%Y-%m-%dT%H%M%S") + "_income_" + startdate + "_" + enddate + ".csv"
@@ -998,6 +1012,7 @@ def show_all_history(start, end):
 
     history = {"columns": []}
 
+    temp: tuple[str, str]
     for timeframe in ranges:
         start = (
             datetime.combine(datetime.fromisoformat(timeframe[0]), datetime.min.time()).timestamp()
@@ -1011,7 +1026,7 @@ def show_all_history(start, end):
             "SELECT incomeType, COUNT(IID) FROM income WHERE time >= ? AND time <= ? GROUP BY incomeType",
             [start, end],
         )
-        temp = timeframe[0] + "/" + timeframe[1]
+        temp = (timeframe[0], timeframe[1])
         if temp not in history:
             history[temp] = {}
             history[temp]["total"] = 0
@@ -1022,7 +1037,7 @@ def show_all_history(start, end):
             if totals[0] not in history["columns"]:
                 history["columns"].append(totals[0])
     for timeframe in ranges:
-        temp = timeframe[0] + "/" + timeframe[1]
+        temp = (timeframe[0], timeframe[1])
         for column in history["columns"]:
             if column not in history[temp]:
                 history[temp][column] = 0
@@ -1042,7 +1057,7 @@ def show_all_history(start, end):
 
 
 @app.route("/projection")
-def projection():
+def projection_page():
     balance = query_db("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     projections: Projections = {
         "dates": [],
@@ -1053,7 +1068,7 @@ def projection():
         "pcustom": [],
         "pcustom_value": 0.0,
     }
-    if balance[1] is not None:
+    if balance[0] is not None:
 
         ranges = timeranges()
 
