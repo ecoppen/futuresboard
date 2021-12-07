@@ -1,13 +1,16 @@
-import sys
-import json
-import time
-import logging
+from __future__ import annotations
+
 import argparse
+import json
+import logging
 import pathlib
+import sys
 import threading
-from futuresboard import __version__
-from futuresboard import scraper
-from futuresboard.app import app
+import time
+
+from xyzboard import __version__
+from xyzboard import scraper
+from xyzboard.app import app
 
 log = logging.getLogger(__name__)
 
@@ -16,42 +19,36 @@ def auto_scrape():
     while True:
         app.logger.info("Auto scrape routines starting")
         scraper.scrape(auto_scrape=True)
-        app.logger.info("Auto scrape routines terninated. Sleeping %s seconds...", app.config["AUTO_SCRAPE_INTERVAL"])
+        app.logger.info(
+            "Auto scrape routines terninated. Sleeping %s seconds...",
+            app.config["AUTO_SCRAPE_INTERVAL"],
+        )
         time.sleep(app.config["AUTO_SCRAPE_INTERVAL"])
 
 
 def main():
-    parser = argparse.ArgumentParser(prog="futuresboard")
+    parser = argparse.ArgumentParser(prog="xyzboard")
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument(
-        "-c", "--config-dir",
+        "-c",
+        "--config-dir",
         type=pathlib.Path,
         default=None,
-        help="Path to configuration directory. Defaults to the `config/` sub-directory on the current directory"
+        help="Path to configuration directory. Defaults to the `config/` sub-directory on the current directory",
     )
     parser.add_argument(
-        "--scrape-only",
-        default=False,
-        action="store_true",
-        help="Run only the scraper code"
+        "--scrape-only", default=False, action="store_true", help="Run only the scraper code"
     )
     parser.add_argument(
         "--disable-auto-scraper",
         default=False,
         action="store_true",
-        help="Disable the routines which scrape while the webservice is running"
+        help="Disable the routines which scrape while the webservice is running",
     )
     server_settings = parser.add_argument_group("Server Settings")
+    server_settings.add_argument("--host", default="0.0.0.0", help="Server host. Default: %default")
     server_settings.add_argument(
-        "--host",
-        default="0.0.0.0",
-        help="Server host. Default: 0.0.0.0"
-    )
-    server_settings.add_argument(
-        "--port",
-        type=int,
-        default=5000,
-        help="Server port. Default: 5000"
+        "--port", type=int, default=5000, help="Server port. Default: %default"
     )
     args = parser.parse_args()
 

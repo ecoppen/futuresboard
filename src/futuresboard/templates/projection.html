@@ -9,19 +9,19 @@
             <div class="card text-center">
                 <div class="card-header text-muted">
                     Balance projection visualised
-                  </div>
+                </div>
                 <canvas id="lineChart" height="400"></canvas>
             </div>
         </div>
     </div>
-<br>
+    <br>
 
-<div class="row">
+    <div class="row">
         <div class="col-md-12">
             <div class="card text-center">
                 <div class="card-header text-muted">
                     Balance projection breakdown
-                  </div>
+                </div>
                 <table id="hype" class='table table-sm table-bordered text-center'>
                     <thead class="thead-dark">
                         <tr>
@@ -86,88 +86,88 @@
         </div>
     </div>
 
-<script>
-    
-$(document).ready( function () {
-    $('#hype').DataTable({
-		"paging": false,
-		"searching": false,
-		"order": [],
-		"info": false,
-	});
-} );
-    
-Chart.register(ChartDataLabels);
-    
-const data = {
-  labels: {{ data[0][1] | safe }},
-  datasets: [
-	  {
-		label: '0.30%',
-		data: {{ data[0][0] }},
-		fill: false,
-		borderColor: 'rgba(153, 102, 255, 0.3)',
-		tension: 0.1,
-	  },
-	  {
-		label: '0.50%',
-		data: {{ data[1][0] }},
-		fill: false,
-		borderColor: 'rgba(255, 99, 132, 0.3)',
-		tension: 0.1,
-	  },
- 	  {
-		label: '1%',
-		data: {{ data[2][0] }},
-		fill: false,
-		borderColor: 'rgba(255, 159, 64, 0.3)',
-		tension: 0.1,
-	  },
-	  {
-		label: '1.2%',
-		data: {{ data[3][0] }},
-		fill: false,
-		borderColor: 'rgba(240, 234, 151, 0.3)',
-		tension: 0.1,
-	  },
-	  {
-		label: '{{ data[4][2] }}%',
-		data: {{ data[4][0] }},
-		fill: false,
-		borderColor: 'rgba(75, 192, 192, 0.3)',
-		tension: 0.1,
-	  },
-  ]
-};
-const config2 = {
-  type: 'line',
-  data: data,
-  options: {
-		responsive: true,
-        layout: {
-            padding: {
-                top: 20
+    <script>
+
+        $(document).ready( function () {
+            $('#hype').DataTable({
+                "paging": false,
+                "searching": false,
+                "order": [],
+                "info": false,
+            });
+        } );
+
+        Chart.register(ChartDataLabels);
+
+        const data = {
+            labels: {{ data[0][1] | safe }},
+            datasets: [
+                {
+                    label: '0.30%',
+                    data: {{ data[0][0] }},
+                    fill: false,
+                    borderColor: 'rgba(153, 102, 255, 0.3)',
+                    tension: 0.1,
+                },
+                {
+                    label: '0.50%',
+                    data: {{ data[1][0] }},
+                    fill: false,
+                    borderColor: 'rgba(255, 99, 132, 0.3)',
+                    tension: 0.1,
+                },
+                {
+                    label: '1%',
+                    data: {{ data[2][0] }},
+                    fill: false,
+                    borderColor: 'rgba(255, 159, 64, 0.3)',
+                    tension: 0.1,
+                },
+                {
+                    label: '1.2%',
+                    data: {{ data[3][0] }},
+                    fill: false,
+                    borderColor: 'rgba(240, 234, 151, 0.3)',
+                    tension: 0.1,
+                },
+                {
+                    label: '{{ data[4][2] }}%',
+                    data: {{ data[4][0] }},
+                    fill: false,
+                    borderColor: 'rgba(75, 192, 192, 0.3)',
+                    tension: 0.1,
+                },
+            ]
+        };
+        const config2 = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                layout: {
+                    padding: {
+                        top: 20
+                    }
+                },
+                plugins:{
+                    datalabels: {
+                        display: false
+                    },
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        ticks: {
+                            autoSkip: false,
+                        }
+                    }
+                }
             }
-        },
-        plugins:{
-            datalabels: {
-                display: false
-            },
-        },
-		scales: {
-			y: {
-				type: 'linear',
-				ticks: {
-					autoSkip: false,
-				}
-			}
-		}
-	}
-};
-    
-var myChart = new Chart(
-    document.getElementById('lineChart'),
-    config2
-);
-</script>
+        };
+
+        var myChart = new Chart(
+            document.getElementById('lineChart'),
+            config2
+        );
+    </script>
 {% endblock %}
