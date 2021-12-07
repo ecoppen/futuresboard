@@ -7,92 +7,92 @@
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group me-2">
                 <form method="GET" name="daterangeform">
-                  <div class="input-group input-group-sm">
-                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-                    <input type="text" class="form-control" name="daterange" size="22" />
-                  </div>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                        <input type="text" class="form-control" name="daterange" size="22" />
+                    </div>
                 </form>
             </div>
-          <a type="button" class="btn btn-sm btn-outline-secondary" href="https://www.binance.com/en/futures/{{ coin }}" target="_blank">
-            <i class="fas fa-external-link-alt"></i> View on Binance 
-          </a>
+            <a type="button" class="btn btn-sm btn-outline-secondary" href="https://www.binance.com/en/futures/{{ coin }}" target="_blank">
+                <i class="fas fa-external-link-alt"></i> View on Binance
+            </a>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-2">
-            <a href="../../../coins/{{ coin }}/{{timeranges[0][0]}}/{{timeranges[0][1]}}">
+            <a href="{{ url_for("main.coin_page_timeframe", coin=coin, start=timeranges[0][0], end=timeranges[0][1]) }}">
                 <div class="card text-center">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ totals[6][0] }}%</h5>
-                    <p class="card-text">${{ totals[1] }}</p>
-                  </div>
-                  <div class="card-footer text-muted">
-                    Profit today
-                  </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ totals[6][0] }}%</h5>
+                        <p class="card-text">${{ totals[1] }}</p>
+                    </div>
+                    <div class="card-footer text-muted">
+                        Profit today
+                    </div>
                 </div>
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="../../../coins/{{ coin }}/{{timeranges[2][0]}}/{{timeranges[2][1]}}">
+            <a href="{{ url_for("main.coin_page_timeframe", coin=coin, start=timeranges[2][0], end=timeranges[2][1]) }}">
                 <div class="card text-center">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ totals[6][1] }}%</h5>
-                    <p class="card-text">${{ totals[2] }}</p>
-                  </div>
-                  <div class="card-footer text-muted">
-                    Profit from Monday
-                  </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ totals[6][1] }}%</h5>
+                        <p class="card-text">${{ totals[2] }}</p>
+                    </div>
+                    <div class="card-footer text-muted">
+                        Profit from Monday
+                    </div>
                 </div>
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="../../../coins/{{ coin }}/{{timeranges[4][0]}}/{{timeranges[4][1]}}">
+            <a href="{{ url_for("main.coin_page_timeframe", coin=coin, start=timeranges[4][0], end=timeranges[4][1]) }}">
                 <div class="card text-center">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ totals[6][2] }}%</h5>
-                    <p class="card-text">${{ totals[3] }}</p>
-                  </div>
-                  <div class="card-footer text-muted">
-                    Profit in {{ totals[8] }}
-                  </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ totals[6][2] }}%</h5>
+                        <p class="card-text">${{ totals[3] }}</p>
+                    </div>
+                    <div class="card-footer text-muted">
+                        Profit in {{ totals[8] }}
+                    </div>
                 </div>
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="../../../coins/{{ coin }}/{{timeranges[8][0]}}/{{timeranges[8][1]}}">
+            <a href="{{ url_for("main.coin_page_timeframe", coin=coin, start=timeranges[8][0], end=timeranges[8][1]) }}">
                 <div class="card text-center">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ totals[6][3] }}%</h5>
-                    <p class="card-text">${{ totals[0] }}</p>
-                  </div>
-                  <div class="card-footer text-muted">
-                    Total profit
-                  </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ totals[6][3] }}%</h5>
+                        <p class="card-text">${{ totals[0] }}</p>
+                    </div>
+                    <div class="card-footer text-muted">
+                        Total profit
+                    </div>
                 </div>
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="../../../positions">
+            <a href="{{ url_for("main.positions_page") }}">
                 <div class="card text-center">
-                  <div class="card-body">
-                    <h5 class="card-title">${{ totals[7][0] }}</h5>
-	            <p class="card-text">&nbsp;</p>
-                  </div>
-                  <div class="card-footer text-muted">
-                    Unrealised PnL
-                  </div>
+                    <div class="card-body">
+                        <h5 class="card-title">${{ totals[7][0] }}</h5>
+                        <p class="card-text">&nbsp;</p>
+                    </div>
+                    <div class="card-footer text-muted">
+                        Unrealised PnL
+                    </div>
                 </div>
             </a>
         </div>
         <div class="col-sm-2">
             <div class="card text-center">
-              <div class="card-body">
-                <h5 class="card-title">${{ totals[7][1] }}</h5>
-                <p class="card-text">&nbsp;</p>
-              </div>
-              <div class="card-footer text-muted">
-                Wallet balance
-              </div>
+                <div class="card-body">
+                    <h5 class="card-title">${{ totals[7][1] }}</h5>
+                    <p class="card-text">&nbsp;</p>
+                </div>
+                <div class="card-footer text-muted">
+                    Wallet balance
+                </div>
             </div>
         </div>
     </div>
@@ -102,208 +102,208 @@
             <div class="card text-center">
                 <div class="card-header text-muted">
                     Profit by day between {{ startdate }} and {{ enddate }}
-                  </div>
+                </div>
                 <canvas id="lineChart" height="400"></canvas>
             </div>
         </div>
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header text-muted text-center">
-                     Position / orders
+                    Position / orders
                     <span class="float-end"><i class="fas fa-tag"></i> {{ markprice }}</span>
                 </div>
-                
-              <table id="orders" class='table table-sm table-bordered text-center'>
-				<thead class="thead-dark">
-					<tr>
-						<th>Type</th>
-						<th>Volume</th>
-						<th>Price</th>
-						<th>Date</th>
-					</tr>
-				</thead>
-				<tbody>
-                  {% for position in orders[0] %}
-				  <tr class="table-primary">
-                        <td>{{position[5]}} {{position[3]}}x</td>
-                        <td>{{position[6]}}</td> 
-						<td>{{position[4]}}</td>
-						<td></td>
-                  </tr>
-                  {% endfor %}
-                  {% for order in orders[1] %}
-                        {% if order[3] == "BUY" %}
-                            <tr class="table-success">
-                        {% else %}
-							<tr class="table-danger">
+
+                <table id="orders" class='table table-sm table-bordered text-center'>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Type</th>
+                            <th>Volume</th>
+                            <th>Price</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for position in orders[0] %}
+                            <tr class="table-primary">
+                                <td>{{position[5]}} {{position[3]}}x</td>
+                                <td>{{position[6]}}</td>
+                                <td>{{position[4]}}</td>
+                                <td></td>
+                            </tr>
+                        {% endfor %}
+                        {% for order in orders[1] %}
+                            {% if order[3] == "BUY" %}
+                                <tr class="table-success">
+                            {% else %}
+                                <tr class="table-danger">
+                            {% endif %}
+                            <td>{{order[3]}} {{order[8]}} {{order[4]}}</td>
+
+                            <td>{{order[1]}}</td>
+                            <td>{{order[2]}}</td>
+                            <td>{{ order[7] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    {% if coin in coin_list['active'] %}
+                        {% if coin_list['active'][coin][0] == 0 %}
+                            <hr>
+                            <table class='table table-sm table-bordered text-center'>
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <td colspan="3" class="text-center">Average Down Calculator</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Type</td>
+                                        <td>Volume</td>
+                                        <td>$</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for position in orders[0] %}
+                                        <tr class="table-secondary">
+                                            <td>Position</td>
+                                            <td><input class="form-control form-control-sm" id="positionsize" value="{{position[6]}}" readonly></td>
+                                            <td><input class="form-control form-control-sm" id="positionvalue" value="{{position[4]}}" readonly></td>
+                                        </tr>
+                                    {% endfor %}
+                                    <tr>
+                                        <td>Custom</td>
+                                        <td><input type="number" class="form-control form-control-sm" id="customsize" onchange="averageDown()" min="0" step="any"></td>
+                                        <td><input type="number" class="form-control form-control-sm" id="customvalue" onchange="averageDown()" min="0" step="any"></td>
+                                    </tr>
+                                    <tr class="table-secondary">
+                                        <td>Averaged</td>
+                                        <td><input class="form-control form-control-sm" id="averagesize" readonly></td>
+                                        <td><input class="form-control form-control-sm" id="averagevalue" readonly></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
                         {% endif %}
-                        <td>{{order[3]}} {{order[8]}} {{order[4]}}</td> 
-						
-						<td>{{order[1]}}</td>
-						<td>{{order[2]}}</td>
-						<td>{{ order[7] }}</td>
-                    </tr>
-                  {% endfor %}
-              </table>
-                {% if coin in coin_list['active'] %}
-                    {% if coin_list['active'][coin][0] == 0 %}
-                        <hr>
-                        <table class='table table-sm table-bordered text-center'>
-                            <thead class="thead-dark">
-                                <tr>
-                                    <td colspan="3" class="text-center">Average Down Calculator</td>
-                                </tr>
-                                <tr>
-                                    <td>Type</td>
-                                    <td>Volume</td>
-                                    <td>$</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for position in orders[0] %}
-                                <tr class="table-secondary">
-                                    <td>Position</td>
-                                    <td><input class="form-control form-control-sm" id="positionsize" value="{{position[6]}}" readonly></td>
-                                    <td><input class="form-control form-control-sm" id="positionvalue" value="{{position[4]}}" readonly></td>
-                                </tr>
-                                {% endfor %}
-                                <tr>
-                                    <td>Custom</td>
-                                    <td><input type="number" class="form-control form-control-sm" id="customsize" onchange="averageDown()" min="0" step="any"></td>
-                                    <td><input type="number" class="form-control form-control-sm" id="customvalue" onchange="averageDown()" min="0" step="any"></td>
-                                </tr>
-                                <tr class="table-secondary">
-                                    <td>Averaged</td>
-                                    <td><input class="form-control form-control-sm" id="averagesize" readonly></td>
-                                    <td><input class="form-control form-control-sm" id="averagevalue" readonly></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        
                     {% endif %}
-                {% endif %}
-                
+
+                </div>
             </div>
         </div>
-    </div>
 
-<script>
-    $('input[name="daterange"]').daterangepicker({
-        "showDropdowns": true,
-        "autoApply": true,
-        ranges: {
-            'Today': ['{{timeranges[0][0]}}', '{{timeranges[0][1]}}'],
-            'Yesterday': ['{{timeranges[1][0]}}', '{{timeranges[1][1]}}'],
-            'This Week': ['{{timeranges[2][0]}}', '{{timeranges[2][1]}}'],
-            'Last Week': ['{{timeranges[3][0]}}', '{{timeranges[3][1]}}'],
-            'This Month': ['{{timeranges[4][0]}}', '{{timeranges[4][1]}}'],
-            'Last Month': ['{{timeranges[5][0]}}', '{{timeranges[5][1]}}'],
-            'This Year': ['{{timeranges[6][0]}}', '{{timeranges[6][1]}}'],
-            'Last Year': ['{{timeranges[7][0]}}', '{{timeranges[7][1]}}'],
-            'All Time': ['{{timeranges[8][0]}}', '{{timeranges[8][1]}}'],
-        },
-        "locale": {
-            "format": "YYYY-MM-DD",
-            "separator": " - ",
-            "fromLabel": "From",
-            "toLabel": "To",
-            "weekLabel": "W",
-            "daysOfWeek": [
-                "Su",
-                "Mo",
-                "Tu",
-                "We",
-                "Th",
-                "Fr",
-                "Sa"
-            ],
-            "monthNames": [
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December"
-            ],
-            "firstDay": 1
-        },
-        "alwaysShowCalendars": true,
-        "startDate": "{{startdate}}",
-        "endDate": "{{enddate}}",
-        "opens": "left"
-    });
-    
-    $('input[name="daterange"]').on('apply.daterangepicker', (e, picker) => {
-      document.forms["daterangeform"].submit();
-    });    
-    
-function averageDown() {
-    var positionsize = document.getElementById("positionsize").value;
-    var customsize = document.getElementById("customsize").value;
-    var positionvalue = document.getElementById("positionvalue").value;
-    var customvalue = document.getElementById("customvalue").value;
-    
-    if (customsize.length > 0 && customvalue.length > 0){
-        positionsize = parseFloat(positionsize);
-        positionvalue = parseFloat(positionvalue);
-        customsize = parseFloat(customsize);
-        customvalue = parseFloat(customvalue);
-        document.getElementById("averagesize").value = positionsize + customsize;
-        document.getElementById("averagevalue").value = ((positionsize * positionvalue) + (customsize * customvalue)) / (positionsize + customsize);
-    }
-}
-    
-$(document).ready( function () {
-    $('#orders').DataTable({
-		"paging": false,
-		"searching": false,
-		"order": [],
-		"info": false,
-	});
-} );
+        <script>
+            $('input[name="daterange"]').daterangepicker({
+                "showDropdowns": true,
+                "autoApply": true,
+                ranges: {
+                    'Today': ['{{timeranges[0][0]}}', '{{timeranges[0][1]}}'],
+                    'Yesterday': ['{{timeranges[1][0]}}', '{{timeranges[1][1]}}'],
+                    'This Week': ['{{timeranges[2][0]}}', '{{timeranges[2][1]}}'],
+                    'Last Week': ['{{timeranges[3][0]}}', '{{timeranges[3][1]}}'],
+                    'This Month': ['{{timeranges[4][0]}}', '{{timeranges[4][1]}}'],
+                    'Last Month': ['{{timeranges[5][0]}}', '{{timeranges[5][1]}}'],
+                    'This Year': ['{{timeranges[6][0]}}', '{{timeranges[6][1]}}'],
+                    'Last Year': ['{{timeranges[7][0]}}', '{{timeranges[7][1]}}'],
+                    'All Time': ['{{timeranges[8][0]}}', '{{timeranges[8][1]}}'],
+                },
+                "locale": {
+                    "format": "YYYY-MM-DD",
+                    "separator": " - ",
+                    "fromLabel": "From",
+                    "toLabel": "To",
+                    "weekLabel": "W",
+                    "daysOfWeek": [
+                        "Su",
+                        "Mo",
+                        "Tu",
+                        "We",
+                        "Th",
+                        "Fr",
+                        "Sa"
+                    ],
+                    "monthNames": [
+                        "January",
+                        "February",
+                        "March",
+                        "April",
+                        "May",
+                        "June",
+                        "July",
+                        "August",
+                        "September",
+                        "October",
+                        "November",
+                        "December"
+                    ],
+                    "firstDay": 1
+                },
+                "alwaysShowCalendars": true,
+                "startDate": "{{startdate}}",
+                "endDate": "{{enddate}}",
+                "opens": "left"
+            });
 
-Chart.register(ChartDataLabels);
-const data2 = {
-  labels: {{ data[0][1] | safe }},
-  datasets: [{
-    label: 'Profit',
-    data: {{ data[0][0] }},
-    fill: false,
-    borderColor: 'rgb(75, 192, 192)',
-    tension: 0.1
-  }]
-};
-const config2 = {
-  type: 'line',
-  data: data2,
-  options: {
-        layout: {
-            padding: {
-                top: 20
+            $('input[name="daterange"]').on('apply.daterangepicker', (e, picker) => {
+                document.forms["daterangeform"].submit();
+            });
+
+            function averageDown() {
+                var positionsize = document.getElementById("positionsize").value;
+                var customsize = document.getElementById("customsize").value;
+                var positionvalue = document.getElementById("positionvalue").value;
+                var customvalue = document.getElementById("customvalue").value;
+
+                if (customsize.length > 0 && customvalue.length > 0){
+                    positionsize = parseFloat(positionsize);
+                    positionvalue = parseFloat(positionvalue);
+                    customsize = parseFloat(customsize);
+                    customvalue = parseFloat(customvalue);
+                    document.getElementById("averagesize").value = positionsize + customsize;
+                    document.getElementById("averagevalue").value = ((positionsize * positionvalue) + (customsize * customvalue)) / (positionsize + customsize);
+                }
             }
-        },
-        plugins:{   
-            datalabels: {
-                anchor: 'end',
-                align: 'top',
-                offset: 5,
-            },
-            legend: {
-                display: false
-            },
-        }
-  }
-};
-    
-var myChart = new Chart(
-    document.getElementById('lineChart'),
-    config2
-);
-</script>
+
+            $(document).ready( function () {
+                $('#orders').DataTable({
+                    "paging": false,
+                    "searching": false,
+                    "order": [],
+                    "info": false,
+                });
+            } );
+
+            Chart.register(ChartDataLabels);
+            const data2 = {
+                labels: {{ data[0][1] | safe }},
+                datasets: [{
+                    label: 'Profit',
+                    data: {{ data[0][0] }},
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            };
+            const config2 = {
+                type: 'line',
+                data: data2,
+                options: {
+                    layout: {
+                        padding: {
+                            top: 20
+                        }
+                    },
+                    plugins:{
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 5,
+                        },
+                        legend: {
+                            display: false
+                        },
+                    }
+                }
+            };
+
+            var myChart = new Chart(
+                document.getElementById('lineChart'),
+                config2
+            );
+        </script>
 {% endblock %}

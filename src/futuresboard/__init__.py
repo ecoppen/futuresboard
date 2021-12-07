@@ -1,4 +1,6 @@
 #
+from __future__ import annotations
+
 import pathlib
 
 PACKAGE_ROOT = pathlib.Path(__file__).resolve().parent

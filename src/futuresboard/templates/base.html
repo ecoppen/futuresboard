@@ -1,128 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% block autoreload %}{% endblock %} 
-    {% if coin_list['warning'] %}
-        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon2.ico') }}">
-    {% else %}
-        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    {% endif %}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/dashboard.css') }}">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/sidebars.css') }}">
-    <link rel= "stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    {% block head %}
-    <title>{% block title %}{% endblock %} - Futuresboard</title>
-    {% endblock %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js" integrity="sha512-GMGzUEevhWh8Tc/njS0bDpwgxdCJLQBWG3Z2Ct+JGOpVnEmjvNx6ts4v6A2XJf1HOrtOsfhv3hBKpK9kE5z8AQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-	<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
-	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-<style>
-    a { 
-        color:black;
-        text-decoration:none;
-    }
-    </style>
-</head>
-<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-  <a class="navbar-brand col-md-3 col-lg-2 me-0 px-5" href="/">Futuresboard</a>
-  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-</header>
-<body class="d-flex flex-column h-100">
-<div class="wrapper">
-    <div class="container">
-      <div class="row">
-          <div class="flex-shrink-0 p-3 bg-white col-md-2">
-            <ul class="list-unstyled ps-0">
-              <li>
-                <a href="../../../" class="btn align-items-center rounded">
-                    Dashboard
-                </a>
-              </li>
-                <li>
-                <a href="../../../positions" class="btn align-items-center rounded">
-                    All positions
-                </a>
-              </li>
-              <li>
-                <a href="../../../history" class="btn align-items-center rounded">
-                    Income history
-                </a>
-              </li>
-              <li class="mb-1">
-                <button class="btn btn-toggle align-items-center rounded" data-bs-toggle="collapse" data-bs-target="#activecoins-collapse" aria-expanded="true">
-                  Active coins ({{ coin_list['totals']['active'] }})
-                </button>
-                <div class="collapse show" id="activecoins-collapse" style="">
-                  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                      <table class="table table-sm">
-                        {% for item in coin_list['active'] %}
-                            <tr>
-                                <td {% if coin_list['active'][item][0] == 0 %} class="table-danger" {% endif %}>
-                                    <a href="../../../coins/{{ item }}" class="link-dark rounded">{{ item }}</a></td>
-                                <td class="text-center">{{ coin_list['active'][item][2] }}</td>
-                                <td class="table-success text-center">{{ coin_list['active'][item][0] }}</td>
-                                <td class="table-danger text-center">{{ coin_list['active'][item][1] }}</td>
-                            </tr>
-                        {% endfor %}
-                          <tr class="table-secondary">
-                              <td class="text-center">Total</td>
-                              <td class="text-center">{{ coin_list['totals']['pbr'] }}</td>
-                              <td class="text-center">{{ coin_list['totals']['buys'] }}</td>
-                              <td class="text-center">{{ coin_list['totals']['sells'] }}</td>
-                          </tr>
-                      </table>
-                  </ul>
-                </div>
-              </li>
-              <li class="mb-1">
-                <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#inactivecoins-collapse" aria-expanded="false">
-                  Inactive coins ({{ coin_list['totals']['inactive'] }})
-                </button>
-                <div class="collapse" id="inactivecoins-collapse" style="">
-                  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        {% for item in coin_list['inactive'] %}
-                            <li><a href="../../../coins/{{ item }}" class="link-dark rounded">{{ item }}</a></li>
-                        {% endfor %}
-                  </ul>
-                </div>
-              </li>
-            </ul>
-            </div>
-      
-            <div class="col-md-10 ms-sm-auto">
-                <div id="content">{% block content %}{% endblock %}</div>
-            </div>
-        </div>
-    </div>
-    {% block footer %}
-    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-        <div class="col-md-4 d-flex align-items-center px-5">
-          <a href="https://www.passivbot.com/en/latest/" target="_blank" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1">
-            <i class="fas fa-rocket"></i>
-          </a>
-            <a href="https://github.com/ecoppen/futuresboard" target="_blank" class="text-decoration-none">
-                <span class="text-muted">© 2021 Futuresboard</span>
-            </a>
-        </div>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        {% block autoreload %}{% endblock %}
+        {% if coin_list['warning'] %}
+            <link rel="shortcut icon" href="{{ url_for('static', filename='favicon2.ico') }}">
+        {% else %}
+            <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        {% endif %}
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/dashboard.css') }}">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/sidebars.css') }}">
+        <link rel= "stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        {% block head %}
+            <title>{% block title %}{% endblock %} - Futures Board</title>
+        {% endblock %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js" integrity="sha512-GMGzUEevhWh8Tc/njS0bDpwgxdCJLQBWG3Z2Ct+JGOpVnEmjvNx6ts4v6A2XJf1HOrtOsfhv3hBKpK9kE5z8AQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+        <style>
+            a {
+                color:black;
+                text-decoration:none;
+            }
+        </style>
+    </head>
+    <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-5" href="{{ url_for("main.index_page") }}">futuresboard</a>
+        <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </header>
+    <body class="d-flex flex-column h-100">
+        <div class="wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="flex-shrink-0 p-3 bg-white col-md-2">
+                        <ul class="list-unstyled ps-0">
+                            <li>
+                                <a href="{{ url_for("main.index_page") }}" class="btn align-items-center rounded">
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for("main.positions_page") }}" class="btn align-items-center rounded">
+                                    All positions
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for("main.history_page") }}" class="btn align-items-center rounded">
+                                    Income history
+                                </a>
+                            </li>
+                            <li class="mb-1">
+                                <button class="btn btn-toggle align-items-center rounded" data-bs-toggle="collapse" data-bs-target="#activecoins-collapse" aria-expanded="true">
+                                    Active coins ({{ coin_list['totals']['active'] }})
+                                </button>
+                                <div class="collapse show" id="activecoins-collapse" style="">
+                                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                                        <table class="table table-sm">
+                                            {% for item in coin_list['active'] %}
+                                                <tr>
+                                                    <td {% if coin_list['active'][item][0] == 0 %} class="table-danger" {% endif %}>
+                                                        <a href="{{ url_for("main.coin_page", coin=item) }}" class="link-dark rounded">{{ item }}</a></td>
+                                                    <td class="text-center">{{ coin_list['active'][item][2] }}</td>
+                                                    <td class="table-success text-center">{{ coin_list['active'][item][0] }}</td>
+                                                    <td class="table-danger text-center">{{ coin_list['active'][item][1] }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                            <tr class="table-secondary">
+                                                <td class="text-center">Total</td>
+                                                <td class="text-center">{{ coin_list['totals']['pbr'] }}</td>
+                                                <td class="text-center">{{ coin_list['totals']['buys'] }}</td>
+                                                <td class="text-center">{{ coin_list['totals']['sells'] }}</td>
+                                            </tr>
+                                        </table>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="mb-1">
+                                <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#inactivecoins-collapse" aria-expanded="false">
+                                    Inactive coins ({{ coin_list['totals']['inactive'] }})
+                                </button>
+                                <div class="collapse" id="inactivecoins-collapse" style="">
+                                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                                        {% for item in coin_list['inactive'] %}
+                                            <li><a href="{{ url_for("main.coin_page", coin=item) }}" class="link-dark rounded">{{ item }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
 
-        <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-          <li class="ms-3"><a class="text-muted" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#twitter"></use></svg></a></li>
-          <li class="ms-3"><a class="text-muted" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#instagram"></use></svg></a></li>
-          <li class="ms-3"><a class="text-muted" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#facebook"></use></svg></a></li>
-        </ul>
-    </footer>
-    {% endblock %}
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-</body>
+                    <div class="col-md-10 ms-sm-auto">
+                        <div id="content">{% block content %}{% endblock %}</div>
+                    </div>
+                </div>
+            </div>
+            {% block footer %}
+                <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+                    <div class="col-md-4 d-flex align-items-center px-5">
+                        <i class="fas fa-rocket"></i>&nbsp;&nbsp;<span class="text-muted">© 2021 Futuresboard</span>
+                    </div>
+
+                    <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+                        <li class="ms-3"><a class="text-muted" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#twitter"></use></svg></a></li>
+                        <li class="ms-3"><a class="text-muted" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#instagram"></use></svg></a></li>
+                        <li class="ms-3"><a class="text-muted" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#facebook"></use></svg></a></li>
+                    </ul>
+                </footer>
+            {% endblock %}
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    </body>
 </html>

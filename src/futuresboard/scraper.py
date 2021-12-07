@@ -1,21 +1,41 @@
 # https://github.com/binance/binance-signature-examples
+from __future__ import annotations
 
-import hmac
-import time
-import hashlib
-import requests
 import datetime
+import hashlib
+import hmac
 import sqlite3
-
+import threading
+import time
 from datetime import timedelta
 from sqlite3 import Error
 from urllib.parse import urlencode
-from futuresboard.app import app
+
+import requests
+from flask import current_app
+
+
+def auto_scrape(app):
+    thread = threading.Thread(target=_auto_scrape, args=(app,))
+    thread.daemon = True
+    thread.start()
+
+
+def _auto_scrape(app):
+    with app.app_context():
+        interval = app.config["AUTO_SCRAPE_INTERVAL"]
+        while True:
+            app.logger.info("Auto scrape routines starting")
+            scrape(app=app)
+            app.logger.info("Auto scrape routines terninated. Sleeping %s seconds...", interval)
+            time.sleep(interval)
 
 
 def hashing(query_string):
     return hmac.new(
-        app.config["API_SECRET"].encode("utf-8"), query_string.encode("utf-8"), hashlib.sha256
+        current_app.config["API_SECRET"].encode("utf-8"),
+        query_string.encode("utf-8"),
+        hashlib.sha256,
     ).hexdigest()
 
 
@@ -26,7 +46,10 @@ def get_timestamp():
 def dispatch_request(http_method):
     session = requests.Session()
     session.headers.update(
-        {"Content-Type": "application/json;charset=utf-8", "X-MBX-APIKEY": app.config["API_KEY"]}
+        {
+            "Content-Type": "application/json;charset=utf-8",
+            "X-MBX-APIKEY": current_app.config["API_KEY"],
+        }
     )
     return {
         "GET": session.get,
@@ -42,12 +65,17 @@ def send_signed_request(http_method, url_path, payload={}):
     # replace single quote to double quote
     query_string = query_string.replace("%27", "%22")
     if query_string:
-        query_string = "{}&timestamp={}".format(query_string, get_timestamp())
+        query_string = f"{query_string}&timestamp={get_timestamp()}"
     else:
-        query_string = "timestamp={}".format(get_timestamp())
+        query_string = f"timestamp={get_timestamp()}"
 
     url = (
-        app.config["API_BASE_URL"] + url_path + "?" + query_string + "&signature=" + hashing(query_string)
+        current_app.config["API_BASE_URL"]
+        + url_path
+        + "?"
+        + query_string
+        + "&signature="
+        + hashing(query_string)
     )
     # print("{} {}".format(http_method, url))
     params = {"url": url, "params": {}}
@@ -58,7 +86,7 @@ def send_signed_request(http_method, url_path, payload={}):
 # used for sending public data request
 def send_public_request(url_path, payload={}):
     query_string = urlencode(payload, True)
-    url = app.config["API_BASE_URL"] + url_path
+    url = current_app.config["API_BASE_URL"] + url_path
     if query_string:
         url = url + "?" + query_string
     # print("{}".format(url))
@@ -169,9 +197,7 @@ def update_position(conn, position):
 
 def select_position(conn, symbol):
     cur = conn.cursor()
-    cur.execute(
-        "SELECT unrealizedProfit FROM positions WHERE symbol = ? LIMIT 0, 1", (symbol,)
-    )
+    cur.execute("SELECT unrealizedProfit FROM positions WHERE symbol = ? LIMIT 0, 1", (symbol,))
     return cur.fetchone()
 
 
@@ -208,9 +234,9 @@ def create_orders(conn, orders):
     cur.execute(sql, orders)
 
 
-def scrape(auto_scrape=False):
+def scrape(app=None):
     start = time.time()
-    db_setup(app.config["DATABASE"])
+    db_setup(current_app.config["DATABASE"])
 
     up_to_date = False
     weightused = 0
@@ -221,7 +247,7 @@ def scrape(auto_scrape=False):
         responseHeader, responseJSON = send_signed_request("GET", "/fapi/v1/openOrders")
         weightused = int(responseHeader["X-MBX-USED-WEIGHT-1M"])
 
-        with create_connection(app.config["DATABASE"]) as conn:
+        with create_connection(current_app.config["DATABASE"]) as conn:
             delete_all_orders(conn)
             for order in responseJSON:
                 updated_orders += 1
@@ -237,19 +263,19 @@ def scrape(auto_scrape=False):
                 )
                 create_orders(conn, row)
             conn.commit()
-    
+
     responseHeader, responseJSON = send_signed_request("GET", "/fapi/v2/account")
     weightused = int(responseHeader["X-MBX-USED-WEIGHT-1M"])
 
     overweight = False
     try:
         positions = responseJSON["positions"]
-    except:
+    except Exception:
         overweight = True
-    
+
     if not overweight:
-        with create_connection(app.config["DATABASE"]) as conn:
-            row = (
+        with create_connection(current_app.config["DATABASE"]) as conn:
+            totals_row = (
                 float(responseJSON["totalWalletBalance"]),
                 float(responseJSON["totalUnrealizedProfit"]),
                 float(responseJSON["totalMarginBalance"]),
@@ -259,12 +285,12 @@ def scrape(auto_scrape=False):
             )
             accountCheck = select_account(conn)
             if accountCheck is None:
-                create_account(conn, row)
+                create_account(conn, totals_row)
             elif float(accountCheck[0]) != float(responseJSON["totalWalletBalance"]):
-                update_account(conn, row)
+                update_account(conn, totals_row)
 
             for position in positions:
-                row = (
+                position_row = (
                     float(position["unrealizedProfit"]),
                     int(position["leverage"]),
                     float(position["entryPrice"]),
@@ -274,40 +300,31 @@ def scrape(auto_scrape=False):
                 )
                 unrealizedProfit = select_position(conn, position["symbol"])
                 if unrealizedProfit is None:
-                    create_position(conn, row)
+                    create_position(conn, position_row)
                     new_positions += 1
                 elif float(unrealizedProfit[0]) != float(position["unrealizedProfit"]):
-                    update_position(conn, row)
+                    update_position(conn, position_row)
                     updated_positions += 1
 
             conn.commit()
 
     while not up_to_date:
         if weightused > 800:
-            print(
-                "Weight used: {}/800\nProcessed: {}\nSleep: 1 minute".format(
-                    weightused, processed
-                )
-            )
+            print(f"Weight used: {weightused}/800\nProcessed: {processed}\nSleep: 1 minute")
             sleeps += 1
             time.sleep(60)
-            
-        with create_connection(app.config["DATABASE"]) as conn:
+
+        with create_connection(current_app.config["DATABASE"]) as conn:
             startTime = select_latest_income(conn)
-            if startTime == None:
+            if startTime is None:
                 startTime = int(
-                    datetime.datetime.fromisoformat(
-                        "2020-01-01 00:00:00+00:00"
-                    ).timestamp()
-                    * 1000
+                    datetime.datetime.fromisoformat("2020-01-01 00:00:00+00:00").timestamp() * 1000
                 )
             else:
                 startTime = startTime[0]
             params = {"startTime": startTime + 1, "limit": 1000}
 
-            responseHeader, responseJSON = send_signed_request(
-                "GET", "/fapi/v1/income", params
-            )
+            responseHeader, responseJSON = send_signed_request("GET", "/fapi/v1/income", params)
             weightused = int(responseHeader["X-MBX-USED-WEIGHT-1M"])
 
             if len(responseJSON) == 0:
@@ -316,7 +333,7 @@ def scrape(auto_scrape=False):
                 for income in responseJSON:
                     if len(income["tradeId"]) == 0:
                         income["tradeId"] = 0
-                    row = (
+                    income_row = (
                         int(income["tranId"]),
                         income["symbol"],
                         income["incomeType"],
@@ -326,14 +343,14 @@ def scrape(auto_scrape=False):
                         int(income["time"]),
                         int(income["tradeId"]),
                     )
-                    create_income(conn, row)
+                    create_income(conn, income_row)
                     processed += 1
 
                 conn.commit()
 
     elapsed = time.time() - start
-    if auto_scrape is True:
-        app.logger.info(
+    if app is not None:
+        current_app.logger.info(
             "Orders updated: %s; Positions updated: %s (new: %s); Trades processed: %s; Time elapsed: %s; Sleeps: %s",
             updated_orders,
             updated_positions,

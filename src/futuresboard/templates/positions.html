@@ -9,64 +9,64 @@
         <div class="col-md-12">
             <div class="accordion" id="accordionExample">
                 {% for coin in positions %}
-                  <div class="accordion-item">
-                    <h2 class="accordion-header" id="heading{{ coin }}">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ coin }}" aria-expanded="false" aria-controls="collapse{{ coin }}">
-                        {{ coin }}&nbsp;&nbsp;<span class="badge bg-secondary">{{ positions[coin][0][0][5]}} {{ positions[coin][0][0][3] }}x</span>&nbsp;&nbsp;<span class="badge bg-primary">Volume: {{ positions[coin][0][0][6] }}</span>&nbsp;&nbsp;<span class="badge bg-success">Price {{ positions[coin][0][0][4] }}</span>
-                      </button>
-                    </h2>
-                    <div id="collapse{{ coin }}" class="accordion-collapse collapse" aria-labelledby="heading{{ coin}}" data-bs-parent="#accordionExample">
-                      <div class="accordion-body">
-                      <table id="orders" class='table table-sm table-bordered text-center'>
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>Type</th>
-                                <th>Volume</th>
-                                <th>Price</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                          {% for position in positions[coin][0] %}
-                          <tr class="table-primary">
-                                <td>{{position[5]}} {{position[3]}}x</td>
-                                <td>{{position[6]}}</td> 
-                                <td>{{position[4]}}</td>
-                                <td></td>
-                          </tr>
-                          {% endfor %}
-                          {% for order in positions[coin][1] %}
-                                {% if order[3] == "BUY" %}
-                                    <tr class="table-success">
-                                {% else %}
-                                    <tr class="table-danger">
-                                {% endif %}
-                                <td>{{order[3]}} {{order[8]}} {{order[4]}}</td> 
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading{{ coin }}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ coin }}" aria-expanded="false" aria-controls="collapse{{ coin }}">
+                                {{ coin }}&nbsp;&nbsp;<span class="badge bg-secondary">{{ positions[coin][0][0][5]}} {{ positions[coin][0][0][3] }}x</span>&nbsp;&nbsp;<span class="badge bg-primary">Volume: {{ positions[coin][0][0][6] }}</span>&nbsp;&nbsp;<span class="badge bg-success">Price {{ positions[coin][0][0][4] }}</span>
+                            </button>
+                        </h2>
+                        <div id="collapse{{ coin }}" class="accordion-collapse collapse" aria-labelledby="heading{{ coin}}" data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                <table id="orders" class='table table-sm table-bordered text-center'>
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Volume</th>
+                                            <th>Price</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for position in positions[coin][0] %}
+                                            <tr class="table-primary">
+                                                <td>{{position[5]}} {{position[3]}}x</td>
+                                                <td>{{position[6]}}</td>
+                                                <td>{{position[4]}}</td>
+                                                <td></td>
+                                            </tr>
+                                        {% endfor %}
+                                        {% for order in positions[coin][1] %}
+                                            {% if order[3] == "BUY" %}
+                                                <tr class="table-success">
+                                            {% else %}
+                                                <tr class="table-danger">
+                                            {% endif %}
+                                            <td>{{order[3]}} {{order[8]}} {{order[4]}}</td>
 
-                                <td>{{order[1]}}</td>
-                                <td>{{order[2]}}</td>
-                                <td>{{ order[7] }}</td>
-                            </tr>
-                          {% endfor %}
-                      </table>
-                      </div>
-                    </div>
-                  </div>
+                                            <td>{{order[1]}}</td>
+                                            <td>{{order[2]}}</td>
+                                            <td>{{ order[7] }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                 {% endfor %}
             </div>
         </div>
     </div>
 
-<script>
+    <script>
 
-$(document).ready( function () {
-    $('#orders').DataTable({
-		"paging": false,
-		"searching": false,
-		"order": [],
-		"info": false,
-	});
-} );
-    
-</script>
+        $(document).ready( function () {
+            $('#orders').DataTable({
+                "paging": false,
+                "searching": false,
+                "order": [],
+                "info": false,
+            });
+        } );
+
+    </script>
 {% endblock %}
