@@ -5,6 +5,6 @@
   "custom":{
     "navbar_title": "Futuresboard",
     "navbar_bg": "bg-dark",
-    "projections": [0.3, 0.5, 1.0]
+    "projections": [1.003, 1.005, 1.01, 1.012]
   }
 }
