@@ -55,16 +55,10 @@ def main():
     if "DATABASE" not in config:
         config["DATABASE"] = f"{args.config_dir / 'futures.db'}"
 
-    if "EXCHANGE" not in config:
+    if "API_BASE_URL" not in config:
         base_url = "https://fapi.binance.com"  # production base url
         # base_url = 'https://testnet.binancefuture.com' # testnet base url
-    else:
-        if config['EXCHANGE'] == "binance":
-            base_url = "https://fapi.binance.com"
-        else: #others can be added here, otherwise default to binance
-            base_url = "https://fapi.binance.com"
-            
-    config["API_BASE_URL"] = base_url
+        config["API_BASE_URL"] = base_url
 
     if "AUTO_SCRAPE_INTERVAL" not in config:
         config["AUTO_SCRAPE_INTERVAL"] = 5 * 60
