@@ -1,4 +1,10 @@
 {
+  "exchange": "binance",
   "api_key": "",
-  "api_secret": ""
+  "api_secret": "",
+  "custom":{
+    "navbar_title": "Futuresboard",
+    "navbar_bg": "bg-dark",
+    "projections": [0.3, 0.5, 1.0]
+  }
 }
