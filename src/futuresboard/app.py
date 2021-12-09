@@ -80,7 +80,7 @@ def init_app(config: dict[str, Any] | None = None):
                         percentage = float(percentage)
                         if percentage > -3.0 and percentage < 3.0:
                             temp.append(percentage)
-                    except:
+                    except TypeError:
                         pass
                 config["PROJECTIONS"] = temp
 
