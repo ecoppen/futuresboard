@@ -51,7 +51,7 @@ def init_app(config: dict[str, Any] | None = None):
                 interval = int(config["AUTO_SCRAPE_INTERVAL"])
                 if interval < 60 or interval > 3600:
                     config["AUTO_SCRAPE_INTERVAL"] = 5 * 60
-            except:
+            except TypeError:
                 config["AUTO_SCRAPE_INTERVAL"] = 5 * 60
 
         if "CUSTOM" not in config:
