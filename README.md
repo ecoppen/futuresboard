@@ -37,8 +37,10 @@ Currently only Binance and Futures are supported.
 - `PROJECTIONS` changes the percentage values on the projections page. `1.003` equates to `0.3%` daily and `1.01` equates to `1%` daily.
 
 ## Screenshots
-<img width="1303" alt="dashboard" src="https://user-images.githubusercontent.com/51025241/142727550-d4f9e1e5-1d80-4a43-8f4e-e4be2ee41e90.png">
-<img width="1303" alt="dashboard1" src="https://user-images.githubusercontent.com/51025241/142727553-c73d8e1e-0dec-4e75-ac1e-5fd6e8dbec3b.png">
+<img width="1330" src="https://user-images.githubusercontent.com/51025241/145480467-0c1c473a-90f8-42fd-bdb0-071dc0f096f9.png">
+<img width="1330" src="https://user-images.githubusercontent.com/51025241/145480501-86deab0e-55fe-48fa-910f-7cae679664bb.png">
+<img width="1330" src="https://user-images.githubusercontent.com/51025241/145480517-61d5fd40-22d4-4887-9307-7689d1303138.png">
+<img width="1314" src="https://user-images.githubusercontent.com/51025241/145480528-408dff64-1742-41ea-baac-89bb5458d406.png">
 
 ## Alternative dashboards
 
