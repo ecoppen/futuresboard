@@ -32,15 +32,16 @@ Currently only Binance and Futures are supported.
 ## Customising the dashboard
 
 - `AUTO_SCRAPE_INTERVAL` is set to 300 seconds, this value can be adjusted between `60` and `3600`
-- `NAVBAR_TITLE` changes the branding in the top left of the navigation
-- `NAVBAR_BG` changes the colour of the navigation bar, acceptable values are: `bg-primary`, `bg-secondary`, `bg-success`, `bg-danger`, `bg-warning`, `bg-info` and the default `bg-dark`
+- `NAVBAR_TITLE` changes the branding in the top left of the navigation (see below)
+- `NAVBAR_BG` changes the colour of the navigation bar, acceptable values are: `bg-primary` (see below), `bg-secondary`, `bg-success`, `bg-danger`, `bg-warning`, `bg-info` and the default `bg-dark`
 - `PROJECTIONS` changes the percentage values on the projections page. `1.003` equates to `0.3%` daily and `1.01` equates to `1%` daily.
+
+<img width="1314" src="https://user-images.githubusercontent.com/51025241/145480528-408dff64-1742-41ea-baac-89bb5458d406.png">
 
 ## Screenshots
 <img width="1330" src="https://user-images.githubusercontent.com/51025241/145480467-0c1c473a-90f8-42fd-bdb0-071dc0f096f9.png">
 <img width="1330" src="https://user-images.githubusercontent.com/51025241/145480501-86deab0e-55fe-48fa-910f-7cae679664bb.png">
 <img width="1330" src="https://user-images.githubusercontent.com/51025241/145480517-61d5fd40-22d4-4887-9307-7689d1303138.png">
-<img width="1314" src="https://user-images.githubusercontent.com/51025241/145480528-408dff64-1742-41ea-baac-89bb5458d406.png">
 
 ## Alternative dashboards
 
