@@ -1,11 +1,11 @@
 {
-  "EXCHANGE": "binance",
-  "API_KEY": "",
-  "API_SECRET": "",
-  "AUTO_SCRAPE_INTERVAL": 300,
-  "CUSTOM":{
-    "NAVBAR_TITLE": "Futuresboard",
-    "NAVBAR_BG": "bg-dark",
-    "PROJECTIONS": [1.003, 1.005, 1.01, 1.012]
-  }
+    "EXCHANGE": "binance",
+    "API_KEY": "",
+    "API_SECRET": "",
+    "AUTO_SCRAPE_INTERVAL": 300,
+    "CUSTOM": {
+        "NAVBAR_TITLE": "Futuresboard",
+        "NAVBAR_BG": "bg-dark",
+        "PROJECTIONS": [1.003, 1.005, 1.01, 1.012],
+    },
 }

@@ -40,8 +40,8 @@ def init_app(config: dict[str, Any] | None = None):
             if config["EXCHANGE"] == "binance":
                 base_url = "https://fapi.binance.com"
             else:
-                base_url = "https://fapi.binance.com"   #alternatives here later
-        
+                base_url = "https://fapi.binance.com"  # alternatives here later
+
         config["API_BASE_URL"] = base_url
 
         if "AUTO_SCRAPE_INTERVAL" not in config:
@@ -53,7 +53,7 @@ def init_app(config: dict[str, Any] | None = None):
                     config["AUTO_SCRAPE_INTERVAL"] = 5 * 60
             except:
                 config["AUTO_SCRAPE_INTERVAL"] = 5 * 60
-                
+
         if "CUSTOM" not in config:
             config["NAVBAR_TITLE"] = "Futuresboard"
             config["NAVBAR_BG"] = "bg-dark"
@@ -61,7 +61,15 @@ def init_app(config: dict[str, Any] | None = None):
         else:
             if len(config["NAVBAR_TITLE"]) < 1 or len(config["NAVBAR_TITLE"]) > 50:
                 config["NAVBAR_TITLE"] = "Futuresboard"
-            if config["NAVBAR_BG"] not in ["bg-primary", "bg-secondary", "bg-success", "bg-danger", "bg-warning", "bg-info", "bg-light"]:
+            if config["NAVBAR_BG"] not in [
+                "bg-primary",
+                "bg-secondary",
+                "bg-success",
+                "bg-danger",
+                "bg-warning",
+                "bg-info",
+                "bg-light",
+            ]:
                 config["NAVBAR_BG"] = "bg-dark"
             if not isinstance(config["PROJECTIONS"], list):
                 config["PROJECTIONS"] = [1.003, 1.005, 1.01, 1.012]
