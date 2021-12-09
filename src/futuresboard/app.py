@@ -55,13 +55,13 @@ def init_app(config: dict[str, Any] | None = None):
                 config["AUTO_SCRAPE_INTERVAL"] = 5 * 60
 
         if "CUSTOM" not in config:
-            config["NAVBAR_TITLE"] = "Futuresboard"
-            config["NAVBAR_BG"] = "bg-dark"
-            config["PROJECTIONS"] = [1.003, 1.005, 1.01, 1.012]
+            config["CUSTOM"]["NAVBAR_TITLE"] = "Futuresboard"
+            config["CUSTOM"]["NAVBAR_BG"] = "bg-dark"
+            config["CUSTOM"]["PROJECTIONS"] = [1.003, 1.005, 1.01, 1.012]
         else:
-            if len(config["NAVBAR_TITLE"]) < 1 or len(config["NAVBAR_TITLE"]) > 50:
-                config["NAVBAR_TITLE"] = "Futuresboard"
-            if config["NAVBAR_BG"] not in [
+            if len(config["CUSTOM"]["NAVBAR_TITLE"]) < 1 or len(config["NAVBAR_TITLE"]) > 50:
+                config["CUSTOM"]["NAVBAR_TITLE"] = "Futuresboard"
+            if config["CUSTOM"]["NAVBAR_BG"] not in [
                 "bg-primary",
                 "bg-secondary",
                 "bg-success",
@@ -70,19 +70,19 @@ def init_app(config: dict[str, Any] | None = None):
                 "bg-info",
                 "bg-light",
             ]:
-                config["NAVBAR_BG"] = "bg-dark"
-            if not isinstance(config["PROJECTIONS"], list):
-                config["PROJECTIONS"] = [1.003, 1.005, 1.01, 1.012]
+                config["CUSTOM"]["NAVBAR_BG"] = "bg-dark"
+            if not isinstance(config["CUSTOM"]["PROJECTIONS"], list):
+                config["CUSTOM"]["PROJECTIONS"] = [1.003, 1.005, 1.01, 1.012]
             else:
                 temp = []
-                for percentage in config["PROJECTIONS"]:
+                for percentage in config["CUSTOM"]["PROJECTIONS"]:
                     try:
                         percentage = float(percentage)
                         if percentage > -3.0 and percentage < 3.0:
                             temp.append(percentage)
                     except TypeError:
                         pass
-                config["PROJECTIONS"] = temp
+                config["CUSTOM"]["PROJECTIONS"] = temp
 
     app = Flask(__name__)
     app.config.from_mapping(**config)
