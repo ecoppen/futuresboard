@@ -322,7 +322,7 @@ def index_page():
         startdate=startdate,
         enddate=enddate,
         timeranges=ranges,
-        custom=[
+        custom=current_app.config["CUSTOM"]
             current_app.config["CUSTOM"]["NAVBAR_TITLE"],
             current_app.config["CUSTOM"]["NAVBAR_BG"],
         ],
