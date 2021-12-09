@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block autoreload %}<meta http-equiv="refresh" content="120">{% endblock %}
+{% block autoreload %}<meta http-equiv="refresh" content="60">{% endblock %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -7,92 +7,92 @@
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group me-2">
                 <form method="GET" name="daterangeform">
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-                        <input type="text" class="form-control" name="daterange" size="22" />
-                    </div>
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                    <input type="text" class="form-control" name="daterange" size="22" />
+                  </div>
                 </form>
             </div>
-            <a type="button" class="btn btn-sm btn-outline-secondary" href="https://www.binance.com/en/futures/{{ coin }}" target="_blank">
-                <i class="fas fa-external-link-alt"></i> View on Binance
-            </a>
+          <a type="button" class="btn btn-sm btn-outline-secondary" href="https://www.binance.com/en/futures/{{ coin }}" target="_blank">
+            <i class="fas fa-external-link-alt"></i> View on Binance 
+          </a>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-2">
             <a href="{{ url_for("main.dashboard_page", start=timeranges[0][0], end=timeranges[0][1]) }}">
                 <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ totals[6][0] }}%</h5>
-                        <p class="card-text">${{ totals[1] }}</p>
-                    </div>
-                    <div class="card-footer text-muted">
-                        Profit today
-                    </div>
+                  <div class="card-body">
+                    <h5 class="card-title">{{ totals[6][0] }}%</h5>
+                    <p class="card-text">${{ totals[1] }}</p>
+                  </div>
+                  <div class="card-footer text-muted">
+                    Profit today
+                  </div>
                 </div>
             </a>
         </div>
         <div class="col-sm-2">
             <a href="{{ url_for("main.dashboard_page", start=timeranges[2][0], end=timeranges[2][1]) }}">
                 <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ totals[6][1] }}%</h5>
-                        <p class="card-text">${{ totals[2] }}</p>
-                    </div>
-                    <div class="card-footer text-muted">
-                        Profit from Monday
-                    </div>
+                  <div class="card-body">
+                    <h5 class="card-title">{{ totals[6][1] }}%</h5>
+                    <p class="card-text">${{ totals[2] }}</p>
+                  </div>
+                  <div class="card-footer text-muted">
+                    Profit from Monday
+                  </div>
                 </div>
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="{{ url_for("main.dashboard_page", start=timeranges[4][0], end=timeranges[4][1]) }}">
+             <a href="{{ url_for("main.dashboard_page", start=timeranges[4][0], end=timeranges[4][1]) }}">
                 <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ totals[6][2] }}%</h5>
-                        <p class="card-text">${{ totals[3] }}</p>
-                    </div>
-                    <div class="card-footer text-muted">
-                        Profit in {{ totals[8] }}
-                    </div>
+                  <div class="card-body">
+                    <h5 class="card-title">{{ totals[6][2] }}%</h5>
+                    <p class="card-text">${{ totals[3] }}</p>
+                  </div>
+                  <div class="card-footer text-muted">
+                    Profit in {{ totals[8] }}
+                  </div>
                 </div>
             </a>
         </div>
         <div class="col-sm-2">
-            <a href="{{ url_for("main.dashboard_page", start=timeranges[8][0], end=timeranges[8][1]) }}">
+           <a href="{{ url_for("main.dashboard_page", start=timeranges[8][0], end=timeranges[8][1]) }}">
                 <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ totals[6][3] }}%</h5>
-                        <p class="card-text">${{ totals[0] }}</p>
-                    </div>
-                    <div class="card-footer text-muted">
-                        Total profit
-                    </div>
+                  <div class="card-body">
+                    <h5 class="card-title">{{ totals[6][3] }}%</h5>
+                    <p class="card-text">${{ totals[0] }}</p>
+                  </div>
+                  <div class="card-footer text-muted">
+                    Total profit
+                  </div>
                 </div>
             </a>
         </div>
         <div class="col-sm-2">
             <a href="{{ url_for("main.positions_page") }}">
                 <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">${{ totals[7][0] }}</h5>
-                        <p class="card-text">&nbsp;</p>
-                    </div>
-                    <div class="card-footer text-muted">
-                        Unrealised PnL
-                    </div>
+                  <div class="card-body">
+                    <h5 class="card-title">${{ totals[7][0] }}</h5>
+	            <p class="card-text">&nbsp;</p>
+                  </div>
+                  <div class="card-footer text-muted">
+                    Unrealised PnL
+                  </div>
                 </div>
             </a>
         </div>
         <div class="col-sm-2">
             <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">${{ totals[7][1] }}</h5>
-                    <p class="card-text">&nbsp;</p>
-                </div>
-                <div class="card-footer text-muted">
-                    Wallet balance
-                </div>
+              <div class="card-body">
+                <h5 class="card-title">${{ totals[7][1] }}</h5>
+                <p class="card-text">&nbsp;</p>
+              </div>
+              <div class="card-footer text-muted">
+                Wallet balance
+              </div>
             </div>
         </div>
     </div>
@@ -101,193 +101,200 @@
         <div class="col-md-6">
             <div class="card text-center">
                 <div class="card-header text-muted">
-                    Profit by day between {{ startdate }} and {{ enddate }}<span class="float-end"><a class="btn btn-outline-secondary btn-sm" role="button" href="{{ url_for("main.projection_page") }}">Projection</a></span>
-                </div>
+                    Profit by day between {{ startdate }} and {{ enddate }}<span class="float-end"><a class="btn btn-outline-secondary btn-sm" role="button" href="../../projection">Projection</a></span>
+                  </div>
                 <canvas id="lineChart" height="400"></canvas>
+				<div class="card-footer text-muted">
+					Profit over this period: {{ "$%.2f"|format(totals[9]) }}
+				</div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="card text-center">
                 <div class="card-header text-muted">
                     Profit by coin between {{ startdate }} and {{ enddate }}
-                </div>
+                  </div>
                 <canvas id="barChart" height="400"></canvas>
+				<div class="card-footer text-muted">
+					Coins active over this period: {{ totals[10] }}
+				</div>
             </div>
         </div>
     </div>
 
-    <script>
-        $('input[name="daterange"]').daterangepicker({
-            "showDropdowns": true,
-            "autoApply": true,
-            ranges: {
-                'Today': ['{{timeranges[0][0]}}', '{{timeranges[0][1]}}'],
-                'Yesterday': ['{{timeranges[1][0]}}', '{{timeranges[1][1]}}'],
-                'This Week': ['{{timeranges[2][0]}}', '{{timeranges[2][1]}}'],
-                'Last Week': ['{{timeranges[3][0]}}', '{{timeranges[3][1]}}'],
-                'This Month': ['{{timeranges[4][0]}}', '{{timeranges[4][1]}}'],
-                'Last Month': ['{{timeranges[5][0]}}', '{{timeranges[5][1]}}'],
-                'This Year': ['{{timeranges[6][0]}}', '{{timeranges[6][1]}}'],
-                'Last Year': ['{{timeranges[7][0]}}', '{{timeranges[7][1]}}'],
-                'All Time': ['{{timeranges[8][0]}}', '{{timeranges[8][1]}}'],
-            },
-            "locale": {
-                "format": "YYYY-MM-DD",
-                "separator": " - ",
-                "fromLabel": "From",
-                "toLabel": "To",
-                "weekLabel": "W",
-                "daysOfWeek": [
-                    "Su",
-                    "Mo",
-                    "Tu",
-                    "We",
-                    "Th",
-                    "Fr",
-                    "Sa"
-                ],
-                "monthNames": [
-                    "January",
-                    "February",
-                    "March",
-                    "April",
-                    "May",
-                    "June",
-                    "July",
-                    "August",
-                    "September",
-                    "October",
-                    "November",
-                    "December"
-                ],
-                "firstDay": 1
-            },
-            "alwaysShowCalendars": true,
-            "startDate": "{{startdate}}",
-            "endDate": "{{enddate}}",
-            "opens": "left"
-        });
+<script>    
+    $('input[name="daterange"]').daterangepicker({
+        "showDropdowns": true,
+        "autoApply": true,
+        ranges: {
+            'Today': ['{{timeranges[0][0]}}', '{{timeranges[0][1]}}'],
+            'Yesterday': ['{{timeranges[1][0]}}', '{{timeranges[1][1]}}'],
+            'This Week': ['{{timeranges[2][0]}}', '{{timeranges[2][1]}}'],
+            'Last Week': ['{{timeranges[3][0]}}', '{{timeranges[3][1]}}'],
+            'This Month': ['{{timeranges[4][0]}}', '{{timeranges[4][1]}}'],
+            'Last Month': ['{{timeranges[5][0]}}', '{{timeranges[5][1]}}'],
+            'This Year': ['{{timeranges[6][0]}}', '{{timeranges[6][1]}}'],
+            'Last Year': ['{{timeranges[7][0]}}', '{{timeranges[7][1]}}'],
+            'All Time': ['{{timeranges[8][0]}}', '{{timeranges[8][1]}}'],
+        },
+        "locale": {
+            "format": "YYYY-MM-DD",
+            "separator": " - ",
+            "fromLabel": "From",
+            "toLabel": "To",
+            "weekLabel": "W",
+            "daysOfWeek": [
+                "Su",
+                "Mo",
+                "Tu",
+                "We",
+                "Th",
+                "Fr",
+                "Sa"
+            ],
+            "monthNames": [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+            ],
+            "firstDay": 1
+        },
+        "alwaysShowCalendars": true,
+        "startDate": "{{startdate}}",
+        "endDate": "{{enddate}}",
+        "opens": "left"
+    });
+    
+    $('input[name="daterange"]').on('apply.daterangepicker', (e, picker) => {
+      document.forms["daterangeform"].submit();
+    });
+    
+Chart.register(ChartDataLabels);
+const data = {
+  labels: {{ data[1][0] | safe }},
+  datasets: [{
+    axis: 'y',
+    label: 'Profit $',
+    data: {{ data[1][1] }},
+    fill: false,
+    borderWidth: 1
+  }]
+};
 
-        $('input[name="daterange"]').on('apply.daterangepicker', (e, picker) => {
-            document.forms["daterangeform"].submit();
-        });
+const config = {
+  type: 'bar',
+  data: data,
+  options: {
+      onClick: graphClickEvent,
+      indexAxis: 'y',
+      plugins:{   
+          legend: {
+              display: false
+        },
+      },
+	  scales: {
+		y: {
+			ticks: {
+				autoSkip: false,
+			}
+		}
+	  }
+  }
+};
+    
+function graphClickEvent(event, array){
+    if(array[0]){
+        const value = data.labels[array[0].index];
+        location.href = "../../coins/" + value;
+    }
+}
 
-        Chart.register(ChartDataLabels);
-        const data = {
-            labels: {{ data[1][0] | safe }},
-            datasets: [{
-                axis: 'y',
-                label: 'Profit $',
-                data: {{ data[1][1] }},
-                fill: false,
-                borderWidth: 1
-            }]
-        };
-
-        const config = {
-            type: 'bar',
-            data: data,
-            options: {
-                onClick: graphClickEvent,
-                indexAxis: 'y',
-                plugins:{
-                    legend: {
-                        display: false
-                    },
-                },
-                scales: {
-                    y: {
-                        ticks: {
-                            autoSkip: false,
-                        }
-                    }
-                }
-            }
-        };
-
-        function graphClickEvent(event, array){
-            if(array[0]){
-                const value = data.labels[array[0].index];
-                location.href = "../../coins/" + value;
+var myChart = new Chart(
+    document.getElementById('barChart'),
+    config
+);
+    
+const data2 = {
+  labels: {{ data[0][1] | safe }},
+  datasets: [
+	  {
+		label: 'Profit',
+		data: {{ data[0][0] }},
+		fill: false,
+		borderColor: 'rgb(75, 192, 192)',
+		tension: 0.1,
+		yAxisID: 'y',
+	  },
+	  {
+		label: 'Balance',
+		data: {{ data[2][0] }},
+		fill: true,
+		borderColor: 'rgba(240, 234, 151, 0.3)',
+		backgroundColor: 'rgba(240, 234, 151, 0.3)',
+		tension: 0.1,
+		yAxisID: 'y1',
+        datalabels: {
+            labels: {
+              title: null
             }
         }
-
-        var myChart = new Chart(
-            document.getElementById('barChart'),
-            config
-        );
-
-        const data2 = {
-            labels: {{ data[0][1] | safe }},
-            datasets: [
-                {
-                    label: 'Profit',
-                    data: {{ data[0][0] }},
-                    fill: false,
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1,
-                    yAxisID: 'y',
-                },
-                {
-                    label: 'Balance',
-                    data: {{ data[2][0] }},
-                    fill: true,
-                    borderColor: 'rgba(240, 234, 151, 0.3)',
-                    backgroundColor: 'rgba(240, 234, 151, 0.3)',
-                    tension: 0.1,
-                    yAxisID: 'y1',
-                    datalabels: {
-                        labels: {
-                            title: null
-                        }
-                    }
-                },
-            ]
-        };
-        const config2 = {
-            type: 'line',
-            data: data2,
-            options: {
-                responsive: true,
-                layout: {
-                    padding: {
-                        top: 20
-                    }
-                },
-                plugins:{
-                    datalabels: {
-                        anchor: 'end',
-                        align: 'top',
-                        offset: 5,
-                    },
-                    legend: {
-                        display: false
-                    },
-                },
-                scales: {
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        ticks: {
-                            autoSkip: false,
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        grid: {
-                            drawOnChartArea: false, // only want the grid lines for one axis to show up
-                        }
-                    }
-                }
+	  },	  
+  ]
+};
+const config2 = {
+  type: 'line',
+  data: data2,
+  options: {
+		responsive: true,
+        layout: {
+            padding: {
+                top: 20
             }
-        };
-
-        var myChart = new Chart(
-            document.getElementById('lineChart'),
-            config2
-        );
-    </script>
+        },
+        plugins:{
+            datalabels: {
+                anchor: 'end',
+                align: 'top',
+                offset: 5,
+            },
+            legend: {
+                display: false
+            },
+        },
+		scales: {
+			y: {
+				type: 'linear',
+				display: true,
+				position: 'left',
+				beginAtZero: true,
+				ticks: {
+					autoSkip: false,
+				}
+			},
+			y1: {
+				type: 'linear',
+				display: true,
+				position: 'right',
+				grid: {
+				  drawOnChartArea: false, // only want the grid lines for one axis to show up
+				}
+			}
+		}
+	}
+};
+    
+var myChart = new Chart(
+    document.getElementById('lineChart'),
+    config2
+);
+</script>
 {% endblock %}

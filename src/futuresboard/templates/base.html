@@ -14,7 +14,7 @@
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/sidebars.css') }}">
         <link rel= "stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         {% block head %}
-            <title>{% block title %}{% endblock %} - Futures Board</title>
+            <title>{% block title %}{% endblock %} - {{ custom["NAVBAR_TITLE"] }}</title>
         {% endblock %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js" integrity="sha512-GMGzUEevhWh8Tc/njS0bDpwgxdCJLQBWG3Z2Ct+JGOpVnEmjvNx6ts4v6A2XJf1HOrtOsfhv3hBKpK9kE5z8AQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -31,8 +31,8 @@
             }
         </style>
     </head>
-    <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-5" href="{{ url_for("main.index_page") }}">futuresboard</a>
+    <header class="navbar navbar-dark sticky-top {{ custom["NAVBAR_BG"] }} flex-md-nowrap p-0 shadow">
+        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-5" href="{{ url_for("main.index_page") }}">{{ custom[0] }}</a>
         <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -69,9 +69,9 @@
                                                 <tr>
                                                     <td {% if coin_list['active'][item][0] == 0 %} class="table-danger" {% endif %}>
                                                         <a href="{{ url_for("main.coin_page", coin=item) }}" class="link-dark rounded">{{ item }}</a></td>
-                                                    <td class="text-center">{{ coin_list['active'][item][2] }}</td>
-                                                    <td class="table-success text-center">{{ coin_list['active'][item][0] }}</td>
-                                                    <td class="table-danger text-center">{{ coin_list['active'][item][1] }}</td>
+                                                    <td class="text-center" data-toggle="tooltip" title="PBR">{{ coin_list['active'][item][2] }}</td>
+                                                    <td class="table-success text-center" data-toggle="tooltip" title="Buy Orders">{{ coin_list['active'][item][0] }}</td>
+                                                    <td class="table-danger text-center" data-toggle="tooltip" title="Sell Orders">{{ coin_list['active'][item][1] }}</td>
                                                 </tr>
                                             {% endfor %}
                                             <tr class="table-secondary">
@@ -107,7 +107,10 @@
             {% block footer %}
                 <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
                     <div class="col-md-4 d-flex align-items-center px-5">
-                        <i class="fas fa-rocket"></i>&nbsp;&nbsp;<span class="text-muted">© 2021 Futuresboard</span>
+                        <i class="fas fa-rocket"></i>&nbsp;&nbsp;
+						<a href="https://github.com/ecoppen/futuresboard" target="_blank" class="text-decoration-none">
+							<span class="text-muted">© 2021 Futuresboard</span>
+						</a>
                     </div>
 
                     <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
@@ -119,5 +122,10 @@
             {% endblock %}
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-    </body>
+		<script>
+		$(document).ready(function() {
+			$("body").tooltip({ selector: '[data-toggle=tooltip]' });
+		});
+		</script>
+	</body>
 </html>
