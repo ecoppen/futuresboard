@@ -42,10 +42,7 @@ class History(TypedDict):
 
 class Projections(TypedDict):
     dates: list[str]
-    p03: list[float]
-    p05: list[float]
-    p10: list[float]
-    p15: list[float]
+    proj: dict[float, list[float]]
     pcustom: list[float]
     pcustom_value: float
 
@@ -1055,10 +1052,7 @@ def projection_page():
     balance = db.query("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     projections: Projections = {
         "dates": [],
-        "p03": [],
-        "p05": [],
-        "p10": [],
-        "p15": [],
+        "proj": {},
         "pcustom": [],
         "pcustom_value": 0.0,
     }
@@ -1087,37 +1081,28 @@ def projection_page():
         projections["pcustom_value"] = custom
         today = date.today()
         x = 1
+        config_projections = current_app.config["CUSTOM"]["PROJECTIONS"]
         while x < 365:
             nextday = today + timedelta(days=x)
             projections["dates"].append(nextday.strftime("%Y-%m-%d"))
-            if len(projections["p03"]) < 1:
-                newbalance = balance[0]
-            else:
-                newbalance = projections["p03"][-1]
-            projections["p03"].append(newbalance * 1.003)
-
-            if len(projections["p05"]) < 1:
-                newbalance = balance[0]
-            else:
-                newbalance = projections["p05"][-1]
-            projections["p05"].append(newbalance * 1.005)
-
-            if len(projections["p10"]) < 1:
-                newbalance = balance[0]
-            else:
-                newbalance = projections["p10"][-1]
-            projections["p10"].append(newbalance * 1.01)
-
-            if len(projections["p15"]) < 1:
-                newbalance = balance[0]
-            else:
-                newbalance = projections["p15"][-1]
-            projections["p15"].append(newbalance * 1.012)
+            
+            for each_projection in config_projections:
+                if each_projection not in projections["proj"]:
+                    projections["proj"][each_projection] = []
+                    
+                if len(projections["proj"][each_projection]) < 1:
+                    newbalance = balance[0]
+                    projections["proj"][each_projection].append(newbalance)
+                else:
+                    newbalance = projections["proj"][each_projection][-1]
+                    
+                projections["proj"][each_projection].append(newbalance * each_projection)
 
             if len(projections["pcustom"]) < 1:
                 newbalance = balance[0]
             else:
                 newbalance = projections["pcustom"][-1]
+                
             projections["pcustom"].append(newbalance * (1 + (week[0] / balance[0]) / 7))
 
             x += 1
