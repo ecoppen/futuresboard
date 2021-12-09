@@ -13,6 +13,7 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask.helpers import url_for
+from flask import current_app
 from typing_extensions import TypedDict
 
 from futuresboard import db
@@ -310,7 +311,10 @@ def index_page():
         percentages,
         pnl,
         datetime.now().strftime("%B"),
+        zero_value(week[0]),
+        len(by_symbol[0])
     ]
+    
     return render_template(
         "home.html",
         coin_list=get_coins(),
@@ -321,6 +325,7 @@ def index_page():
         startdate=startdate,
         enddate=enddate,
         timeranges=ranges,
+        custom=[current_app.config["CUSTOM"]["NAVBAR_TITLE"], current_app.config["CUSTOM"]["NAVBAR_BG"]]
     )
 
 
@@ -475,6 +480,8 @@ def dashboard_page(start, end):
         percentages,
         pnl,
         datetime.now().strftime("%B"),
+        zero_value(customframe[0]),
+        len(by_symbol[0])
     ]
     return render_template(
         "home.html",
@@ -485,6 +492,7 @@ def dashboard_page(start, end):
         startdate=startdate,
         enddate=enddate,
         timeranges=ranges,
+        custom=[current_app.config["CUSTOM"]["NAVBAR_TITLE"], current_app.config["CUSTOM"]["NAVBAR_BG"]]
     )
 
 
@@ -519,14 +527,14 @@ def positions_page():
 
         positions[coin] = [allpositions, allorders]
 
-    return render_template("positions.html", coin_list=get_coins(), positions=positions)
+    return render_template("positions.html", coin_list=get_coins(), positions=positions, custom=[current_app.config["CUSTOM"]["NAVBAR_TITLE"], current_app.config["CUSTOM"]["NAVBAR_BG"]])
 
 
 @app.route("/coins/<coin>", methods=["GET"])
 def coin_page(coin):
     coins = get_coins()
     if coin not in coins["inactive"] and coin not in coins["active"]:
-        return render_template("error.html", coin_list=get_coins()), 404
+        return render_template("error.html", coin_list=get_coins(),custom=[current_app.config["CUSTOM"]["NAVBAR_TITLE"], current_app.config["CUSTOM"]["NAVBAR_BG"]]), 404
 
     daterange = request.args.get("daterange")
     ranges = timeranges()
@@ -675,6 +683,7 @@ def coin_page(coin):
             percentages,
             pnl,
             datetime.now().strftime("%B"),
+            zero_value(week[0]),
         ]
         by_date = db.query(
             'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ? GROUP BY Date',
@@ -699,6 +708,7 @@ def coin_page(coin):
         startdate=startdate,
         enddate=enddate,
         timeranges=ranges,
+        custom=[current_app.config["CUSTOM"]["NAVBAR_TITLE"], current_app.config["CUSTOM"]["NAVBAR_BG"]]
     )
 
 
@@ -706,7 +716,7 @@ def coin_page(coin):
 def coin_page_timeframe(coin, start, end):
     coins = get_coins()
     if coin not in coins["inactive"] and coin not in coins["active"]:
-        return render_template("error.html", coin_list=get_coins()), 404
+        return render_template("error.html", coin_list=get_coins(), custom=[current_app.config["CUSTOM"]["NAVBAR_TITLE"], current_app.config["CUSTOM"]["NAVBAR_BG"]]), 404
 
     ranges = timeranges()
     daterange = request.args.get("daterange")
@@ -853,18 +863,6 @@ def coin_page_timeframe(coin, start, end):
             ]
         for row in result:
             fees[row[1]] = format_dp(abs(zero_value(row[0])), 4)
-        pnl = [format_dp(zero_value(unrealized[0])), format_dp(balance)]
-        totals = [
-            format_dp(zero_value(total[0])),
-            format_dp(zero_value(today[0])),
-            format_dp(zero_value(week[0])),
-            format_dp(zero_value(month[0])),
-            ranges[3],
-            fees,
-            percentages,
-            pnl,
-            datetime.now().strftime("%B"),
-        ]
 
         by_date = db.query(
             'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ? GROUP BY Date',
@@ -875,6 +873,27 @@ def coin_page_timeframe(coin, start, end):
             temp[0].append(round(float(each[1]), 2))
             temp[1].append(each[0])
         by_date = temp
+            
+        pnl = [format_dp(zero_value(unrealized[0])), format_dp(balance)]
+
+        customframe = db.query(
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ?',
+            [start, end, coin],
+            one=True,
+        )
+       
+        totals = [
+            format_dp(zero_value(total[0])),
+            format_dp(zero_value(today[0])),
+            format_dp(zero_value(week[0])),
+            format_dp(zero_value(month[0])),
+            ranges[3],
+            fees,
+            percentages,
+            pnl,
+            datetime.now().strftime("%B"),
+            zero_value(customframe[0]),
+        ]
 
     return render_template(
         "coin.html",
@@ -889,6 +908,7 @@ def coin_page_timeframe(coin, start, end):
         startdate=startdate,
         enddate=enddate,
         timeranges=ranges,
+        custom=[current_app.config["CUSTOM"]["NAVBAR_TITLE"], current_app.config["CUSTOM"]["NAVBAR_BG"]]
     )
 
 
@@ -934,7 +954,7 @@ def history_page():
             previous_files.append("csv/" + file)
 
     return render_template(
-        "history.html", coin_list=get_coins(), history=history, filename="-", files=previous_files
+        "history.html", coin_list=get_coins(), history=history, filename="-", files=previous_files, custom=[current_app.config["CUSTOM"]["NAVBAR_TITLE"], current_app.config["CUSTOM"]["NAVBAR_BG"]]
     )
 
 
@@ -1026,7 +1046,7 @@ def history_page_timeframe(start, end):
             previous_files.append("csv/" + file)
 
     return render_template(
-        "history.html", coin_list=get_coins(), history=history, fname=filename, files=previous_files
+        "history.html", coin_list=get_coins(), history=history, fname=filename, files=previous_files, custom=[current_app.config["CUSTOM"]["NAVBAR_TITLE"], current_app.config["CUSTOM"]["NAVBAR_BG"]]
     )
 
 
@@ -1102,9 +1122,9 @@ def projection_page():
 
             x += 1
 
-    return render_template("projection.html", coin_list=get_coins(), data=projections)
+    return render_template("projection.html", coin_list=get_coins(), data=projections, custom=[current_app.config["CUSTOM"]["NAVBAR_TITLE"], current_app.config["CUSTOM"]["NAVBAR_BG"]])
 
 
 @app.errorhandler(404)
 def not_found(error):
-    return render_template("error.html", coin_list=get_coins()), 404
+    return render_template("error.html", coin_list=get_coins(),custom=[current_app.config["CUSTOM"]["NAVBAR_TITLE"], current_app.config["CUSTOM"]["NAVBAR_BG"]]), 404

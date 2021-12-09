@@ -12,7 +12,7 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="heading{{ coin }}">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ coin }}" aria-expanded="false" aria-controls="collapse{{ coin }}">
-                                {{ coin }}&nbsp;&nbsp;<span class="badge bg-secondary">{{ positions[coin][0][0][5]}} {{ positions[coin][0][0][3] }}x</span>&nbsp;&nbsp;<span class="badge bg-primary">Volume: {{ positions[coin][0][0][6] }}</span>&nbsp;&nbsp;<span class="badge bg-success">Price {{ positions[coin][0][0][4] }}</span>
+                                {{ coin }}&nbsp;&nbsp;<span class="badge bg-secondary">{{ positions[coin][0][0][5]}} {{ positions[coin][0][0][3] }}x</span>&nbsp;&nbsp;<span class="badge bg-primary">Volume: {{ positions[coin][0][0][6] }}</span>&nbsp;&nbsp;<span class="badge bg-success">Price {{ positions[coin][0][0][4] }}</span>&nbsp;&nbsp;<span class="badge bg-danger">Unrealised PnL {{ "$%.2f"|format(positions[coin][0][0][2]) }}</span>
                             </button>
                         </h2>
                         <div id="collapse{{ coin }}" class="accordion-collapse collapse" aria-labelledby="heading{{ coin}}" data-bs-parent="#accordionExample">

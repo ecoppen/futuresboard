@@ -104,6 +104,9 @@
                     Profit by day between {{ startdate }} and {{ enddate }}
                 </div>
                 <canvas id="lineChart" height="400"></canvas>
+				<div class="card-footer text-muted">
+					Profit over this period: {{ "$%.2f"|format(totals[9]) }}
+				</div>
             </div>
         </div>
         <div class="col-md-6">
