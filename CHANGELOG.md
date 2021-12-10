@@ -8,6 +8,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Store and display historical unrealized PnL
 - Tidy up repeated code into functions
 
+## 2021-12-10
+### Changed
+- Minor fixes and README updates regarding the latest changes made yesterday
+
+## 2021-12-09
+### Added
+- The config file now has the ability to change the look and feel of the dashboard. The title can be changed using `NAVBAR_TITLE`, the background colour of the navigation bar can now be changed to a set of colours using `NAVBAR_BG` and the projection percentages can be changed to show more or less values as specified by the user with `PROJECTIONS`
+- The config file can also be used to set the value of the `AUTO_SCRAPE_INTERVAL` between `60` and `3600` for more or less frequent updates depending on their needs
+- Under the charts on the dashboard and coin pages there is now a summary showing either the `total profit` for that period or `number of coins active`
+- Positions page now shows unrealised Profit and Loss for each coin
+
+### Changed
+- Tooltips were lost somewhere along the line for the values in the sidebar, these are reintroduced 
+- Link to the repo in the footer was lost also, reintroduced
+
 ## 2021-12-07
 ### Changed
 - Codebase overhauled by [@s0undt3ch](https://github.com/s0undt3ch) to use a blueprint which allows the multiple dashboards to be served 
