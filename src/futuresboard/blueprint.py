@@ -322,10 +322,7 @@ def index_page():
         startdate=startdate,
         enddate=enddate,
         timeranges=ranges,
-        custom=[
-            current_app.config["CUSTOM"]["NAVBAR_TITLE"],
-            current_app.config["CUSTOM"]["NAVBAR_BG"],
-        ],
+        custom=current_app.config["CUSTOM"],
     )
 
 
@@ -492,10 +489,7 @@ def dashboard_page(start, end):
         startdate=startdate,
         enddate=enddate,
         timeranges=ranges,
-        custom=[
-            current_app.config["CUSTOM"]["NAVBAR_TITLE"],
-            current_app.config["CUSTOM"]["NAVBAR_BG"],
-        ],
+        custom=current_app.config["CUSTOM"],
     )
 
 
@@ -534,10 +528,7 @@ def positions_page():
         "positions.html",
         coin_list=get_coins(),
         positions=positions,
-        custom=[
-            current_app.config["CUSTOM"]["NAVBAR_TITLE"],
-            current_app.config["CUSTOM"]["NAVBAR_BG"],
-        ],
+        custom=current_app.config["CUSTOM"],
     )
 
 
@@ -549,10 +540,7 @@ def coin_page(coin):
             render_template(
                 "error.html",
                 coin_list=get_coins(),
-                custom=[
-                    current_app.config["CUSTOM"]["NAVBAR_TITLE"],
-                    current_app.config["CUSTOM"]["NAVBAR_BG"],
-                ],
+                custom=current_app.config["CUSTOM"],
             ),
             404,
         )
@@ -729,10 +717,7 @@ def coin_page(coin):
         startdate=startdate,
         enddate=enddate,
         timeranges=ranges,
-        custom=[
-            current_app.config["CUSTOM"]["NAVBAR_TITLE"],
-            current_app.config["CUSTOM"]["NAVBAR_BG"],
-        ],
+        custom=current_app.config["CUSTOM"],
     )
 
 
@@ -744,10 +729,7 @@ def coin_page_timeframe(coin, start, end):
             render_template(
                 "error.html",
                 coin_list=get_coins(),
-                custom=[
-                    current_app.config["CUSTOM"]["NAVBAR_TITLE"],
-                    current_app.config["CUSTOM"]["NAVBAR_BG"],
-                ],
+                custom=current_app.config["CUSTOM"],
             ),
             404,
         )
@@ -942,10 +924,7 @@ def coin_page_timeframe(coin, start, end):
         startdate=startdate,
         enddate=enddate,
         timeranges=ranges,
-        custom=[
-            current_app.config["CUSTOM"]["NAVBAR_TITLE"],
-            current_app.config["CUSTOM"]["NAVBAR_BG"],
-        ],
+        custom=current_app.config["CUSTOM"],
     )
 
 
@@ -996,10 +975,7 @@ def history_page():
         history=history,
         filename="-",
         files=previous_files,
-        custom=[
-            current_app.config["CUSTOM"]["NAVBAR_TITLE"],
-            current_app.config["CUSTOM"]["NAVBAR_BG"],
-        ],
+        custom=current_app.config["CUSTOM"],
     )
 
 
@@ -1096,10 +1072,7 @@ def history_page_timeframe(start, end):
         history=history,
         fname=filename,
         files=previous_files,
-        custom=[
-            current_app.config["CUSTOM"]["NAVBAR_TITLE"],
-            current_app.config["CUSTOM"]["NAVBAR_BG"],
-        ],
+        custom=current_app.config["CUSTOM"],
     )
 
 
@@ -1167,10 +1140,7 @@ def projection_page():
         "projection.html",
         coin_list=get_coins(),
         data=projections,
-        custom=[
-            current_app.config["CUSTOM"]["NAVBAR_TITLE"],
-            current_app.config["CUSTOM"]["NAVBAR_BG"],
-        ],
+        custom=current_app.config["CUSTOM"],
     )
 
 
@@ -1180,10 +1150,7 @@ def not_found(error):
         render_template(
             "error.html",
             coin_list=get_coins(),
-            custom=[
-                current_app.config["CUSTOM"]["NAVBAR_TITLE"],
-                current_app.config["CUSTOM"]["NAVBAR_BG"],
-            ],
+            custom=current_app.config["CUSTOM"],
         ),
         404,
     )
