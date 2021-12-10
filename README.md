@@ -30,12 +30,13 @@ Currently only Binance and Futures are supported.
 - The scraper will sleep for a minute when the rate exceeds `800 within a minute`
 
 ## Customising the dashboard
-
+The `/config/config.json` file allows you to customise the look and feel of your dashboard as follows:
 - `AUTO_SCRAPE_INTERVAL` is set to 300 seconds, this value can be adjusted between `60` and `3600`
 - `NAVBAR_TITLE` changes the branding in the top left of the navigation (see below)
-- `NAVBAR_BG` changes the colour of the navigation bar, acceptable values are: `bg-primary` (see below), `bg-secondary`, `bg-success`, `bg-danger`, `bg-warning`, `bg-info` and the default `bg-dark`
+- `NAVBAR_BG` changes the colour of the navigation bar, acceptable values are: `bg-primary`, `bg-secondary`, `bg-success`, `bg-danger`, `bg-warning`, `bg-info` and the default `bg-dark`
 - `PROJECTIONS` changes the percentage values on the projections page. `1.003` equates to `0.3%` daily and `1.01` equates to `1%` daily.
 
+For example, setting `"NAVBAR_TITLE": "Futuresboard2"` and `"NAVBAR_BG": "bg-primary",` would result in:
 <img width="1314" src="https://user-images.githubusercontent.com/51025241/145480528-408dff64-1742-41ea-baac-89bb5458d406.png">
 
 ## Screenshots
