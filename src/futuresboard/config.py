@@ -8,7 +8,9 @@ from typing import List
 from typing import Optional
 
 from pydantic import BaseModel
+from pydantic import DirectoryPath
 from pydantic import Field
+from pydantic import IPvAnyInterface
 from pydantic import root_validator
 from pydantic import validator
 
@@ -49,14 +51,14 @@ class Custom(BaseModel):
 
 
 class Config(BaseModel):
-    CONFIG_DIR: pathlib.Path = pathlib.Path.cwd()
+    CONFIG_DIR: DirectoryPath = pathlib.Path.cwd()
     DATABASE: Optional[pathlib.Path]
     EXCHANGE: Optional[Exchanges] = Exchanges.BINANCE
     API_BASE_URL: Optional[str]
     AUTO_SCRAPE_INTERVAL: int = 300
     DISABLE_AUTO_SCRAPE: bool = False
-    HOST: Optional[str] = "0.0.0.0"
-    PORT: Optional[int] = 5000
+    HOST: Optional[IPvAnyInterface] = IPvAnyInterface.validate("0.0.0.0")  # type: ignore[assignment]
+    PORT: Optional[int] = Field(5000, ge=1, le=65535)
     API_KEY: str
     API_SECRET: str
 
