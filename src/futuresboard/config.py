@@ -46,7 +46,7 @@ class Custom(BaseModel):
         if value < -3.0:
             raise ValueError("The lower allowed projection value is -3.0")
         if value > 3.0:
-            raise ValueError("The upper allowed projection value is -3.0")
+            raise ValueError("The upper allowed projection value is 3.0")
         return value
 
 
