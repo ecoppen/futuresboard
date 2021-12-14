@@ -40,7 +40,7 @@ def _auto_scrape(app):
         while True:
             app.logger.info("Auto scrape routines starting")
             scrape(app=app)
-            app.logger.info("Auto scrape routines terninated. Sleeping %s seconds...", interval)
+            app.logger.info("Auto scrape routines terminated. Sleeping %s seconds...", interval)
             time.sleep(interval)
 
 
