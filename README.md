@@ -4,6 +4,8 @@ A python (3.7+) based scraper and dashboard to monitor the performance of your B
 
 [Change log](https://github.com/ecoppen/futuresboard/blob/main/CHANGELOG.md)
 
+[Guide to setting up futuresboard and passivbot](https://www.futuresboard.xyz/)
+
 ## Getting started
 
 - Create a fresh new API on Binance, with only read rights.
