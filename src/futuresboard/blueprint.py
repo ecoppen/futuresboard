@@ -67,6 +67,9 @@ def calc_pbr(volume, price, side, balance):
     return 0.0
 
 
+def average_down_target(posprice, posqty, currentprice, targetprice):
+    return (posqty * (posprice - targetprice)) / (targetprice - currentprice)
+
 def get_coins():
     coins: Coins = {
         "active": {},
@@ -497,6 +500,19 @@ def dashboard_page(start, end):
 def positions_page():
     coins = get_coins()
     positions = {}
+
+    try:
+        response = requests.get(
+            "https://fapi.binance.com/fapi/v1/premiumIndex", timeout=2
+        )
+        markPrices: list
+        if response:
+            markPrices = response.json()
+        else:
+            markPrices = []
+    except Exception:
+        markPrices = []
+    
     for coin in coins["active"]:
 
         allpositions = db.query(
@@ -571,18 +587,6 @@ def coin_page(coin):
             except Exception:
                 pass
 
-    try:
-        response = requests.get(
-            "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=1
-        )
-        markPrice: float | str
-        if response:
-            markPrice = round(float(response.json()["markPrice"]), 5)
-        else:
-            markPrice = "-"
-    except Exception:
-        markPrice = "-"
-
     balance = db.query("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     if balance[0] is None:
         totals = ["-", "-", "-", "-", "-", {"USDT": 0, "BNB": 0}, ["-", "-", "-", "-"]]
@@ -646,7 +650,7 @@ def coin_page(coin):
             one=True,
         )
         allpositions = db.query(
-            "SELECT * FROM positions WHERE symbol = ?",
+            "SELECT * FROM positions WHERE symbol = ? AND entryPrice > 0",
             [coin],
         )
         allorders = db.query(
@@ -660,7 +664,25 @@ def coin_page(coin):
             position[4] = round(float(position[4]), 5)
             temp.append(position)
         allpositions = temp
-
+        
+        averagetargets = ["-","-","-","-"]
+        try:
+            response = requests.get(
+                "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=2
+            )
+            markPrice: float | str
+            if response:
+                markPrice = float(response.json()["markPrice"])
+                averagetargets = [
+                    round(average_down_target(allpositions[0][4], allpositions[0][6], markPrice, markPrice*1.001)),
+                    round(average_down_target(allpositions[0][4], allpositions[0][6], markPrice, markPrice*1.005)),
+                    round(average_down_target(allpositions[0][4], allpositions[0][6], markPrice, markPrice*1.01)),
+                ]
+            else:
+                markPrice = "-"
+        except Exception:
+            markPrice = "-"
+        
         temp = []
         for order in allorders:
             order = list(order)
@@ -718,6 +740,7 @@ def coin_page(coin):
         enddate=enddate,
         timeranges=ranges,
         custom=current_app.config["CUSTOM"],
+        target=averagetargets,
     )
 
 
@@ -799,18 +822,6 @@ def coin_page_timeframe(coin, start, end):
         * 1000
     )
 
-    try:
-        response = requests.get(
-            "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=1
-        )
-        markPrice: float | str
-        if response:
-            markPrice = round(float(response.json()["markPrice"]), 5)
-        else:
-            markPrice = "-"
-    except Exception:
-        markPrice = "-"
-
     balance = db.query("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     if balance[0] is None:
         totals = ["-", "-", "-", "-", "-", {"USDT": 0, "BNB": 0}, ["-", "-", "-", "-"]]
@@ -845,7 +856,7 @@ def coin_page_timeframe(coin, start, end):
             one=True,
         )
         allpositions = db.query(
-            "SELECT * FROM positions WHERE symbol = ?",
+            "SELECT * FROM positions WHERE symbol = ? AND entryPrice > 0",
             [coin],
         )
         allorders = db.query(
@@ -860,6 +871,24 @@ def coin_page_timeframe(coin, start, end):
             temp.append(position)
         allpositions = temp
 
+        averagetargets = ["-","-","-","-"]
+        try:
+            response = requests.get(
+                "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=2
+            )
+            markPrice: float | str
+            if response:
+                markPrice = float(response.json()["markPrice"])
+                averagetargets = [
+                    round(average_down_target(allpositions[0][4], allpositions[0][6], markPrice, markPrice*1.001)),
+                    round(average_down_target(allpositions[0][4], allpositions[0][6], markPrice, markPrice*1.005)),
+                    round(average_down_target(allpositions[0][4], allpositions[0][6], markPrice, markPrice*1.01)),
+                ]
+            else:
+                markPrice = "-"
+        except Exception:
+            markPrice = "-"
+        
         temp = []
         for order in allorders:
             order = list(order)
@@ -925,6 +954,7 @@ def coin_page_timeframe(coin, start, end):
         enddate=enddate,
         timeranges=ranges,
         custom=current_app.config["CUSTOM"],
+        target=averagetargets,
     )
 
 

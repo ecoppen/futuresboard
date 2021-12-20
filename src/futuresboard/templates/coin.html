@@ -149,7 +149,7 @@
                         {% endfor %}
                     </table>
                     {% if coin in coin_list['active'] %}
-                        {% if coin_list['active'][coin][0] == 0 %}
+                        {% if coin_list['active'][coin][1] > 0 %}
                             <hr>
                             <table class='table table-sm table-bordered text-center'>
                                 <thead class="thead-dark">
@@ -179,6 +179,26 @@
                                         <td>Averaged</td>
                                         <td><input class="form-control form-control-sm" id="averagesize" readonly></td>
                                         <td><input class="form-control form-control-sm" id="averagevalue" readonly></td>
+                                    </tr>
+                                    <tr class="table-secondary">
+                                        <td>0.1% away</td>
+                                        <td>{{ target[0] }}</td>
+                                        <td>{{ markprice }}</td>
+                                    </tr>
+                                    <tr class="table-secondary">
+                                        <td>0.5% away</td>
+                                        <td>{{ target[1] }}</td>
+                                        <td>{{ markprice }}</td>
+                                    </tr>
+                                    <tr class="table-secondary">
+                                        <td>1% away</td>
+                                        <td>{{ target[2] }}</td>
+                                        <td>{{ markprice }}</td>
+                                    </tr>
+                                    <tr class="">
+                                        <td><input type="number" class="form-control form-control-sm" id="customaway" onchange="calcTarget()" min="0" step="any"></td>
+                                        <td><input class="form-control form-control-sm" id="averageTarget" readonly></td>
+                                        <td>{{ markprice }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -245,7 +265,22 @@
             $('input[name="daterange"]').on('apply.daterangepicker', (e, picker) => {
                 document.forms["daterangeform"].submit();
             });
-
+            
+            function calcTarget() {
+                var positionsize = document.getElementById("positionsize").value;
+                var positionvalue = document.getElementById("positionvalue").value;
+                var customaway = document.getElementById("customaway").value;
+                if (customaway.length > 0){
+                    var markprice = {{ markprice }};
+                    positionsize = parseFloat(positionsize);
+                    positionvalue = parseFloat(positionvalue);
+                    markprice = parseFloat(markprice);
+                    customaway = parseFloat(customaway);
+                    var targetprice = markprice * (1+(customaway/100));
+                    document.getElementById("averageTarget").value = (positionsize * (positionvalue - targetprice)) / (targetprice - markprice);
+                }
+            }
+            
             function averageDown() {
                 var positionsize = document.getElementById("positionsize").value;
                 var customsize = document.getElementById("customsize").value;
