@@ -74,13 +74,10 @@ def dispatch_request(http_method):
 
 # used for sending request requires the signature
 def send_signed_request(http_method, url_path, payload={}):
-    query_string = urlencode(payload)
-    # replace single quote to double quote
-    query_string = query_string.replace("%27", "%22")
-    if query_string:
-        query_string = f"{query_string}&timestamp={get_timestamp()}"
-    else:
-        query_string = f"timestamp={get_timestamp()}"
+    if "timestamp" not in payload:
+        payload["timestamp"] = get_timestamp()
+    query_string = urlencode(OrderedDict(sorted(payload.items())))
+    query_string = query_string.replace("%27", "%22") # replace single quote to double quote
 
     url = (
         current_app.config["API_BASE_URL"]
@@ -89,7 +86,8 @@ def send_signed_request(http_method, url_path, payload={}):
         + query_string
         + "&signature="
         + hashing(query_string)
-    )
+    )       
+        
     # print("{} {}".format(http_method, url))
     params = {"url": url, "params": {}}
     response = dispatch_request(http_method)(**params)
