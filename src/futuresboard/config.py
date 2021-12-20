@@ -28,6 +28,7 @@ class NavbarBG(enum.Enum):
 
 class Exchanges(enum.Enum):
     BINANCE = "binance"
+    BYBIT = "bybit"
 
 
 class Custom(BaseModel):
@@ -77,6 +78,8 @@ class Config(BaseModel):
         if not value:
             if values["EXCHANGE"] == Exchanges.BINANCE:
                 value = "https://fapi.binance.com"
+            elif values["EXCHANGE"] == Exchanges.BYBIT:
+                value = "https://api.bybit.com"
         return value
 
     @validator("AUTO_SCRAPE_INTERVAL")
