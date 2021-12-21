@@ -277,7 +277,7 @@
                     markprice = parseFloat(markprice);
                     customaway = parseFloat(customaway);
                     var targetprice = markprice * (1+(customaway/100));
-                    document.getElementById("averageTarget").value = (positionsize * (positionvalue - targetprice)) / (targetprice - markprice);
+                    document.getElementById("averageTarget").value = Math.round((positionsize * (positionvalue - targetprice)) / (targetprice - markprice));
                 }
             }
             
