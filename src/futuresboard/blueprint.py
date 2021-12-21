@@ -505,13 +505,16 @@ def positions_page():
         response = requests.get(
             "https://fapi.binance.com/fapi/v1/premiumIndex", timeout=2
         )
-        markPrices: list
+        markPrices: dict
+        markPrices = {}
         if response:
-            markPrices = response.json()
+            temp = response.json()
+            for each in temp:
+                markPrices[each["symbol"]] = each["markPrice"]
         else:
-            markPrices = []
+            markPrices = {}
     except Exception:
-        markPrices = []
+        markPrices = {}
     
     for coin in coins["active"]:
 
@@ -532,19 +535,44 @@ def positions_page():
         allpositions = temp
 
         temp = []
+        buys = []
+        sells = []
         for order in allorders:
             order = list(order)
             order[7] = datetime.fromtimestamp(order[7] / 1000.0).strftime("%Y-%m-%d %H:%M:%S")
+            if order[3] == "BUY":
+                buys.append(order[2])
+            else:
+                sells.append(order[2])
             temp.append(order)
         allorders = temp
-
-        positions[coin] = [allpositions, allorders]
+        stats = [len(buys),len(sells)]
+        if stats[0] == 0:
+            stats.append("-")
+            stats.append("-")
+        else:
+            stats.append(sorted(buys)[-1])
+            if coin in markPrices:
+                stats.append(round(float(markPrices[coin]) - sorted(buys)[-1],5))
+            else:
+                stats.append("-")
+        if stats[1] == 0:
+            stats.append("-")
+            stats.append("-")
+        else:
+            stats.append(sorted(sells)[0])
+            if coin in markPrices:
+                stats.append(round(float(markPrices[coin]) - sorted(sells)[0],5))
+            else:
+                stats.append("-")
+        positions[coin] = [allpositions, allorders, stats]
 
     return render_template(
         "positions.html",
         coin_list=get_coins(),
         positions=positions,
         custom=current_app.config["CUSTOM"],
+        markprices=markPrices,
     )
 
 

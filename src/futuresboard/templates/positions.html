@@ -6,54 +6,43 @@
         <h3><i class="fas fa-hand-holding-usd"></i> Positions</h3>
     </div>
     <div class="row">
-        <div class="col-md-12">
-            <div class="accordion" id="accordionExample">
-                {% for coin in positions %}
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="heading{{ coin }}">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ coin }}" aria-expanded="false" aria-controls="collapse{{ coin }}">
-                                {{ coin }}&nbsp;&nbsp;<span class="badge bg-secondary">{{ positions[coin][0][0][5]}} {{ positions[coin][0][0][3] }}x</span>&nbsp;&nbsp;<span class="badge bg-primary">Volume: {{ positions[coin][0][0][6] }}</span>&nbsp;&nbsp;<span class="badge bg-success">Price {{ positions[coin][0][0][4] }}</span>&nbsp;&nbsp;<span class="badge bg-danger">Unrealised PnL {{ "$%.2f"|format(positions[coin][0][0][2]) }}</span>
-                            </button>
-                        </h2>
-                        <div id="collapse{{ coin }}" class="accordion-collapse collapse" aria-labelledby="heading{{ coin}}" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <table id="orders" class='table table-sm table-bordered text-center'>
-                                    <thead class="thead-dark">
-                                        <tr>
-                                            <th>Type</th>
-                                            <th>Volume</th>
-                                            <th>Price</th>
-                                            <th>Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for position in positions[coin][0] %}
-                                            <tr class="table-primary">
-                                                <td>{{position[5]}} {{position[3]}}x</td>
-                                                <td>{{position[6]}}</td>
-                                                <td>{{position[4]}}</td>
-                                                <td></td>
-                                            </tr>
-                                        {% endfor %}
-                                        {% for order in positions[coin][1] %}
-                                            {% if order[3] == "BUY" %}
-                                                <tr class="table-success">
-                                            {% else %}
-                                                <tr class="table-danger">
-                                            {% endif %}
-                                            <td>{{order[3]}} {{order[8]}} {{order[4]}}</td>
-
-                                            <td>{{order[1]}}</td>
-                                            <td>{{order[2]}}</td>
-                                            <td>{{ order[7] }}</td>
-                                            </tr>
-                                        {% endfor %}
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                {% endfor %}
-            </div>
+        <div class="col-md-12 table-responsive">
+            <table id="orders" class='table table-sm table-bordered text-center'>
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Leverage</th>
+                        <th>Pos. Volume</th>
+                        <th>Pos. Price</th>
+                        <th>Unrealised PnL</th>
+                        <th>Current Price</th>
+                        <th class="table-success">Buys left</th>
+                        <th class="table-success">Next buy</th>
+                        <th class="table-success">Distance</th>
+                        <th class="table-danger">Sells left</th>
+                        <th class="table-danger">Next sell</th>
+                        <th class="table-danger">Distance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for coin in positions %}
+                        <tr>
+                            <td>{{ coin }}</td>
+                            <td>{{ positions[coin][0][0][5]}} {{ positions[coin][0][0][3] }}x</td>
+                            <td>{{ positions[coin][0][0][6] }}</td>
+                            <td>{{ positions[coin][0][0][4] }}</td>
+                            <td>{{ "$%.2f"|format(positions[coin][0][0][2]) }}</td>
+                            <td>{{ markprices[coin] }}</td>
+                            <td {% if positions[coin][2][0] == 0 %} class="table-danger" {% endif %}>{{ positions[coin][2][0]}}</td>
+                            <td {% if positions[coin][2][0] == 0 %} class="table-danger" {% endif %}>{{ positions[coin][2][2]}}</td>
+                            <td {% if positions[coin][2][0] == 0 %} class="table-danger" {% endif %}>{{ positions[coin][2][3]}}</td>
+                            <td>{{ positions[coin][2][1]}}</td>
+                            <td>{{ positions[coin][2][4]}}</td>
+                            <td>{{ positions[coin][2][5]}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -62,9 +51,7 @@
         $(document).ready( function () {
             $('#orders').DataTable({
                 "paging": false,
-                "searching": false,
-                "order": [],
-                "info": false,
+                "order": [[6,"asc"]],
             });
         } );
 
