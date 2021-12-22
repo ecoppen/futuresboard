@@ -10,6 +10,7 @@ import time
 from datetime import timedelta
 from sqlite3 import Error
 from urllib.parse import urlencode
+from collections import OrderedDict
 
 import requests
 from flask import current_app
@@ -73,7 +74,7 @@ def dispatch_request(http_method):
 
 
 # used for sending request requires the signature
-def send_signed_request(http_method, url_path, payload={}):
+def send_signed_request(http_method, url_path, payload={}, signature="signature"):
     if "timestamp" not in payload:
         payload["timestamp"] = get_timestamp()
     query_string = urlencode(OrderedDict(sorted(payload.items())))
@@ -84,7 +85,7 @@ def send_signed_request(http_method, url_path, payload={}):
         + url_path
         + "?"
         + query_string
-        + "&signature="
+        + "&" + signature + "="
         + hashing(query_string)
     )       
         
