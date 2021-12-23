@@ -203,10 +203,12 @@ def select_latest_income(conn):
     cur.execute("SELECT time FROM income ORDER BY time DESC LIMIT 0, 1")
     return cur.fetchone()
 
+
 def select_latest_income_symbol(conn, symbol):
     cur = conn.cursor()
     cur.execute("SELECT time FROM income WHERE symbol = ? ORDER BY time DESC LIMIT 0, 1", (symbol,))
     return cur.fetchone()
+
 
 # position interactions
 def create_position(conn, position):
@@ -435,7 +437,10 @@ def _scrape(app=None):
                         update_position(conn, position_row)
                         updated_positions += 1
 
-                    params = {"symbol": position["data"]["symbol"], "api_key": current_app.config["API_KEY"]}
+                    params = {
+                        "symbol": position["data"]["symbol"],
+                        "api_key": current_app.config["API_KEY"],
+                    }
                     responseHeader, responseJSON = send_signed_request(
                         "GET", "/private/linear/order/search", params, signature="sign"
                     )
