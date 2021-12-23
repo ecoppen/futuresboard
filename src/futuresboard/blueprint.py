@@ -1031,6 +1031,8 @@ def history_page():
         if temp not in history:
             history[temp] = {}  # type: ignore[misc]
             history[temp]["total"] = 0  # type: ignore[misc]
+            history[temp]["start"] = timeframe[0]
+            history[temp]["end"] = timeframe[1]
 
         for totals in incomesummary:
             history[temp][totals[0]] = int(totals[1])  # type: ignore[misc]
@@ -1044,7 +1046,6 @@ def history_page():
                 history[temp][column] = 0  # type: ignore[misc]
 
     history["columns"].sort()
-
     previous_files = []
     for file in os.listdir(os.path.join(app.root_path, "static", "csv")):
         if file.endswith(".csv"):
@@ -1122,10 +1123,12 @@ def history_page_timeframe(start, end):
             "SELECT incomeType, COUNT(IID) FROM income WHERE time >= ? AND time <= ? GROUP BY incomeType",
             [start, end],
         )
-        temp = (timeframe[0], timeframe[1])
+        temp = timeframe[0] + "/" + timeframe[1]
         if temp not in history:
             history[temp] = {}
             history[temp]["total"] = 0
+            history[temp]["start"] = timeframe[0]
+            history[temp]["end"] = timeframe[1]
 
         for totals in incomesummary:
             history[temp][totals[0]] = int(totals[1])
