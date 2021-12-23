@@ -70,6 +70,7 @@ def calc_pbr(volume, price, side, balance):
 def average_down_target(posprice, posqty, currentprice, targetprice):
     return (posqty * (posprice - targetprice)) / (targetprice - currentprice)
 
+
 def get_coins():
     coins: Coins = {
         "active": {},
@@ -502,9 +503,7 @@ def positions_page():
     positions = {}
 
     try:
-        response = requests.get(
-            "https://fapi.binance.com/fapi/v1/premiumIndex", timeout=2
-        )
+        response = requests.get("https://fapi.binance.com/fapi/v1/premiumIndex", timeout=2)
         markPrices: dict
         markPrices = {}
         if response:
@@ -515,7 +514,7 @@ def positions_page():
             markPrices = {}
     except Exception:
         markPrices = {}
-    
+
     for coin in coins["active"]:
 
         allpositions = db.query(
@@ -546,14 +545,14 @@ def positions_page():
                 sells.append(order[2])
             temp.append(order)
         allorders = temp
-        stats = [len(buys),len(sells)]
+        stats = [len(buys), len(sells)]
         if stats[0] == 0:
             stats.append("-")
             stats.append("-")
         else:
             stats.append(sorted(buys)[-1])
             if coin in markPrices:
-                stats.append(round(float(markPrices[coin]) - sorted(buys)[-1],5))
+                stats.append(round(float(markPrices[coin]) - sorted(buys)[-1], 5))
             else:
                 stats.append("-")
         if stats[1] == 0:
@@ -562,7 +561,7 @@ def positions_page():
         else:
             stats.append(sorted(sells)[0])
             if coin in markPrices:
-                stats.append(round(float(markPrices[coin]) - sorted(sells)[0],5))
+                stats.append(round(float(markPrices[coin]) - sorted(sells)[0], 5))
             else:
                 stats.append("-")
         positions[coin] = [allpositions, allorders, stats]
@@ -692,8 +691,8 @@ def coin_page(coin):
             position[4] = round(float(position[4]), 5)
             temp.append(position)
         allpositions = temp
-        
-        averagetargets = ["-","-","-","-"]
+
+        averagetargets = ["-", "-", "-", "-"]
         try:
             response = requests.get(
                 "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=2
@@ -702,15 +701,27 @@ def coin_page(coin):
             if response:
                 markPrice = float(response.json()["markPrice"])
                 averagetargets = [
-                    round(average_down_target(allpositions[0][4], allpositions[0][6], markPrice, markPrice*1.001)),
-                    round(average_down_target(allpositions[0][4], allpositions[0][6], markPrice, markPrice*1.005)),
-                    round(average_down_target(allpositions[0][4], allpositions[0][6], markPrice, markPrice*1.01)),
+                    round(
+                        average_down_target(
+                            allpositions[0][4], allpositions[0][6], markPrice, markPrice * 1.001
+                        )
+                    ),
+                    round(
+                        average_down_target(
+                            allpositions[0][4], allpositions[0][6], markPrice, markPrice * 1.005
+                        )
+                    ),
+                    round(
+                        average_down_target(
+                            allpositions[0][4], allpositions[0][6], markPrice, markPrice * 1.01
+                        )
+                    ),
                 ]
             else:
                 markPrice = "-"
         except Exception:
             markPrice = "-"
-        
+
         temp = []
         for order in allorders:
             order = list(order)
@@ -899,7 +910,7 @@ def coin_page_timeframe(coin, start, end):
             temp.append(position)
         allpositions = temp
 
-        averagetargets = ["-","-","-","-"]
+        averagetargets = ["-", "-", "-", "-"]
         try:
             response = requests.get(
                 "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=2
@@ -908,15 +919,27 @@ def coin_page_timeframe(coin, start, end):
             if response:
                 markPrice = float(response.json()["markPrice"])
                 averagetargets = [
-                    round(average_down_target(allpositions[0][4], allpositions[0][6], markPrice, markPrice*1.001)),
-                    round(average_down_target(allpositions[0][4], allpositions[0][6], markPrice, markPrice*1.005)),
-                    round(average_down_target(allpositions[0][4], allpositions[0][6], markPrice, markPrice*1.01)),
+                    round(
+                        average_down_target(
+                            allpositions[0][4], allpositions[0][6], markPrice, markPrice * 1.001
+                        )
+                    ),
+                    round(
+                        average_down_target(
+                            allpositions[0][4], allpositions[0][6], markPrice, markPrice * 1.005
+                        )
+                    ),
+                    round(
+                        average_down_target(
+                            allpositions[0][4], allpositions[0][6], markPrice, markPrice * 1.01
+                        )
+                    ),
                 ]
             else:
                 markPrice = "-"
         except Exception:
             markPrice = "-"
-        
+
         temp = []
         for order in allorders:
             order = list(order)
