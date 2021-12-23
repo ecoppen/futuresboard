@@ -47,9 +47,12 @@ For example, setting `"NAVBAR_TITLE": "Custom title"` and `"NAVBAR_BG": "bg-prim
 <img width="1314" src="https://user-images.githubusercontent.com/51025241/145480528-408dff64-1742-41ea-baac-89bb5458d406.png">
 <img width="500" src="https://user-images.githubusercontent.com/51025241/145609351-631db009-ac04-47c9-ae82-0d76af0362d2.png">
 ## Screenshots
-<img width="1330" src="https://user-images.githubusercontent.com/51025241/145480467-0c1c473a-90f8-42fd-bdb0-071dc0f096f9.png">
-<img width="1330" src="https://user-images.githubusercontent.com/51025241/145480501-86deab0e-55fe-48fa-910f-7cae679664bb.png">
-<img width="1330" src="https://user-images.githubusercontent.com/51025241/145480517-61d5fd40-22d4-4887-9307-7689d1303138.png">
+<img width="600" alt="dashboard" src="https://user-images.githubusercontent.com/51025241/147236951-c87d1b2e-9eee-49bb-bc44-1769b9756f45.png">
+<img width="600" alt="calendar" src="https://user-images.githubusercontent.com/51025241/147236947-426ee144-fe30-4041-93b0-36a3073a9233.png">
+<img width="600" alt="coin" src="https://user-images.githubusercontent.com/51025241/147236949-56dc879a-398d-43f8-b8bc-890b61f12368.png">
+<img width="600" alt="history" src="https://user-images.githubusercontent.com/51025241/147236956-7b427c72-0a8b-443b-bd24-3eaef3246895.png">
+<img width="600" alt="positions" src="https://user-images.githubusercontent.com/51025241/147236958-160a4cd8-c461-46d2-87d1-560d89207a93.png">
+<img width="600" alt="projection" src="https://user-images.githubusercontent.com/51025241/147236959-7ca52391-f6bb-496e-bba2-5b914ee333c7.png">
 
 ## Alternative dashboards
 
