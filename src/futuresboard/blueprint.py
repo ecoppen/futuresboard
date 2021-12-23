@@ -722,6 +722,38 @@ def coin_page(coin):
         except Exception:
             markPrice = "-"
 
+        sticks = {"15m": [], "1h": [], "4h": []}
+
+        for timeframe in sticks:
+            try:
+                response = requests.get(
+                    "https://fapi.binance.com/fapi/v1/klines?symbol="
+                    + coin
+                    + "&interval="
+                    + timeframe
+                    + "&limit=1000",
+                    timeout=2,
+                )
+                if response:
+                    timestamps = []
+                    candles = []
+                    for candle in response.json():
+                        dateconvert = candle[0]
+                        timestamps.append(dateconvert)
+                        candles.append(
+                            [
+                                dateconvert,
+                                candle[1],
+                                candle[2],
+                                candle[3],
+                                candle[4],
+                                candle[5],
+                            ]
+                        )
+                    sticks[timeframe] = [timestamps, candles]
+            except:
+                pass
+
         temp = []
         for order in allorders:
             order = list(order)
@@ -780,6 +812,7 @@ def coin_page(coin):
         timeranges=ranges,
         custom=current_app.config["CUSTOM"],
         target=averagetargets,
+        candlesticks=sticks,
     )
 
 
