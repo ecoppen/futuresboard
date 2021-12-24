@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block autoreload %}<meta http-equiv="refresh" content="60">{% endblock %}
+{% block autoreload %}<meta http-equiv="refresh" content="120">{% endblock %}
 {% block title %}{{ coin }}{% endblock %}
 {% block content %}
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -178,9 +178,9 @@
                 <canvas id="candleChart15m" height="400px" width="800px"></canvas>
               </div>
                 <div class="modal-footer">
-                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal1h" data-bs-toggle="modal">1h</button>&nbsp;&nbsp;
-                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal4h" data-bs-toggle="modal">4h</button>&nbsp;&nbsp;
-                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal1d" data-bs-toggle="modal">1d</button>
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal1h" data-bs-toggle="modal">1h</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal4h" data-bs-toggle="modal">4h</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal1d" data-bs-toggle="modal">1d</button>
                   </div>
             </div>
           </div>
@@ -196,9 +196,9 @@
                 <canvas id="candleChart1h" height="400px" width="800px"></canvas>
               </div>
                 <div class="modal-footer">
-                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal15m" data-bs-toggle="modal">15m</button>&nbsp;&nbsp;
-                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal4h" data-bs-toggle="modal">4h</button>&nbsp;&nbsp;
-                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal1d" data-bs-toggle="modal">1d</button>
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal15m" data-bs-toggle="modal">15m</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal4h" data-bs-toggle="modal">4h</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal1d" data-bs-toggle="modal">1d</button>
                   </div>
             </div>
           </div>
@@ -214,9 +214,9 @@
                 <canvas id="candleChart4h" height="400px" width="800px"></canvas>
               </div>
                 <div class="modal-footer">
-                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal15m" data-bs-toggle="modal">15m</button>&nbsp;&nbsp;
-                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal1h" data-bs-toggle="modal">4h</button>&nbsp;&nbsp;
-                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal1d" data-bs-toggle="modal">1d</button>
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal15m" data-bs-toggle="modal">15m</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal1h" data-bs-toggle="modal">4h</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal1d" data-bs-toggle="modal">1d</button>
                   </div>
             </div>
           </div>
@@ -225,16 +225,16 @@
           <div class="modal-dialog modal-xl">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">{{coin}} 1d§ Chart</h5>
+                <h5 class="modal-title" id="exampleModalLabel">{{coin}} 1d Chart</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
                 <canvas id="candleChart1d" height="400px" width="800px"></canvas>
               </div>
                 <div class="modal-footer">
-                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal15m" data-bs-toggle="modal">15m</button>&nbsp;&nbsp;
-                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal1h" data-bs-toggle="modal">1h</button>&nbsp;&nbsp;
-                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal4h" data-bs-toggle="modal">4h</button>
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal15m" data-bs-toggle="modal">15m</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal1h" data-bs-toggle="modal">1h</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal4h" data-bs-toggle="modal">4h</button>
                   </div>
             </div>
           </div>
@@ -414,7 +414,6 @@
                 mode: 'xy',
               }
             };
-            // </block>
 
             const panStatus = () => zoomOptions.pan.enabled ? 'enabled' : 'disabled';
             const zoomStatus = () => zoomOptions.zoom.wheel.enabled ? 'enabled' : 'disabled';
@@ -458,7 +457,6 @@
             );
             
             const data15m = {
-                labels: {{ candlesticks["15m"][0] | safe }},
                 datasets: [{
                     //label: 'Profit',
                     data: [
@@ -516,7 +514,6 @@
             );
 
             const data1h = {
-                labels: {{ candlesticks["1h"][0] | safe }},
                 datasets: [{
                     //label: 'Profit',
                     data: [
@@ -574,7 +571,6 @@
             );
 
             const data4h = {
-                labels: {{ candlesticks["4h"][0] | safe }},
                 datasets: [{
                     //label: 'Profit',
                     data: [
@@ -596,8 +592,8 @@
                 type: 'candlestick',
                 data: data4h,
                 options: {
-                    zoom: zoomOptions,
                     plugins:{
+                        zoom: zoomOptions,
                         annotation: {
                           annotations: {
                                 {% for order in orders[1] %}
@@ -632,7 +628,6 @@
             );
             
            const data1d = {
-                labels: {{ candlesticks["1d"][0] | safe }},
                 datasets: [{
                     //label: 'Profit',
                     data: [
@@ -654,8 +649,8 @@
                 type: 'candlestick',
                 data: data1d,
                 options: {
-                    zoom: zoomOptions,
                     plugins:{
+                        zoom: zoomOptions,
                         annotation: {
                           annotations: {
                                 {% for order in orders[1] %}
