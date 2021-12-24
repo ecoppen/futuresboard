@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block autoreload %}<meta http-equiv="refresh" content="60">{% endblock %}
+{% block autoreload %}<meta http-equiv="refresh" content="120">{% endblock %}
 {% block title %}{{ coin }}{% endblock %}
 {% block content %}
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -126,36 +126,128 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for position in orders[0] %}
-                            <tr class="table-primary">
-                                <td>{{position[5]}} {{position[3]}}x</td>
-                                <td>{{position[6]}}</td>
-                                <td>{{position[4]}}</td>
-                                <td></td>
-                            </tr>
-                        {% endfor %}
-                        {% for order in orders[1] %}
-                            {% if order[3] == "BUY" %}
-                                <tr class="table-success">
-                            {% else %}
-                                <tr class="table-danger">
-                            {% endif %}
-                            <td>{{order[3]}} {{order[8]}} {{order[4]}}</td>
+                    {% for position in orders[0] %}
+                        <tr class="table-primary">
+                            <td>{{position[5]}} {{position[3]}}x</td>
+                            <td>{{position[6]}}</td>
+                            <td>{{position[4]}}</td>
+                            <td></td>
+                        </tr>
+                    {% endfor %}
+                    {% for order in orders[1] %}
+                        {% if order[3] == "BUY" %}
+                            <tr class="table-success">
+                        {% else %}
+                            <tr class="table-danger">
+                        {% endif %}
+                        <td>{{order[3]}} {{order[8]}} {{order[4]}}</td>
 
-                            <td>{{order[1]}}</td>
-                            <td>{{order[2]}}</td>
-                            <td>{{ order[7] }}</td>
-                            </tr>
-                        {% endfor %}
-                    </table>
+                        <td>{{order[1]}}</td>
+                        <td>{{order[2]}}</td>
+                        <td>{{ order[7] }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+<br>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-header text-muted">
+                    Candle chart
+                    <div class="btn-group me-2 float-end">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modal15m">15m</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modal1h">1h</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modal4h">4h</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modal1d">1d</button>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal fade" id="modal15m" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{{coin}} 15m Chart</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <canvas id="candleChart15m" height="400px" width="800px"></canvas>
+              </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal1h" data-bs-toggle="modal">1h</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal4h" data-bs-toggle="modal">4h</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal1d" data-bs-toggle="modal">1d</button>
+                  </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade" id="modal1h" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{{coin}} 1h Chart</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <canvas id="candleChart1h" height="400px" width="800px"></canvas>
+              </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal15m" data-bs-toggle="modal">15m</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal4h" data-bs-toggle="modal">4h</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal1d" data-bs-toggle="modal">1d</button>
+                  </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade" id="modal4h" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{{coin}} 4h Chart</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <canvas id="candleChart4h" height="400px" width="800px"></canvas>
+              </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal15m" data-bs-toggle="modal">15m</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal1h" data-bs-toggle="modal">4h</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal1d" data-bs-toggle="modal">1d</button>
+                  </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade" id="modal1d" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{{coin}} 1d Chart</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <canvas id="candleChart1d" height="400px" width="800px"></canvas>
+              </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal15m" data-bs-toggle="modal">15m</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal1h" data-bs-toggle="modal">1h</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-target="#modal4h" data-bs-toggle="modal">4h</button>
+                  </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-header text-muted">
+                    Average down calculator
+                </div>
                     {% if coin in coin_list['active'] %}
-                        {% if coin_list['active'][coin][0] == 0 %}
-                            <hr>
+                        {% if coin_list['active'][coin][1] > 0 %}
                             <table class='table table-sm table-bordered text-center'>
                                 <thead class="thead-dark">
-                                    <tr>
-                                        <td colspan="3" class="text-center">Average Down Calculator</td>
-                                    </tr>
                                     <tr>
                                         <td>Type</td>
                                         <td>Volume</td>
@@ -180,6 +272,26 @@
                                         <td><input class="form-control form-control-sm" id="averagesize" readonly></td>
                                         <td><input class="form-control form-control-sm" id="averagevalue" readonly></td>
                                     </tr>
+                                    <tr class="table-secondary">
+                                        <td>0.1% away</td>
+                                        <td>{{ target[0] }}</td>
+                                        <td>{{ markprice }}</td>
+                                    </tr>
+                                    <tr class="table-secondary">
+                                        <td>0.5% away</td>
+                                        <td>{{ target[1] }}</td>
+                                        <td>{{ markprice }}</td>
+                                    </tr>
+                                    <tr class="table-secondary">
+                                        <td>1% away</td>
+                                        <td>{{ target[2] }}</td>
+                                        <td>{{ markprice }}</td>
+                                    </tr>
+                                    <tr class="">
+                                        <td><input type="number" class="form-control form-control-sm" id="customaway" onchange="calcTarget()" min="0" step="any"></td>
+                                        <td><input class="form-control form-control-sm" id="averageTarget" readonly></td>
+                                        <td>{{ markprice }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
 
@@ -191,6 +303,7 @@
         </div>
 
         <script>
+            
             $('input[name="daterange"]').daterangepicker({
                 "showDropdowns": true,
                 "autoApply": true,
@@ -245,7 +358,22 @@
             $('input[name="daterange"]').on('apply.daterangepicker', (e, picker) => {
                 document.forms["daterangeform"].submit();
             });
-
+            
+            function calcTarget() {
+                var positionsize = document.getElementById("positionsize").value;
+                var positionvalue = document.getElementById("positionvalue").value;
+                var customaway = document.getElementById("customaway").value;
+                if (customaway.length > 0){
+                    var markprice = {{ markprice }};
+                    positionsize = parseFloat(positionsize);
+                    positionvalue = parseFloat(positionvalue);
+                    markprice = parseFloat(markprice);
+                    customaway = parseFloat(customaway);
+                    var targetprice = markprice * (1+(customaway/100));
+                    document.getElementById("averageTarget").value = Math.round((positionsize * (positionvalue - targetprice)) / (targetprice - markprice));
+                }
+            }
+            
             function averageDown() {
                 var positionsize = document.getElementById("positionsize").value;
                 var customsize = document.getElementById("customsize").value;
@@ -271,6 +399,25 @@
                 });
             } );
 
+            const zoomOptions = {
+              zoom: {
+                wheel: {
+                  enabled: true,
+                },
+                pinch: {
+                  enabled: true,
+                },
+                mode: 'xy',
+              },
+              pan: {
+                enabled: true,
+                mode: 'xy',
+              }
+            };
+
+            const panStatus = () => zoomOptions.pan.enabled ? 'enabled' : 'disabled';
+            const zoomStatus = () => zoomOptions.zoom.wheel.enabled ? 'enabled' : 'disabled';
+            
             Chart.register(ChartDataLabels);
             const data2 = {
                 labels: {{ data[0][1] | safe }},
@@ -307,6 +454,234 @@
             var myChart = new Chart(
                 document.getElementById('lineChart'),
                 config2
+            );
+            
+            const data15m = {
+                datasets: [{
+                    //label: 'Profit',
+                    data: [
+                    {% for stick in candlesticks["15m"][1] %}
+                        {
+                            x: '{{stick[0]}}',
+                            o: {{stick[1]}},
+                            h: {{stick[2]}},
+                            l: {{stick[3]}},
+                            c: {{stick[4]}},
+                        },
+                    {% endfor %}
+                    ]   
+                    ,
+                }]
+            };
+            
+            const config15m = {
+                type: 'candlestick',
+                data: data15m,
+                options: {
+                    plugins:{
+                        zoom: zoomOptions,
+                        annotation: {
+                          annotations: {
+                                {% for order in orders[1] %}
+                                    line{{order[0]}}: {
+                                      type: 'line',
+                                      yMin: {{order[2]}},
+                                      yMax: {{order[2]}},
+                                    {% if order[3] == "BUY" %}
+                                      borderColor: 'rgba(255, 99, 132, 0.3)',
+                                    {% else %}
+                                      borderColor: 'rgba(75, 192, 192, 0.3)',
+                                    {% endif %}
+                                      borderWidth: 2,
+                                    },
+                                {% endfor %}
+
+                          }
+                        },
+                        datalabels: {
+                            display: false
+                        },
+                        legend: {
+                            display: false
+                        },
+                    }
+                }
+            };
+            
+            var myChart = new Chart(
+                document.getElementById('candleChart15m'),
+                config15m
+            );
+
+            const data1h = {
+                datasets: [{
+                    //label: 'Profit',
+                    data: [
+                    {% for stick in candlesticks["1h"][1] %}
+                        {
+                            x: '{{stick[0]}}',
+                            o: {{stick[1]}},
+                            h: {{stick[2]}},
+                            l: {{stick[3]}},
+                            c: {{stick[4]}},
+                        },
+                    {% endfor %}
+                    ]   
+                    ,
+                }]
+            };
+            
+            const config1h = {
+                type: 'candlestick',
+                data: data1h,
+                options: {
+                    plugins:{
+                        zoom: zoomOptions,
+                        annotation: {
+                          annotations: {
+                                {% for order in orders[1] %}
+                                    line{{order[0]}}: {
+                                      type: 'line',
+                                      yMin: {{order[2]}},
+                                      yMax: {{order[2]}},
+                                    {% if order[3] == "BUY" %}
+                                      borderColor: 'rgba(255, 99, 132, 0.3)',
+                                    {% else %}
+                                      borderColor: 'rgba(75, 192, 192, 0.3)',
+                                    {% endif %}
+                                      borderWidth: 2,
+                                    },
+                                {% endfor %}
+
+                          }
+                        },
+                        datalabels: {
+                            display: false
+                        },
+                        legend: {
+                            display: false
+                        },
+                    }
+                }
+            };
+            
+            var myChart = new Chart(
+                document.getElementById('candleChart1h'),
+                config1h
+            );
+
+            const data4h = {
+                datasets: [{
+                    //label: 'Profit',
+                    data: [
+                    {% for stick in candlesticks["4h"][1] %}
+                        {
+                            x: '{{stick[0]}}',
+                            o: {{stick[1]}},
+                            h: {{stick[2]}},
+                            l: {{stick[3]}},
+                            c: {{stick[4]}},
+                        },
+                    {% endfor %}
+                    ]   
+                    ,
+                }]
+            };
+            
+            const config4h = {
+                type: 'candlestick',
+                data: data4h,
+                options: {
+                    plugins:{
+                        zoom: zoomOptions,
+                        annotation: {
+                          annotations: {
+                                {% for order in orders[1] %}
+                                    line{{order[0]}}: {
+                                      type: 'line',
+                                      yMin: {{order[2]}},
+                                      yMax: {{order[2]}},
+                                    {% if order[3] == "BUY" %}
+                                      borderColor: 'rgba(255, 99, 132, 0.3)',
+                                    {% else %}
+                                      borderColor: 'rgba(75, 192, 192, 0.3)',
+                                    {% endif %}
+                                      borderWidth: 2,
+                                    },
+                                {% endfor %}
+
+                          }
+                        },
+                        datalabels: {
+                            display: false
+                        },
+                        legend: {
+                            display: false
+                        },
+                    }
+                }
+            };
+            
+            var myChart = new Chart(
+                document.getElementById('candleChart4h'),
+                config4h
+            );
+            
+           const data1d = {
+                datasets: [{
+                    //label: 'Profit',
+                    data: [
+                    {% for stick in candlesticks["1d"][1] %}
+                        {
+                            x: '{{stick[0]}}',
+                            o: {{stick[1]}},
+                            h: {{stick[2]}},
+                            l: {{stick[3]}},
+                            c: {{stick[4]}},
+                        },
+                    {% endfor %}
+                    ]   
+                    ,
+                }]
+            };
+            
+            const config1d = {
+                type: 'candlestick',
+                data: data1d,
+                options: {
+                    plugins:{
+                        zoom: zoomOptions,
+                        annotation: {
+                          annotations: {
+                                {% for order in orders[1] %}
+                                    line{{order[0]}}: {
+                                      type: 'line',
+                                      yMin: {{order[2]}},
+                                      yMax: {{order[2]}},
+                                    {% if order[3] == "BUY" %}
+                                      borderColor: 'rgba(255, 99, 132, 0.3)',
+                                    {% else %}
+                                      borderColor: 'rgba(75, 192, 192, 0.3)',
+                                    {% endif %}
+                                      borderWidth: 2,
+                                    },
+                                {% endfor %}
+
+                          }
+                        },
+                        datalabels: {
+                            display: false
+                        },
+                        legend: {
+                            display: false
+                        },
+                    }
+                }
+            };
+            
+            var myChart = new Chart(
+                document.getElementById('candleChart1d'),
+                config1d
             );
         </script>
 {% endblock %}

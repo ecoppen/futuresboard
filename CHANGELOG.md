@@ -8,6 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Store and display historical unrealized PnL
 - Tidy up repeated code into functions
 
+## 2021-12-24
+### Added
+- Bybit now supported as an exchange, data will be scraped as best as possible however whole historical data doesn't seem possible currently.
+- Candle chart with buy/sell lines now available on coin pages for 15m, 1h, 4h and 1d
+
+### Changed
+- Coin pages now have Average Down Calculator showing all the time, with specific distances away from position already calculated
+- Income history page buttons fixed
+- Positions page now has a table showing distance from next buys and all previous information
+
 ## 2021-12-10
 ### Changed
 - Minor fixes and README updates regarding the latest changes made yesterday

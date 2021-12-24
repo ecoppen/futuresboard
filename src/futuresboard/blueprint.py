@@ -67,6 +67,10 @@ def calc_pbr(volume, price, side, balance):
     return 0.0
 
 
+def average_down_target(posprice, posqty, currentprice, targetprice):
+    return (posqty * (posprice - targetprice)) / (targetprice - currentprice)
+
+
 def get_coins():
     coins: Coins = {
         "active": {},
@@ -497,6 +501,20 @@ def dashboard_page(start, end):
 def positions_page():
     coins = get_coins()
     positions = {}
+
+    try:
+        response = requests.get("https://fapi.binance.com/fapi/v1/premiumIndex", timeout=2)
+        markPrices: dict
+        markPrices = {}
+        if response:
+            temp = response.json()
+            for each in temp:
+                markPrices[each["symbol"]] = each["markPrice"]
+        else:
+            markPrices = {}
+    except Exception:
+        markPrices = {}
+
     for coin in coins["active"]:
 
         allpositions = db.query(
@@ -516,19 +534,44 @@ def positions_page():
         allpositions = temp
 
         temp = []
+        buys = []
+        sells = []
         for order in allorders:
             order = list(order)
             order[7] = datetime.fromtimestamp(order[7] / 1000.0).strftime("%Y-%m-%d %H:%M:%S")
+            if order[3] == "BUY":
+                buys.append(order[2])
+            else:
+                sells.append(order[2])
             temp.append(order)
         allorders = temp
-
-        positions[coin] = [allpositions, allorders]
+        stats = [len(buys), len(sells)]
+        if stats[0] == 0:
+            stats.append("-")
+            stats.append("-")
+        else:
+            stats.append(sorted(buys)[-1])
+            if coin in markPrices:
+                stats.append(round(float(markPrices[coin]) - sorted(buys)[-1], 5))
+            else:
+                stats.append("-")
+        if stats[1] == 0:
+            stats.append("-")
+            stats.append("-")
+        else:
+            stats.append(sorted(sells)[0])
+            if coin in markPrices:
+                stats.append(round(float(markPrices[coin]) - sorted(sells)[0], 5))
+            else:
+                stats.append("-")
+        positions[coin] = [allpositions, allorders, stats]
 
     return render_template(
         "positions.html",
         coin_list=get_coins(),
         positions=positions,
         custom=current_app.config["CUSTOM"],
+        markprices=markPrices,
     )
 
 
@@ -570,18 +613,6 @@ def coin_page(coin):
                 )
             except Exception:
                 pass
-
-    try:
-        response = requests.get(
-            "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=1
-        )
-        markPrice: float | str
-        if response:
-            markPrice = round(float(response.json()["markPrice"]), 5)
-        else:
-            markPrice = "-"
-    except Exception:
-        markPrice = "-"
 
     balance = db.query("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     if balance[0] is None:
@@ -646,7 +677,7 @@ def coin_page(coin):
             one=True,
         )
         allpositions = db.query(
-            "SELECT * FROM positions WHERE symbol = ?",
+            "SELECT * FROM positions WHERE symbol = ? AND entryPrice > 0",
             [coin],
         )
         allorders = db.query(
@@ -660,6 +691,68 @@ def coin_page(coin):
             position[4] = round(float(position[4]), 5)
             temp.append(position)
         allpositions = temp
+
+        averagetargets = ["-", "-", "-", "-"]
+        try:
+            response = requests.get(
+                "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=2
+            )
+            markPrice: float | str
+            if response:
+                markPrice = float(response.json()["markPrice"])
+                averagetargets = [
+                    round(
+                        average_down_target(
+                            allpositions[0][4], allpositions[0][6], markPrice, markPrice * 1.001
+                        )
+                    ),
+                    round(
+                        average_down_target(
+                            allpositions[0][4], allpositions[0][6], markPrice, markPrice * 1.005
+                        )
+                    ),
+                    round(
+                        average_down_target(
+                            allpositions[0][4], allpositions[0][6], markPrice, markPrice * 1.01
+                        )
+                    ),
+                ]
+            else:
+                markPrice = "-"
+        except Exception:
+            markPrice = "-"
+
+        sticks = {"15m": [], "1h": [], "4h": [], "1d": []}
+
+        for timeframe in sticks:
+            try:
+                response = requests.get(
+                    "https://fapi.binance.com/fapi/v1/klines?symbol="
+                    + coin
+                    + "&interval="
+                    + timeframe
+                    + "&limit=1000",
+                    timeout=2,
+                )
+                if response:
+                    timestamps = []
+                    candles = []
+                    for candle in response.json():
+                        dateconvert = candle[0]
+                        timestamps.append(dateconvert)
+                        candles.append(
+                            [
+                                dateconvert,
+                                candle[1],
+                                candle[2],
+                                candle[3],
+                                candle[4],
+                                candle[5],
+                            ]
+                        )
+                    sticks[timeframe] = [timestamps, candles]
+            except:
+                pass
 
         temp = []
         for order in allorders:
@@ -718,6 +811,8 @@ def coin_page(coin):
         enddate=enddate,
         timeranges=ranges,
         custom=current_app.config["CUSTOM"],
+        target=averagetargets,
+        candlesticks=sticks,
     )
 
 
@@ -799,18 +894,6 @@ def coin_page_timeframe(coin, start, end):
         * 1000
     )
 
-    try:
-        response = requests.get(
-            "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=1
-        )
-        markPrice: float | str
-        if response:
-            markPrice = round(float(response.json()["markPrice"]), 5)
-        else:
-            markPrice = "-"
-    except Exception:
-        markPrice = "-"
-
     balance = db.query("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     if balance[0] is None:
         totals = ["-", "-", "-", "-", "-", {"USDT": 0, "BNB": 0}, ["-", "-", "-", "-"]]
@@ -845,7 +928,7 @@ def coin_page_timeframe(coin, start, end):
             one=True,
         )
         allpositions = db.query(
-            "SELECT * FROM positions WHERE symbol = ?",
+            "SELECT * FROM positions WHERE symbol = ? AND entryPrice > 0",
             [coin],
         )
         allorders = db.query(
@@ -859,6 +942,68 @@ def coin_page_timeframe(coin, start, end):
             position[4] = round(float(position[4]), 5)
             temp.append(position)
         allpositions = temp
+
+        averagetargets = ["-", "-", "-", "-"]
+        try:
+            response = requests.get(
+                "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=" + coin, timeout=2
+            )
+            markPrice: float | str
+            if response:
+                markPrice = float(response.json()["markPrice"])
+                averagetargets = [
+                    round(
+                        average_down_target(
+                            allpositions[0][4], allpositions[0][6], markPrice, markPrice * 1.001
+                        )
+                    ),
+                    round(
+                        average_down_target(
+                            allpositions[0][4], allpositions[0][6], markPrice, markPrice * 1.005
+                        )
+                    ),
+                    round(
+                        average_down_target(
+                            allpositions[0][4], allpositions[0][6], markPrice, markPrice * 1.01
+                        )
+                    ),
+                ]
+            else:
+                markPrice = "-"
+        except Exception:
+            markPrice = "-"
+
+        sticks = {"15m": [], "1h": [], "4h": [], "1d": []}
+
+        for timeframe in sticks:
+            try:
+                response = requests.get(
+                    "https://fapi.binance.com/fapi/v1/klines?symbol="
+                    + coin
+                    + "&interval="
+                    + timeframe
+                    + "&limit=1000",
+                    timeout=2,
+                )
+                if response:
+                    timestamps = []
+                    candles = []
+                    for candle in response.json():
+                        dateconvert = candle[0]
+                        timestamps.append(dateconvert)
+                        candles.append(
+                            [
+                                dateconvert,
+                                candle[1],
+                                candle[2],
+                                candle[3],
+                                candle[4],
+                                candle[5],
+                            ]
+                        )
+                    sticks[timeframe] = [timestamps, candles]
+            except:
+                pass
 
         temp = []
         for order in allorders:
@@ -925,6 +1070,8 @@ def coin_page_timeframe(coin, start, end):
         enddate=enddate,
         timeranges=ranges,
         custom=current_app.config["CUSTOM"],
+        target=averagetargets,
+        candlesticks=sticks,
     )
 
 
@@ -950,6 +1097,8 @@ def history_page():
         if temp not in history:
             history[temp] = {}  # type: ignore[misc]
             history[temp]["total"] = 0  # type: ignore[misc]
+            history[temp]["start"] = timeframe[0]
+            history[temp]["end"] = timeframe[1]
 
         for totals in incomesummary:
             history[temp][totals[0]] = int(totals[1])  # type: ignore[misc]
@@ -963,7 +1112,6 @@ def history_page():
                 history[temp][column] = 0  # type: ignore[misc]
 
     history["columns"].sort()
-
     previous_files = []
     for file in os.listdir(os.path.join(app.root_path, "static", "csv")):
         if file.endswith(".csv"):
@@ -1041,10 +1189,12 @@ def history_page_timeframe(start, end):
             "SELECT incomeType, COUNT(IID) FROM income WHERE time >= ? AND time <= ? GROUP BY incomeType",
             [start, end],
         )
-        temp = (timeframe[0], timeframe[1])
+        temp = timeframe[0] + "/" + timeframe[1]
         if temp not in history:
             history[temp] = {}
             history[temp]["total"] = 0
+            history[temp]["start"] = timeframe[0]
+            history[temp]["end"] = timeframe[1]
 
         for totals in incomesummary:
             history[temp][totals[0]] = int(totals[1])
