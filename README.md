@@ -49,11 +49,12 @@ For example, setting `"NAVBAR_TITLE": "Custom title"` and `"NAVBAR_BG": "bg-prim
 ## Screenshots
 <img width="600" alt="dashboard" src="https://user-images.githubusercontent.com/51025241/147236951-c87d1b2e-9eee-49bb-bc44-1769b9756f45.png">
 <img width="600" alt="calendar" src="https://user-images.githubusercontent.com/51025241/147236947-426ee144-fe30-4041-93b0-36a3073a9233.png">
-<img width="600" alt="coin" src="https://user-images.githubusercontent.com/51025241/147236949-56dc879a-398d-43f8-b8bc-890b61f12368.png">
+<img width="550" alt="coin" src="https://user-images.githubusercontent.com/51025241/147359139-e2ba33c9-0d10-4b09-a235-c9979658dd9b.png">
+<img width="600" alt="1h chart" src="https://user-images.githubusercontent.com/51025241/147358812-b860f5db-a867-4bf4-b98e-b467bb928a25.png">
 <img width="600" alt="history" src="https://user-images.githubusercontent.com/51025241/147236956-7b427c72-0a8b-443b-bd24-3eaef3246895.png">
 <img width="600" alt="positions" src="https://user-images.githubusercontent.com/51025241/147236958-160a4cd8-c461-46d2-87d1-560d89207a93.png">
 <img width="600" alt="projection" src="https://user-images.githubusercontent.com/51025241/147236959-7ca52391-f6bb-496e-bba2-5b914ee333c7.png">
-<img width="600" alt="1h chart" src="https://user-images.githubusercontent.com/51025241/147358812-b860f5db-a867-4bf4-b98e-b467bb928a25.png">
+
 ## Alternative dashboards
 
 - https://github.com/hoeckxer/exchanges_dashboard
