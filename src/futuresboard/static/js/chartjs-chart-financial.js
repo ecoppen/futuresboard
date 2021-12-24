@@ -254,9 +254,9 @@ const globalOpts$2 = chart_js.Chart.defaults;
 
 globalOpts$2.elements.financial = {
 	color: {
-		up: 'rgba(80, 160, 115, 1)',
-		down: 'rgba(215, 85, 65, 1)',
-		unchanged: 'rgba(90, 90, 90, 1)',
+		up: 'rgba(80, 160, 115, 0.6)',
+		down: 'rgba(215, 85, 65, 0.6)',
+		unchanged: 'rgba(90, 90, 90, 0.6)',
 	}
 };
 
