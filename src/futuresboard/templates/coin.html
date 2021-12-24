@@ -161,6 +161,7 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modal15m">15m</button>
                         <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modal1h">1h</button>
                         <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modal4h">4h</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modal1d">1d</button>
                     </div>
                 </div>
                 
@@ -176,6 +177,11 @@
               <div class="modal-body">
                 <canvas id="candleChart15m" height="400px" width="800px"></canvas>
               </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal1h" data-bs-toggle="modal">1h</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal4h" data-bs-toggle="modal">4h</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal1d" data-bs-toggle="modal">1d</button>
+                  </div>
             </div>
           </div>
         </div>
@@ -189,6 +195,11 @@
               <div class="modal-body">
                 <canvas id="candleChart1h" height="400px" width="800px"></canvas>
               </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal15m" data-bs-toggle="modal">15m</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal4h" data-bs-toggle="modal">4h</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal1d" data-bs-toggle="modal">1d</button>
+                  </div>
             </div>
           </div>
         </div>
@@ -202,6 +213,29 @@
               <div class="modal-body">
                 <canvas id="candleChart4h" height="400px" width="800px"></canvas>
               </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal15m" data-bs-toggle="modal">15m</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal1h" data-bs-toggle="modal">4h</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal1d" data-bs-toggle="modal">1d</button>
+                  </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade" id="modal1d" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{{coin}} 1d§ Chart</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <canvas id="candleChart1d" height="400px" width="800px"></canvas>
+              </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal15m" data-bs-toggle="modal">15m</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal1h" data-bs-toggle="modal">1h</button>&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-outine-secondary" data-bs-target="#modal4h" data-bs-toggle="modal">4h</button>
+                  </div>
             </div>
           </div>
         </div>
@@ -365,6 +399,26 @@
                 });
             } );
 
+            const zoomOptions = {
+              zoom: {
+                wheel: {
+                  enabled: true,
+                },
+                pinch: {
+                  enabled: true,
+                },
+                mode: 'xy',
+              },
+              pan: {
+                enabled: true,
+                mode: 'xy',
+              }
+            };
+            // </block>
+
+            const panStatus = () => zoomOptions.pan.enabled ? 'enabled' : 'disabled';
+            const zoomStatus = () => zoomOptions.zoom.wheel.enabled ? 'enabled' : 'disabled';
+            
             Chart.register(ChartDataLabels);
             const data2 = {
                 labels: {{ data[0][1] | safe }},
@@ -427,6 +481,7 @@
                 data: data15m,
                 options: {
                     plugins:{
+                        zoom: zoomOptions,
                         annotation: {
                           annotations: {
                                 {% for order in orders[1] %}
@@ -484,6 +539,7 @@
                 data: data1h,
                 options: {
                     plugins:{
+                        zoom: zoomOptions,
                         annotation: {
                           annotations: {
                                 {% for order in orders[1] %}
@@ -540,6 +596,7 @@
                 type: 'candlestick',
                 data: data4h,
                 options: {
+                    zoom: zoomOptions,
                     plugins:{
                         annotation: {
                           annotations: {
@@ -572,6 +629,64 @@
             var myChart = new Chart(
                 document.getElementById('candleChart4h'),
                 config4h
+            );
+            
+           const data1d = {
+                labels: {{ candlesticks["1d"][0] | safe }},
+                datasets: [{
+                    //label: 'Profit',
+                    data: [
+                    {% for stick in candlesticks["1d"][1] %}
+                        {
+                            x: '{{stick[0]}}',
+                            o: {{stick[1]}},
+                            h: {{stick[2]}},
+                            l: {{stick[3]}},
+                            c: {{stick[4]}},
+                        },
+                    {% endfor %}
+                    ]   
+                    ,
+                }]
+            };
+            
+            const config1d = {
+                type: 'candlestick',
+                data: data1d,
+                options: {
+                    zoom: zoomOptions,
+                    plugins:{
+                        annotation: {
+                          annotations: {
+                                {% for order in orders[1] %}
+                                    line{{order[0]}}: {
+                                      type: 'line',
+                                      yMin: {{order[2]}},
+                                      yMax: {{order[2]}},
+                                    {% if order[3] == "BUY" %}
+                                      borderColor: 'rgba(255, 99, 132, 0.3)',
+                                    {% else %}
+                                      borderColor: 'rgba(75, 192, 192, 0.3)',
+                                    {% endif %}
+                                      borderWidth: 2,
+                                    },
+                                {% endfor %}
+
+                          }
+                        },
+                        datalabels: {
+                            display: false
+                        },
+                        legend: {
+                            display: false
+                        },
+                    }
+                }
+            };
+            
+            var myChart = new Chart(
+                document.getElementById('candleChart1d'),
+                config1d
             );
         </script>
 {% endblock %}
