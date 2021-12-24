@@ -53,7 +53,7 @@ For example, setting `"NAVBAR_TITLE": "Custom title"` and `"NAVBAR_BG": "bg-prim
 <img width="600" alt="history" src="https://user-images.githubusercontent.com/51025241/147236956-7b427c72-0a8b-443b-bd24-3eaef3246895.png">
 <img width="600" alt="positions" src="https://user-images.githubusercontent.com/51025241/147236958-160a4cd8-c461-46d2-87d1-560d89207a93.png">
 <img width="600" alt="projection" src="https://user-images.githubusercontent.com/51025241/147236959-7ca52391-f6bb-496e-bba2-5b914ee333c7.png">
-
+<img width="600" alt="1h chart" src="https://user-images.githubusercontent.com/51025241/147358812-b860f5db-a867-4bf4-b98e-b467bb928a25.png">
 ## Alternative dashboards
 
 - https://github.com/hoeckxer/exchanges_dashboard
