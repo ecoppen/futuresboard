@@ -722,7 +722,7 @@ def coin_page(coin):
         except Exception:
             markPrice = "-"
 
-        sticks = {"15m": [], "1h": [], "4h": []}
+        sticks = {"15m": [], "1h": [], "4h": [], "1d": []}
 
         for timeframe in sticks:
             try:
