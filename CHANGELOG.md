@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Store and display historical unrealized PnL
 - Tidy up repeated code into functions
 
+##2021-12-25
+### Changed
+- Commas removed from `config.json.example` as the extra commas caused errors [@jontstaz](https://github.com/jontstaz)
+- Inverse the colours for current buy/sells on the 15m, 1h, 4h and 1d charts to match green for buy and red for sell
+
 ## 2021-12-24
 ### Added
 - Bybit now supported as an exchange, data will be scraped as best as possible however whole historical data doesn't seem possible currently.
