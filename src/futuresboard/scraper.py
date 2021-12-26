@@ -75,8 +75,7 @@ def dispatch_request(http_method):
 
 # used for sending request requires the signature
 def send_signed_request(http_method, url_path, payload={}, signature="signature"):
-    if "timestamp" not in payload:
-        payload["timestamp"] = get_timestamp()
+    payload["timestamp"] = get_timestamp()
     query_string = urlencode(OrderedDict(sorted(payload.items())))
     query_string = query_string.replace("%27", "%22")  # replace single quote to double quote
 
