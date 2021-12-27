@@ -506,7 +506,7 @@ def _scrape(app=None):
                     params["start_time"] = startTime
                 else:
                     startTime = int(startTime[0]) / 1000
-                    params["start_time"] = startTime + 1
+                    params["start_time"] = int(startTime + 1)
 
             for page in range(1, 50):
                 if weightused < 20:
