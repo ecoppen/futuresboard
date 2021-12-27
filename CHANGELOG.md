@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Store and display historical unrealized PnL
 - Tidy up repeated code into functions
 
+## 2021-12-27
+### Changed
+- Fixed an issue on history page where dowload buttons would cause 500 error when pressed
+- Fixed an issue with bybit scraping to get latest trades. Still more to do here with regard to old trades looking back.
+
 ## 2021-12-25
 ### Changed
 - Commas removed from `config.json.example` as the extra commas caused errors [@jontstaz](https://github.com/jontstaz)
