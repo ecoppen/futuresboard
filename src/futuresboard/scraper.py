@@ -136,14 +136,15 @@ def create_table(conn, create_table_sql):
 def db_setup(database):
     sql_create_income_table = """ CREATE TABLE IF NOT EXISTS income (
                                         IID integer PRIMARY KEY AUTOINCREMENT,
-                                        tranId integer,
+                                        tranId text,
                                         symbol text,
                                         incomeType text,
                                         income real,
                                         asset text,
                                         info text,
                                         time integer,
-                                        tradeId integer
+                                        tradeId integer,
+                                        UNIQUE(tranId, incomeType) ON CONFLICT REPLACE
                                     ); """
 
     sql_create_position_table = """ CREATE TABLE IF NOT EXISTS positions (
@@ -360,6 +361,7 @@ def _scrape(app=None):
                     )
                 else:
                     startTime = startTime[0]
+
                 params = {"startTime": startTime + 1, "limit": 1000}
 
                 responseHeader, responseJSON = send_signed_request("GET", "/fapi/v1/income", params)
@@ -372,7 +374,7 @@ def _scrape(app=None):
                         if len(income["tradeId"]) == 0:
                             income["tradeId"] = 0
                         income_row = (
-                            int(income["tranId"]),
+                            income["tranId"],
                             income["symbol"],
                             income["incomeType"],
                             income["income"],
@@ -504,9 +506,11 @@ def _scrape(app=None):
                         datetime.datetime.fromisoformat("2020-01-01 00:00:00+00:00").timestamp()
                     )
                     params["start_time"] = startTime
+                    print("default time used for", symbol)
                 else:
                     startTime = int(startTime[0]) / 1000
                     params["start_time"] = int(startTime + 1)
+                    print("custom time", params["start_time"], "used for", symbol)
 
             for page in range(1, 50):
                 if weightused < 20:
@@ -527,6 +531,7 @@ def _scrape(app=None):
                                 trade["id"],
                                 trade["exec_type"],
                                 trade["closed_pnl"],
+                                trade["order_id"],
                             ]
                         if len(responseJSON["result"]["data"]) < 50:
                             break
@@ -540,7 +545,7 @@ def _scrape(app=None):
                 with create_connection(current_app.config["DATABASE"]) as conn:
                     for trade in trades:
                         income_row = (
-                            int(trades[trade][0]),
+                            trades[trade][3],
                             symbol,
                             exec_type[trades[trade][1]],
                             trades[trade][2],
