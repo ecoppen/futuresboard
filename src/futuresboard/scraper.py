@@ -506,11 +506,9 @@ def _scrape(app=None):
                         datetime.datetime.fromisoformat("2020-01-01 00:00:00+00:00").timestamp()
                     )
                     params["start_time"] = startTime
-                    print("default time used for", symbol)
                 else:
                     startTime = int(startTime[0]) / 1000
                     params["start_time"] = int(startTime + 1)
-                    print("custom time", params["start_time"], "used for", symbol)
 
             for page in range(1, 50):
                 if weightused < 20:
