@@ -374,7 +374,7 @@ def _scrape(app=None):
                         if len(income["tradeId"]) == 0:
                             income["tradeId"] = 0
                         income_row = (
-                            int(income["tradeId"]),
+                            int(income["tranId"]),
                             income["symbol"],
                             income["incomeType"],
                             income["income"],
