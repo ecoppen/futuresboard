@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Store and display historical unrealized PnL
 - Tidy up repeated code into functions
 
+## 2022-01-03
+### Changed
+- Added a composite key to the income table in the database to stop duplicates from being entered. This change will only be active on fresh databases/built from scratch. 
+- Added the transactionId from Bybit to the list for future processing - this is a string whereas Binance uses integers. This needs to be managed to avoid more database deletions.
+
 ## 2021-12-27
 ### Changed
 - Fixed an issue on history page where dowload buttons would cause 500 error when pressed
