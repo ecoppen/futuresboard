@@ -136,7 +136,7 @@ def create_table(conn, create_table_sql):
 def db_setup(database):
     sql_create_income_table = """ CREATE TABLE IF NOT EXISTS income (
                                         IID integer PRIMARY KEY AUTOINCREMENT,
-                                        tranId text,
+                                        tranId integer,
                                         symbol text,
                                         incomeType text,
                                         income real,
@@ -374,7 +374,7 @@ def _scrape(app=None):
                         if len(income["tradeId"]) == 0:
                             income["tradeId"] = 0
                         income_row = (
-                            income["tranId"],
+                            int(income["tradeId"]),
                             income["symbol"],
                             income["incomeType"],
                             income["income"],
@@ -545,7 +545,7 @@ def _scrape(app=None):
                 with create_connection(current_app.config["DATABASE"]) as conn:
                     for trade in trades:
                         income_row = (
-                            trades[trade][3],
+                            int(trades[trade][0]),
                             symbol,
                             exec_type[trades[trade][1]],
                             trades[trade][2],
