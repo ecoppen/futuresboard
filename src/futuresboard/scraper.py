@@ -143,7 +143,8 @@ def db_setup(database):
                                         asset text,
                                         info text,
                                         time integer,
-                                        tradeId integer
+                                        tradeId integer,
+                                        UNIQUE(tranId, incomeType) ON CONFLICT REPLACE
                                     ); """
 
     sql_create_position_table = """ CREATE TABLE IF NOT EXISTS positions (
@@ -360,6 +361,7 @@ def _scrape(app=None):
                     )
                 else:
                     startTime = startTime[0]
+
                 params = {"startTime": startTime + 1, "limit": 1000}
 
                 responseHeader, responseJSON = send_signed_request("GET", "/fapi/v1/income", params)
@@ -527,6 +529,7 @@ def _scrape(app=None):
                                 trade["id"],
                                 trade["exec_type"],
                                 trade["closed_pnl"],
+                                trade["order_id"],
                             ]
                         if len(responseJSON["result"]["data"]) < 50:
                             break
