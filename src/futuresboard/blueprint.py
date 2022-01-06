@@ -231,20 +231,20 @@ def index_page():
 
     balance = db.query("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     total = db.query(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER"', one=True
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT"', one=True
     )
     today = db.query(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND time >= ? AND time <= ?',
         [todaystart, todayend],
         one=True,
     )
     week = db.query(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND time >= ? AND time <= ?',
         [weekstart, weekend],
         one=True,
     )
     month = db.query(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND time >= ? AND time <= ?',
         [monthstart, monthend],
         one=True,
     )
@@ -256,12 +256,12 @@ def index_page():
     )
 
     by_date = db.query(
-        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?  AND time <= ? GROUP BY Date',
+        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT"  AND time >= ?  AND time <= ? GROUP BY Date',
         [start, end],
     )
 
     by_symbol = db.query(
-        'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? GROUP BY symbol ORDER BY inc DESC',
+        'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT"  AND time >= ? AND time <= ? GROUP BY symbol ORDER BY inc DESC',
         [start, end],
     )
 
@@ -1202,7 +1202,7 @@ def history_page_timeframe(start, end):
             if totals[0] not in history["columns"]:
                 history["columns"].append(totals[0])
     for timeframe in ranges:
-        temp = timeframe[0] + "/" + timeframe[1]
+        temp = (timeframe[0], timeframe[1])
         for column in history["columns"]:
             if column not in history[temp]:
                 history[temp][column] = 0
