@@ -1202,7 +1202,7 @@ def history_page_timeframe(start, end):
             if totals[0] not in history["columns"]:
                 history["columns"].append(totals[0])
     for timeframe in ranges:
-            temp = timeframe[0] + "/" + timeframe[1]
+        temp = timeframe[0] + "/" + timeframe[1]
         for column in history["columns"]:
             if column not in history[temp]:
                 history[temp][column] = 0
