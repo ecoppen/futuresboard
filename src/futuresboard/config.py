@@ -102,7 +102,7 @@ class Config(BaseModel):
                     _capitalize_keys(value)
                 c[key.upper()] = value
                 if not key.isupper():
-                    fields.pop(key)
+                    c.pop(key)
 
         for key, value in copy.deepcopy(fields).items():
             _capitalize_keys(value)
