@@ -84,7 +84,7 @@ def get_coins():
     )
 
     all_symbols_with_pnl = db.query(
-        'SELECT DISTINCT(symbol) FROM income WHERE asset <> "BNB" AND symbol <> "" AND incomeType <> "TRANSFER" ORDER BY symbol ASC'
+        'SELECT DISTINCT(symbol) FROM income WHERE asset <> "BNB" AND symbol <> "" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" ORDER BY symbol ASC'
     )
 
     balance = db.query("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
@@ -231,20 +231,20 @@ def index_page():
 
     balance = db.query("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     total = db.query(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT"', one=True
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW"', one=True
     )
     today = db.query(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND time >= ? AND time <= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ?',
         [todaystart, todayend],
         one=True,
     )
     week = db.query(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND time >= ? AND time <= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ?',
         [weekstart, weekend],
         one=True,
     )
     month = db.query(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND time >= ? AND time <= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ?',
         [monthstart, monthend],
         one=True,
     )
@@ -256,12 +256,12 @@ def index_page():
     )
 
     by_date = db.query(
-        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND time >= ?  AND time <= ? GROUP BY Date',
+        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ?  AND time <= ? GROUP BY Date',
         [start, end],
     )
 
     by_symbol = db.query(
-        'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND time >= ? AND time <= ? GROUP BY symbol ORDER BY inc DESC',
+        'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ? GROUP BY symbol ORDER BY inc DESC',
         [start, end],
     )
 
@@ -393,21 +393,21 @@ def dashboard_page(start, end):
 
     balance = db.query("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     total = db.query(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER"', one=True
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW"', one=True
     )
 
     today = db.query(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ?',
         [todaystart, todayend],
         one=True,
     )
     week = db.query(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ?',
         [weekstart, weekend],
         one=True,
     )
     month = db.query(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ?',
         [monthstart, monthend],
         one=True,
     )
@@ -419,12 +419,12 @@ def dashboard_page(start, end):
     )
 
     by_date = db.query(
-        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ?  AND time <= ? GROUP BY Date',
+        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ?  AND time <= ? GROUP BY Date',
         [start, end],
     )
 
     by_symbol = db.query(
-        'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? GROUP BY symbol ORDER BY inc DESC',
+        'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ? GROUP BY symbol ORDER BY inc DESC',
         [start, end],
     )
 
@@ -435,7 +435,7 @@ def dashboard_page(start, end):
     temptotal: tuple[list[float], list[float]] = ([], [])
 
     customframe = db.query(
-        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+        'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ?',
         [start, end],
         one=True,
     )
@@ -647,22 +647,22 @@ def coin_page(coin):
         startdate, enddate = ranges[2][0], ranges[2][1]
 
         total = db.query(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND incomeType <> "COIN_SWAP_WITHDRAW" AND symbol = ?',
             [coin],
             one=True,
         )
         today = db.query(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ? AND symbol = ?',
             [todaystart, todayend, coin],
             one=True,
         )
         week = db.query(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ? AND symbol = ?',
             [weekstart, weekend, coin],
             one=True,
         )
         month = db.query(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ? AND symbol = ?',
             [monthstart, monthend, coin],
             one=True,
         )
@@ -788,7 +788,7 @@ def coin_page(coin):
             zero_value(week[0]),
         ]
         by_date = db.query(
-            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ? GROUP BY Date',
+            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER"AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ? AND symbol = ? GROUP BY Date',
             [weekstart, weekend, coin],
         )
         temp = [[], []]
@@ -899,22 +899,22 @@ def coin_page_timeframe(coin, start, end):
         totals = ["-", "-", "-", "-", "-", {"USDT": 0, "BNB": 0}, ["-", "-", "-", "-"]]
     else:
         total = db.query(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND symbol = ?',
             [coin],
             one=True,
         )
         today = db.query(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ? AND symbol = ?',
             [todaystart, todayend, coin],
             one=True,
         )
         week = db.query(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ? AND symbol = ?',
             [weekstart, weekend, coin],
             one=True,
         )
         month = db.query(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ? AND symbol = ?',
             [monthstart, monthend, coin],
             one=True,
         )
@@ -1026,7 +1026,7 @@ def coin_page_timeframe(coin, start, end):
             fees[row[1]] = format_dp(abs(zero_value(row[0])), 4)
 
         by_date = db.query(
-            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ? GROUP BY Date',
+            'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ? AND symbol = ? GROUP BY Date',
             [start, end, coin],
         )
         temp = [[], []]
@@ -1038,7 +1038,7 @@ def coin_page_timeframe(coin, start, end):
         pnl = [format_dp(zero_value(unrealized[0])), format_dp(balance)]
 
         customframe = db.query(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ? AND symbol = ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ? AND symbol = ?',
             [start, end, coin],
             one=True,
         )
@@ -1252,7 +1252,7 @@ def projection_page():
         )
 
         week = db.query(
-            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND time >= ? AND time <= ?',
+            'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" AND time >= ? AND time <= ?',
             [minus_7_start, todayend],
             one=True,
         )
