@@ -46,8 +46,10 @@ class Projections(TypedDict):
     pcustom: list[float]
     pcustom_value: float
 
-remove_incomeTypes = "(" + ', '.join(f'"{w}"' for w in ["TRANSFER", "COIN_SWAP_DEPOSIT", "COIN_SWAP_WITHDRAW"]) + ")"
-        
+
+remove_incomeTypes = ["TRANSFER", "COIN_SWAP_DEPOSIT", "COIN_SWAP_WITHDRAW"]
+
+
 def zero_value(x):
     if x is None:
         return 0
@@ -71,6 +73,7 @@ def calc_pbr(volume, price, side, balance):
 def average_down_target(posprice, posqty, currentprice, targetprice):
     return (posqty * (posprice - targetprice)) / (targetprice - currentprice)
 
+
 def get_coins():
     coins: Coins = {
         "active": {},
@@ -85,7 +88,9 @@ def get_coins():
 
     all_symbols_with_pnl = db.query(
         'SELECT DISTINCT(symbol) FROM income WHERE asset <> "BNB" AND symbol <> "" AND incomeType NOT IN'
-        + remove_incomeTypes + ' ORDER BY symbol ASC'
+        + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
+        + " ORDER BY symbol ASC",
+        remove_incomeTypes,
     )
 
     balance = db.query("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
@@ -233,28 +238,29 @@ def index_page():
     balance = db.query("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     total = db.query(
         'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-        + remove_incomeTypes,
+        + " ({0})".format(", ".join("?" for _ in remove_incomeTypes)),
+        remove_incomeTypes,
         one=True,
     )
     today = db.query(
         'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-        + remove_incomeTypes
+        + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
         + " AND time >= ? AND time <= ?",
-        [todaystart, todayend],
+        remove_incomeTypes + [todaystart, todayend],
         one=True,
     )
     week = db.query(
         'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-        + remove_incomeTypes
+        + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
         + " AND time >= ? AND time <= ?",
-        [weekstart, weekend],
+        remove_incomeTypes + [weekstart, weekend],
         one=True,
     )
     month = db.query(
         'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-        + remove_incomeTypes
+        + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
         + " AND time >= ? AND time <= ?",
-        [monthstart, monthend],
+        remove_incomeTypes + [monthstart, monthend],
         one=True,
     )
 
@@ -266,16 +272,16 @@ def index_page():
 
     by_date = db.query(
         'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-        + remove_incomeTypes
+        + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
         + " AND time >= ?  AND time <= ? GROUP BY Date",
-        [start, end],
+        remove_incomeTypes + [start, end],
     )
 
     by_symbol = db.query(
         'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-        + remove_incomeTypes
+        + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
         + " AND time >= ? AND time <= ? GROUP BY symbol ORDER BY inc DESC",
-        [start, end],
+        remove_incomeTypes + [start, end],
     )
 
     fees = {"USDT": 0, "BNB": 0}
@@ -407,29 +413,30 @@ def dashboard_page(start, end):
     balance = db.query("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
     total = db.query(
         'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-        + remove_incomeTypes,
+        + " ({0})".format(", ".join("?" for _ in remove_incomeTypes)),
+        remove_incomeTypes,
         one=True,
     )
 
     today = db.query(
         'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-        + remove_incomeTypes
+        + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
         + " AND time >= ? AND time <= ?",
-        [todaystart, todayend],
+        remove_incomeTypes + [todaystart, todayend],
         one=True,
     )
     week = db.query(
         'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-        + remove_incomeTypes
+        + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
         + " AND time >= ? AND time <= ?",
-        [weekstart, weekend],
+        remove_incomeTypes + [weekstart, weekend],
         one=True,
     )
     month = db.query(
         'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-        + remove_incomeTypes
+        + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
         + " AND time >= ? AND time <= ?",
-        [monthstart, monthend],
+        remove_incomeTypes + [monthstart, monthend],
         one=True,
     )
 
@@ -441,16 +448,16 @@ def dashboard_page(start, end):
 
     by_date = db.query(
         'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-        + remove_incomeTypes
+        + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
         + " AND time >= ?  AND time <= ? GROUP BY Date",
-        [start, end],
+        remove_incomeTypes + [start, end],
     )
 
     by_symbol = db.query(
         'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-        + remove_incomeTypes
+        + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
         + " AND time >= ? AND time <= ? GROUP BY symbol ORDER BY inc DESC",
-        [start, end],
+        remove_incomeTypes + [start, end],
     )
 
     fees = {"USDT": 0, "BNB": 0}
@@ -461,9 +468,9 @@ def dashboard_page(start, end):
 
     customframe = db.query(
         'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType NOT IN'
-        + remove_incomeTypes
+        + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
         + " AND time >= ? AND time <= ?",
-        [start, end],
+        remove_incomeTypes + [start, end],
         one=True,
     )
 
@@ -675,30 +682,30 @@ def coin_page(coin):
 
         total = db.query(
             'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType NOT IN'
-            + remove_incomeTypes
+            + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
             + " AND symbol = ?",
-            [coin],
+            remove_incomeTypes + [coin],
             one=True,
         )
         today = db.query(
             'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType NOT IN'
-            + remove_incomeTypes
+            + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
             + " AND time >= ? AND time <= ? AND symbol = ?",
-            [todaystart, todayend, coin],
+            remove_incomeTypes + [todaystart, todayend, coin],
             one=True,
         )
         week = db.query(
             'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType NOT IN'
-            + remove_incomeTypes
+            + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
             + " AND time >= ? AND time <= ? AND symbol = ?",
-            [weekstart, weekend, coin],
+            remove_incomeTypes + [weekstart, weekend, coin],
             one=True,
         )
         month = db.query(
             'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType NOT IN'
-            + remove_incomeTypes
+            + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
             + " AND time >= ? AND time <= ? AND symbol = ?",
-            [monthstart, monthend, coin],
+            remove_incomeTypes + [monthstart, monthend, coin],
             one=True,
         )
 
@@ -824,9 +831,9 @@ def coin_page(coin):
         ]
         by_date = db.query(
             'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-            + remove_incomeTypes
+            + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
             + " AND time >= ? AND time <= ? AND symbol = ? GROUP BY Date",
-            [weekstart, weekend, coin],
+            remove_incomeTypes + [weekstart, weekend, coin],
         )
         temp = [[], []]
         for each in by_date:
@@ -937,30 +944,30 @@ def coin_page_timeframe(coin, start, end):
     else:
         total = db.query(
             'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-            + remove_incomeTypes
+            + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
             + " AND symbol = ?",
-            [coin],
+            remove_incomeTypes + [coin],
             one=True,
         )
         today = db.query(
             'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType NOT IN'
-            + remove_incomeTypes
+            + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
             + " AND time >= ? AND time <= ? AND symbol = ?",
-            [todaystart, todayend, coin],
+            remove_incomeTypes + [todaystart, todayend, coin],
             one=True,
         )
         week = db.query(
             'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType NOT IN'
-            + remove_incomeTypes
+            + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
             + " AND time >= ? AND time <= ? AND symbol = ?",
-            [weekstart, weekend, coin],
+            remove_incomeTypes + [weekstart, weekend, coin],
             one=True,
         )
         month = db.query(
             'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType NOT IN'
-            + remove_incomeTypes
+            + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
             + " AND time >= ? AND time <= ? AND symbol = ?",
-            [monthstart, monthend, coin],
+            remove_incomeTypes + [monthstart, monthend, coin],
             one=True,
         )
         result = db.query(
@@ -1072,9 +1079,9 @@ def coin_page_timeframe(coin, start, end):
 
         by_date = db.query(
             'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-            + remove_incomeTypes
+            + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
             + " AND time >= ? AND time <= ? AND symbol = ? GROUP BY Date",
-            [start, end, coin],
+            remove_incomeTypes + [start, end, coin],
         )
         temp = [[], []]
         for each in by_date:
@@ -1086,9 +1093,9 @@ def coin_page_timeframe(coin, start, end):
 
         customframe = db.query(
             'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-            + remove_incomeTypes
+            + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
             + " AND time >= ? AND time <= ? AND symbol = ?",
-            [start, end, coin],
+            remove_incomeTypes + [start, end, coin],
             one=True,
         )
 
