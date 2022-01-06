@@ -46,7 +46,8 @@ class Projections(TypedDict):
     pcustom: list[float]
     pcustom_value: float
 
-
+remove_incomeTypes = "(" + ', '.join(f'"{w}"' for w in ["TRANSFER", "COIN_SWAP_DEPOSIT", "COIN_SWAP_WITHDRAW"]) + ")"
+        
 def zero_value(x):
     if x is None:
         return 0
@@ -70,7 +71,6 @@ def calc_pbr(volume, price, side, balance):
 def average_down_target(posprice, posqty, currentprice, targetprice):
     return (posqty * (posprice - targetprice)) / (targetprice - currentprice)
 
-
 def get_coins():
     coins: Coins = {
         "active": {},
@@ -84,7 +84,8 @@ def get_coins():
     )
 
     all_symbols_with_pnl = db.query(
-        'SELECT DISTINCT(symbol) FROM income WHERE asset <> "BNB" AND symbol <> "" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND incomeType <> "COIN_SWAP_WITHDRAW" ORDER BY symbol ASC'
+        'SELECT DISTINCT(symbol) FROM income WHERE asset <> "BNB" AND symbol <> "" AND incomeType NOT IN'
+        + remove_incomeTypes + ' ORDER BY symbol ASC'
     )
 
     balance = db.query("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
@@ -166,9 +167,6 @@ def timeranges():
         [last_year_start.strftime("%Y-%m-%d"), last_year_end.strftime("%Y-%m-%d")],
         [last_year_start.strftime("%Y-%m-%d"), today.strftime("%Y-%m-%d")],
     ]
-
-
-remove_incomeTypes = "(" + ', '.join(f'"{w}"' for w in ["TRANSFER", "COIN_SWAP_DEPOSIT", "COIN_SWAP_WITHDRAW"]) + ")"
 
 
 @app.route("/", methods=["GET"])
