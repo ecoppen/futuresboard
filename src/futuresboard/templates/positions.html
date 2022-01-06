@@ -14,6 +14,7 @@
                         <th>Leverage</th>
                         <th>Pos. Volume</th>
                         <th>Pos. Price</th>
+                        <th>Pos. Value</th>
                         <th>Unrealised PnL</th>
                         <th>Current Price</th>
                         <th class="table-success">Buys left</th>
@@ -31,6 +32,7 @@
                             <td>{{ positions[coin][0][0][5]}} {{ positions[coin][0][0][3] }}x</td>
                             <td>{{ positions[coin][0][0][6] }}</td>
                             <td>{{ positions[coin][0][0][4] }}</td>
+                            <td>{{ positions[coin][0][0][6] * positions[coin][0][0][4] }}</td>
                             <td>{{ "$%.2f"|format(positions[coin][0][0][2]) }}</td>
                             <td>{{ markprices[coin] }}</td>
                             <td {% if positions[coin][2][0] == 0 %} class="table-danger" {% endif %}>{{ positions[coin][2][0]}}</td>
