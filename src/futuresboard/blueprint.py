@@ -543,7 +543,7 @@ def positions_page():
         if response:
             temp = response.json()
             for each in temp:
-                markPrices[each["symbol"]] = each["markPrice"]
+                markPrices[each["symbol"]] = float(each["markPrice"])
         else:
             markPrices = {}
     except Exception:
