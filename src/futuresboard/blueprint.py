@@ -256,12 +256,12 @@ def index_page():
     )
 
     by_date = db.query(
-        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT"  AND time >= ?  AND time <= ? GROUP BY Date',
+        'SELECT DATE(time / 1000, "unixepoch") AS Date, SUM(income) AS inc FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND time >= ?  AND time <= ? GROUP BY Date',
         [start, end],
     )
 
     by_symbol = db.query(
-        'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT"  AND time >= ? AND time <= ? GROUP BY symbol ORDER BY inc DESC',
+        'SELECT SUM(income) AS inc, symbol FROM income WHERE asset <> "BNB" AND incomeType <> "TRANSFER" AND incomeType <> "COIN_SWAP_DEPOSIT" AND time >= ? AND time <= ? GROUP BY symbol ORDER BY inc DESC',
         [start, end],
     )
 
