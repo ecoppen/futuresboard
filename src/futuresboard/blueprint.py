@@ -1309,9 +1309,9 @@ def projection_page():
 
         week = db.query(
             'SELECT SUM(income) FROM income WHERE asset <> "BNB" AND incomeType NOT IN'
-            + remove_incomeTypes
+            + " ({0})".format(", ".join("?" for _ in remove_incomeTypes))
             + " AND time >= ? AND time <= ?",
-            [minus_7_start, todayend],
+            remove_incomeTypes + [minus_7_start, todayend],
             one=True,
         )
         custom = round(week[0] / balance[0] * 100 / 7, 2)
