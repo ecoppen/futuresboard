@@ -33,7 +33,9 @@ def main():
         help="Disable the routines which scrape while the webservice is running",
     )
     server_settings = parser.add_argument_group("Server Settings")
-    server_settings.add_argument("--host", default=None, help="Server host. Default: 0.0.0.0")
+    server_settings.add_argument(
+        "--host", default='0.0.0.0', help="Server host. Default: 0.0.0.0"
+    )
     server_settings.add_argument(
         "--port", type=int, default=None, help="Server port. Default: 5000"
     )
@@ -58,4 +60,4 @@ def main():
             futuresboard.scraper.scrape()
         sys.exit(0)
 
-    app.run(host=args.host.ip.exploded, port=args.port)
+    app.run(host=args.host, port=args.port)
