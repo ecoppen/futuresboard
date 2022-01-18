@@ -63,4 +63,4 @@ def main():
             futuresboard.scraper.scrape()
         sys.exit(0)
 
-    app.run(host=args.host, port=args.port)
+    app.run(host=args.host.ip.exploded, port=args.port)
