@@ -34,7 +34,10 @@ def main():
     )
     server_settings = parser.add_argument_group("Server Settings")
     server_settings.add_argument(
-        "--host", default='0.0.0.0', help="Server host. Default: 0.0.0.0"
+        "--host",
+        default='0.0.0.0',
+        help="Server host. Default: 0.0.0.0",
+        type=IPvAnyInterface.validate,
     )
     server_settings.add_argument(
         "--port", type=int, default=None, help="Server port. Default: 5000"
