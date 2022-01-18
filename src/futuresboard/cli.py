@@ -9,6 +9,7 @@ import futuresboard.app
 import futuresboard.scraper
 from futuresboard import __version__  # type: ignore[attr-defined]
 from futuresboard.config import Config
+from pydantic import IPvAnyInterface
 
 log = logging.getLogger(__name__)
 
