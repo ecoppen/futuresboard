@@ -462,7 +462,7 @@
                     data: [
                     {% for stick in candlesticks["15m"][1] %}
                         {
-                            x: '{{stick[0]}}',
+                            x: {{stick[0]}},
                             o: {{stick[1]}},
                             h: {{stick[2]}},
                             l: {{stick[3]}},
@@ -478,6 +478,11 @@
                 type: 'candlestick',
                 data: data15m,
                 options: {
+		    scales: {
+			x: {
+			    type: 'time'
+			}
+		    },
                     plugins:{
                         zoom: zoomOptions,
                         annotation: {
@@ -519,7 +524,7 @@
                     data: [
                     {% for stick in candlesticks["1h"][1] %}
                         {
-                            x: '{{stick[0]}}',
+                            x: {{stick[0]}},
                             o: {{stick[1]}},
                             h: {{stick[2]}},
                             l: {{stick[3]}},
@@ -535,6 +540,11 @@
                 type: 'candlestick',
                 data: data1h,
                 options: {
+		    scales: {
+			x: {
+			    type: 'time'
+			}
+		    },
                     plugins:{
                         zoom: zoomOptions,
                         annotation: {
@@ -576,7 +586,7 @@
                     data: [
                     {% for stick in candlesticks["4h"][1] %}
                         {
-                            x: '{{stick[0]}}',
+                            x: {{stick[0]}},
                             o: {{stick[1]}},
                             h: {{stick[2]}},
                             l: {{stick[3]}},
@@ -592,6 +602,11 @@
                 type: 'candlestick',
                 data: data4h,
                 options: {
+		    scales: {
+			x: {
+			    type: 'time'
+			}
+		    },
                     plugins:{
                         zoom: zoomOptions,
                         annotation: {
@@ -633,7 +648,7 @@
                     data: [
                     {% for stick in candlesticks["1d"][1] %}
                         {
-                            x: '{{stick[0]}}',
+                            x: {{stick[0]}},
                             o: {{stick[1]}},
                             h: {{stick[2]}},
                             l: {{stick[3]}},
@@ -649,6 +664,11 @@
                 type: 'candlestick',
                 data: data1d,
                 options: {
+		    scales: {
+			x: {
+			    type: 'time'
+			}
+		    },
                     plugins:{
                         zoom: zoomOptions,
                         annotation: {
