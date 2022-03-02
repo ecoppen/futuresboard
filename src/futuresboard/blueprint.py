@@ -83,7 +83,7 @@ def get_coins():
     }
 
     all_active_positions = db.query(
-        "SELECT symbol, entryPrice, positionSide, positionAmt FROM positions WHERE positionAmt > 0 ORDER BY symbol ASC"
+        "SELECT symbol, entryPrice, positionSide, positionAmt FROM positions WHERE ABS(positionAmt) > 0 ORDER BY symbol ASC"
     )
 
     all_symbols_with_pnl = db.query(
