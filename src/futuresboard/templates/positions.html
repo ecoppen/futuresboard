@@ -44,7 +44,7 @@
                             <td>{{ positions[coin][2][1]}}</td>
                             <td>{{ positions[coin][2][4]}}</td>
                             <td>{{ positions[coin][2][5]}}</td>
-                            <td>{% if positions[coin][2][2] != "-" %}{{ ((1-positions[coin][2][4]/markprices[coin])*100)|round(2)}}% {% endif %}</td>
+                            <td>{% if positions[coin][2][2] != "-" %}{{ ((1-positions[coin][2][4]|int/markprices[coin])*100)|round(2)}}% {% endif %}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
