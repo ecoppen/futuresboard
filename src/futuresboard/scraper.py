@@ -400,7 +400,7 @@ def _scrape(app=None):
         responseHeader, responseJSON = send_signed_request(
             "GET", "/private/linear/position/list", params, signature="sign"
         )
-        weightused = int(responseJSON["rate_limit_status"])
+        weightused = int(responseHeader["rate_limit_status"])
 
         with create_connection(current_app.config["DATABASE"]) as conn:
             delete_all_orders(conn)
@@ -445,7 +445,7 @@ def _scrape(app=None):
                     responseHeader, responseJSON = send_signed_request(
                         "GET", "/private/linear/order/search", params, signature="sign"
                     )
-                    weightused = int(responseJSON["rate_limit_status"])
+                    weightused = int(responseHeader["rate_limit_status"])
 
                     for order in responseJSON["result"]:
 
@@ -520,7 +520,7 @@ def _scrape(app=None):
                     "GET", "/private/linear/trade/closed-pnl/list", params, signature="sign"
                 )
                 if "rate_limit_status" in responseJSON:
-                    weightused = int(responseJSON["rate_limit_status"])
+                    weightused = int(responseHeader["rate_limit_status"])
 
                 if responseJSON["result"] is not None:
                     if responseJSON["result"]["data"] is not None:
