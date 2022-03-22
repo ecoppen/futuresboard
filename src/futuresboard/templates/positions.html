@@ -37,14 +37,31 @@
                             <td>{{ (positions[coin][0][0][6] * positions[coin][0][0][4])|round(2) }}</td>
                             <td>{{ "$%.2f"|format(positions[coin][0][0][2]) }}</td>
                             <td>{{ markprices[coin]|round(8)}}</td>
-                            <td {% if positions[coin][2][0] == 0 %} class="table-danger" {% endif %}>{{ positions[coin][2][0]}}</td>
-                            <td {% if positions[coin][2][0] == 0 %} class="table-danger" {% endif %}>{{ positions[coin][2][2]}}</td>
-                            <td {% if positions[coin][2][0] == 0 %} class="table-danger" {% endif %}>{{ positions[coin][2][3]}}</td>
-                            <td {% if positions[coin][2][0] == 0 %} class="table-danger" {% endif %}>{% if positions[coin][2][2] != "-" %}{{ ((1-positions[coin][2][2]/markprices[coin])*100)|round(2)}}% {% endif %}</td>
-                            <td>{{ positions[coin][2][1]}}</td>
+                            <td>{{ positions[coin][2][0]}}</td>
                             <td>{{ positions[coin][2][4]}}</td>
                             <td>{{ positions[coin][2][5]}}</td>
-                            <td>{% if positions[coin][2][2] != "-" %}{{ ((1-positions[coin][2][4]|int/markprices[coin])*100)|round(2)}}% {% endif %}</td>
+                            <td>{% if positions[coin][2][4] != "-" %}{{ ((1-positions[coin][2][4]/markprices[coin])*100)|round(2)}}% {% endif %}</td>
+                            <td>{{ positions[coin][2][1]}}</td>
+                            <td>{{ positions[coin][2][6]}}</td>
+                            <td>{{ positions[coin][2][7]}}</td>
+                            <td>{% if positions[coin][2][6] != "-" %}{{ ((1-positions[coin][2][6]|int/markprices[coin])*100)|round(2)}}% {% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ coin }}</td>
+                            <td>{{ positions[coin][0][1][5]}} {{ positions[coin][0][1][3] }}x</td>
+                            <td>{{ positions[coin][0][1][6] }}</td>
+                            <td>{{ positions[coin][0][1][4] }}</td>
+                            <td>{{ (positions[coin][0][1][6] * positions[coin][0][1][4])|round(2) }}</td>
+                            <td>{{ "$%.2f"|format(positions[coin][0][1][2]) }}</td>
+                            <td>{{ markprices[coin]|round(8)}}</td>
+                            <td>{{ positions[coin][2][2]}}</td>
+                            <td>{{ positions[coin][2][8]}}</td>
+                            <td>{{ positions[coin][2][9]}}</td>
+                            <td>{% if positions[coin][2][8] != "-" %}{{ ((1-positions[coin][2][8]/markprices[coin])*100)|round(2)}}% {% endif %}</td>
+                            <td>{{ positions[coin][2][3]}}</td>
+                            <td>{{ positions[coin][2][10]}}</td>
+                            <td>{{ positions[coin][2][11]}}</td>
+                            <td>{% if positions[coin][2][10] != "-" %}{{ ((1-positions[coin][2][10]|int/markprices[coin])*100)|round(2)}}% {% endif %}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -57,7 +74,7 @@
         $(document).ready( function () {
             $('#orders').DataTable({
                 "paging": false,
-                "order": [[7,"asc"]],
+                "order": [[0,"asc"]],
             });
         } );
 
