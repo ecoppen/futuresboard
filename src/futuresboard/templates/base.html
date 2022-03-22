@@ -44,7 +44,7 @@
     </header>
     <body class="d-flex flex-column h-100">
         <div class="wrapper">
-            <div class="container">
+            <div class="container-fluid">
                 <div class="row">
                     <div class="flex-shrink-0 p-1 bg-white col-md-2">
                         <ul class="list-unstyled ps-0">
@@ -67,23 +67,28 @@
                                 <button class="btn btn-toggle align-items-center rounded" data-bs-toggle="collapse" data-bs-target="#activecoins-collapse" aria-expanded="true">
                                     Active coins ({{ coin_list['totals']['active'] }})
                                 </button>
-                                <div class="collapse show" id="activecoins-collapse" style="">
+                                <div class="collapse show" id="activecoins-collapse">
                                     <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                                        <table class="table table-sm">
+                                        <table class="table table-sm col-1">
                                             {% for item in coin_list['active'] %}
                                                 <tr>
-                                                    <td {% if coin_list['active'][item][0] == 0 %} class="table-danger" {% endif %}>
-                                                        <a href="{{ url_for("main.coin_page", coin=item) }}" class="link-dark rounded">{{ item }}</a></td>
-                                                    <td class="text-center" data-toggle="tooltip" title="PBR">{{ coin_list['active'][item][2] }}</td>
-                                                    <td class="table-success text-center" data-toggle="tooltip" title="Buy Orders">{{ coin_list['active'][item][0] }}</td>
-                                                    <td class="table-danger text-center" data-toggle="tooltip" title="Sell Orders">{{ coin_list['active'][item][1] }}</td>
+                                                    <td><a href="{{ url_for("main.coin_page", coin=item) }}" class="link-dark rounded">{{ item }}</a></td>
+                                                    <td class="text-center" data-toggle="tooltip" title="PBR Long">{{ coin_list['active'][item][2] }}</td>
+                                                    <td class="table-success text-center" data-toggle="tooltip" title="Buy Orders Long">{{ coin_list['active'][item][0] }}</td>
+                                                    <td class="table-danger text-center" data-toggle="tooltip" title="Sell Orders Long">{{ coin_list['active'][item][1] }}</td>
+                                                    <td class="text-center" data-toggle="tooltip" title="PBR Short">{{ coin_list['active'][item][5] }}</td>
+                                                    <td class="table-success text-center" data-toggle="tooltip" title="Buy Orders Short">{{ coin_list['active'][item][3] }}</td>
+                                                    <td class="table-danger text-center" data-toggle="tooltip" title="Sell Orders Short">{{ coin_list['active'][item][4] }}</td>
                                                 </tr>
                                             {% endfor %}
                                             <tr class="table-secondary">
                                                 <td class="text-center">Total</td>
-                                                <td class="text-center">{{ coin_list['totals']['pbr'] }}</td>
-                                                <td class="text-center">{{ coin_list['totals']['buys'] }}</td>
-                                                <td class="text-center">{{ coin_list['totals']['sells'] }}</td>
+                                                <td class="text-center">{{ coin_list['totals']['pbr_long'] }}</td>
+                                                <td class="text-center">{{ coin_list['totals']['buys_long'] }}</td>
+                                                <td class="text-center">{{ coin_list['totals']['sells_long'] }}</td>
+                                                <td class="text-center">{{ coin_list['totals']['pbr_short'] }}</td>
+                                                <td class="text-center">{{ coin_list['totals']['buys_short'] }}</td>
+                                                <td class="text-center">{{ coin_list['totals']['sells_short'] }}</td>
                                             </tr>
                                         </table>
                                     </ul>
@@ -93,7 +98,7 @@
                                 <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#inactivecoins-collapse" aria-expanded="false">
                                     Inactive coins ({{ coin_list['totals']['inactive'] }})
                                 </button>
-                                <div class="collapse" id="inactivecoins-collapse" style="">
+                                <div class="collapse" id="inactivecoins-collapse">
                                     <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                                         {% for item in coin_list['inactive'] %}
                                             <li><a href="{{ url_for("main.coin_page", coin=item) }}" class="link-dark rounded">{{ item }}</a></li>
