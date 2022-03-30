@@ -99,16 +99,14 @@ def get_coins():
     balance = db.query("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
 
     active_symbols = []
+    pbr_long, pbr_short = 0.0, 0.0
 
     for position in all_active_positions:
         if position[0] not in active_symbols:
             coins["totals"]["active"] += 1
         active_symbols.append(position[0])
 
-        pbr_long = round(calc_pbr(position[3], position[1], position[2], float(balance[0])), 2)
-        pbr_short = round(calc_pbr(position[3], position[1], position[2], float(balance[0])), 2)
-
-        buy_long, sell_long, buy_short, sell_short = 0, 0, 0, 0
+        buy_long, sell_long, buy_short, sell_short,  = 0, 0, 0, 0
 
         buyorders_long = db.query(
             'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "BUY" AND positionSide = "LONG"',
@@ -134,6 +132,14 @@ def get_coins():
             one=True,
         )
 
+        coins["active"][position[0]] = [buy_long, sell_long, pbr_long, buy_short, sell_short, pbr_short]
+        if position[2] == 'LONG':
+            pbr_long = round(calc_pbr(position[3], position[1], position[2], float(balance[0])), 2)
+            pbr_short = 0.0
+        if position[2] == 'SHORT':
+            pbr_short = round(calc_pbr(position[3], position[1], position[2], float(balance[0])), 2)
+            pbr_long = 0.0
+
         if buyorders_long is not None:
             buy_long = int(buyorders_long[0])
         if sellorders_long is not None:
@@ -145,19 +151,26 @@ def get_coins():
         if buy_long == 0 and sell_long == 0 and buy_short == 0 and sell_short == 0:
             coins["warning"] = True
 
-        coins["active"][position[0]] = (buy_long, sell_long, pbr_long, buy_short, sell_short, pbr_short)
+        coins["active"][position[0]][0] = buy_long
+        coins["active"][position[0]][1] = sell_long
+        coins["active"][position[0]][2] += pbr_long
+        coins["active"][position[0]][3] = buy_short
+        coins["active"][position[0]][4] = sell_short
+        coins["active"][position[0]][5] += pbr_short
         coins["totals"]["buys_long"] += buy_long
         coins["totals"]["sells_long"] += sell_long
         coins["totals"]["pbr_long"] += pbr_long
         coins["totals"]["buys_short"] += buy_short
         coins["totals"]["sells_short"] += sell_short
         coins["totals"]["pbr_short"] += pbr_short
+        coins["active"][position[0]][2] = round(coins["active"][position[0]][2],2)
+        coins["active"][position[0]][5] = round(coins["active"][position[0]][5],2)
 
     for symbol in all_symbols_with_pnl:
         if symbol[0] not in active_symbols:
             coins["inactive"].append(symbol[0])
             coins["totals"]["inactive"] += 1
-
+    
     coins["totals"]["pbr_long"] = format_dp(coins["totals"]["pbr_long"])
     coins["totals"]["pbr_short"] = format_dp(coins["totals"]["pbr_short"])
     return coins
