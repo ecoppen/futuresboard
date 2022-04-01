@@ -24,9 +24,12 @@ app = Blueprint("main", __name__)
 class CoinsTotals(TypedDict):
     active: int
     inactive: int
-    buys: int
-    sells: int
-    pbr: int
+    buys_long: int
+    sells_long: int
+    pbr_long: int
+    buys_short: int
+    sells_short: int
+    pbr_short: int
 
 
 class Coins(TypedDict):
@@ -64,7 +67,7 @@ def format_dp(value, dp=2):
 def calc_pbr(volume, price, side, balance):
     if price > 0.0:
         if side == "SHORT":
-            return abs(volume / price) / balance
+            return abs(volume * price) / balance
         elif side == "LONG":
             return abs(volume * price) / balance
     return 0.0
@@ -78,7 +81,7 @@ def get_coins():
     coins: Coins = {
         "active": {},
         "inactive": [],
-        "totals": {"active": 0, "inactive": 0, "buys": 0, "sells": 0, "pbr": 0},
+        "totals": {"active": 0, "inactive": 0, "buys_long": 0, "sells_long": 0, "pbr_long": 0, "buys_short": 0, "sells_short": 0, "pbr_short": 0},
         "warning": False,
     }
 
@@ -96,45 +99,80 @@ def get_coins():
     balance = db.query("SELECT totalWalletBalance FROM account WHERE AID = 1", one=True)
 
     active_symbols = []
+    pbr_long, pbr_short = 0.0, 0.0
 
     for position in all_active_positions:
+        if position[0] not in active_symbols:
+            coins["totals"]["active"] += 1
         active_symbols.append(position[0])
 
-        pbr = round(calc_pbr(position[3], position[1], position[2], float(balance[0])), 2)
+        buy_long, sell_long, buy_short, sell_short,  = 0, 0, 0, 0
 
-        buy, sell = 0, 0
-
-        buyorders = db.query(
-            'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "BUY"',
+        buyorders_long = db.query(
+            'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "BUY" AND positionSide = "LONG"',
             [position[0]],
             one=True,
         )
 
-        sellorders = db.query(
-            'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "SELL"',
+        buyorders_short = db.query(
+            'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "BUY" AND positionSide = "SHORT"',
             [position[0]],
             one=True,
         )
 
-        if buyorders is not None:
-            buy = int(buyorders[0])
-            if buy == 0:
-                coins["warning"] = True
-        if sellorders is not None:
-            sell = int(sellorders[0])
+        sellorders_long = db.query(
+            'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "SELL" AND positionSide = "LONG"',
+            [position[0]],
+            one=True,
+        )
 
-        coins["active"][position[0]] = (buy, sell, pbr)
-        coins["totals"]["active"] += 1
-        coins["totals"]["buys"] += buy
-        coins["totals"]["sells"] += sell
-        coins["totals"]["pbr"] += pbr
+        sellorders_short = db.query(
+            'SELECT COUNT(OID) FROM orders WHERE symbol = ? AND side = "SELL" AND positionSide = "SHORT"',
+            [position[0]],
+            one=True,
+        )
+
+        coins["active"][position[0]] = [buy_long, sell_long, pbr_long, buy_short, sell_short, pbr_short]
+        if position[2] == 'LONG':
+            pbr_long = round(calc_pbr(position[3], position[1], position[2], float(balance[0])), 2)
+            pbr_short = 0.0
+        if position[2] == 'SHORT':
+            pbr_short = round(calc_pbr(position[3], position[1], position[2], float(balance[0])), 2)
+            pbr_long = 0.0
+
+        if buyorders_long is not None:
+            buy_long = int(buyorders_long[0])
+        if sellorders_long is not None:
+            sell_long = int(sellorders_long[0])
+        if buyorders_short is not None:
+            buy_short = int(buyorders_short[0])
+        if sellorders_short is not None:
+            sell_short = int(sellorders_short[0])
+        if buy_long == 0 and sell_long == 0 and buy_short == 0 and sell_short == 0:
+            coins["warning"] = True
+
+        coins["active"][position[0]][0] = buy_long
+        coins["active"][position[0]][1] = sell_long
+        coins["active"][position[0]][2] += pbr_long
+        coins["active"][position[0]][3] = buy_short
+        coins["active"][position[0]][4] = sell_short
+        coins["active"][position[0]][5] += pbr_short
+        coins["totals"]["buys_long"] += buy_long
+        coins["totals"]["sells_long"] += sell_long
+        coins["totals"]["pbr_long"] += pbr_long
+        coins["totals"]["buys_short"] += buy_short
+        coins["totals"]["sells_short"] += sell_short
+        coins["totals"]["pbr_short"] += pbr_short
+        coins["active"][position[0]][2] = round(coins["active"][position[0]][2],2)
+        coins["active"][position[0]][5] = round(coins["active"][position[0]][5],2)
 
     for symbol in all_symbols_with_pnl:
         if symbol[0] not in active_symbols:
             coins["inactive"].append(symbol[0])
             coins["totals"]["inactive"] += 1
-
-    coins["totals"]["pbr"] = format_dp(coins["totals"]["pbr"])
+    
+    coins["totals"]["pbr_long"] = format_dp(coins["totals"]["pbr_long"])
+    coins["totals"]["pbr_short"] = format_dp(coins["totals"]["pbr_short"])
     return coins
 
 
@@ -568,34 +606,58 @@ def positions_page():
         allpositions = temp
 
         temp = []
-        buys = []
-        sells = []
+        buys_long = []
+        sells_long = []
+        buys_short = []
+        sells_short = []
         for order in allorders:
             order = list(order)
             order[7] = datetime.fromtimestamp(order[7] / 1000.0).strftime("%Y-%m-%d %H:%M:%S")
-            if order[3] == "BUY":
-                buys.append(order[2])
-            else:
-                sells.append(order[2])
+            if order[3] == "BUY" and order[4] == "LONG":
+                buys_long.append(order[2])
+            elif order[3] == "SELL" and order[4] == "LONG":
+                sells_long.append(order[2])
+            elif order[3] == "BUY" and order[4] == "SHORT":
+                buys_short.append(order[2])
+            elif order[3] == "SELL" and order[4] == "SHORT":
+                sells_short.append(order[2])
             temp.append(order)
         allorders = temp
-        stats = [len(buys), len(sells)]
+        stats = [len(buys_long), len(sells_long), len(buys_short), len(sells_short)]
         if stats[0] == 0:
             stats.append("-")
             stats.append("-")
         else:
-            stats.append(sorted(buys)[-1])
+            stats.append(sorted(buys_long)[-1])
             if coin in markPrices:
-                stats.append(round(float(markPrices[coin]) - sorted(buys)[-1], 5))
+                stats.append(round(float(markPrices[coin]) - sorted(buys_long)[-1], 5))
             else:
                 stats.append("-")
         if stats[1] == 0:
             stats.append("-")
             stats.append("-")
         else:
-            stats.append(sorted(sells)[0])
+            stats.append(sorted(sells_long)[0])
             if coin in markPrices:
-                stats.append(round(float(markPrices[coin]) - sorted(sells)[0], 5))
+                stats.append(round(float(markPrices[coin]) - sorted(sells_long)[0], 5))
+            else:
+                stats.append("-")
+        if stats[2] == 0:
+            stats.append("-")
+            stats.append("-")
+        else:
+            stats.append(sorted(buys_short)[-1])
+            if coin in markPrices:
+                stats.append(round(float(markPrices[coin]) - sorted(buys_short)[-1], 5))
+            else:
+                stats.append("-")
+        if stats[3] == 0:
+            stats.append("-")
+            stats.append("-")
+        else:
+            stats.append(sorted(sells_short)[0])
+            if coin in markPrices:
+                stats.append(round(float(markPrices[coin]) - sorted(sells_short)[0], 5))
             else:
                 stats.append("-")
         positions[coin] = [allpositions, allorders, stats]
