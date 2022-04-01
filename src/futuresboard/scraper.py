@@ -222,6 +222,13 @@ def update_position(conn, position):
     cur = conn.cursor()
     cur.execute(sql, position)
 
+    
+def delete_all_positions(conn):
+    sql = """ DELETE FROM positions """
+    cur = conn.cursor()
+    cur.execute(sql)
+    conn.commit()
+    
 
 def select_position(conn, symbol):
     cur = conn.cursor()
@@ -326,7 +333,9 @@ def _scrape(app=None):
                     create_account(conn, totals_row)
                 elif float(accountCheck[0]) != float(responseJSON["totalWalletBalance"]):
                     update_account(conn, totals_row)
-
+                    
+                delete_all_positions(conn)
+                
                 for position in positions:
                     position_row = (
                         float(position["unrealizedProfit"]),
@@ -336,13 +345,9 @@ def _scrape(app=None):
                         position["symbol"],
                         position["positionSide"],
                     )
-                    unrealizedProfit = select_position(conn, [position["symbol"], position["positionSide"]])
-                    if unrealizedProfit is None:
-                        create_position(conn, position_row)
-                        new_positions += 1
-                    elif float(unrealizedProfit[0]) != float(position["unrealizedProfit"]):
-                        update_position(conn, position_row)
-                        updated_positions += 1
+
+                    create_position(conn, position_row)
+                    updated_positions += 1
 
                 conn.commit()
 
@@ -405,7 +410,8 @@ def _scrape(app=None):
 
         with create_connection(current_app.config["DATABASE"]) as conn:
             delete_all_orders(conn)
-
+            delete_all_positions(conn)
+            
             for position in responseJSON["result"]:
                 if weightused < 10:
                     print(
@@ -416,13 +422,13 @@ def _scrape(app=None):
 
                 if position["data"]["symbol"] not in all_symbols:
                     all_symbols.append(position["data"]["symbol"])
-
+                    
                 if position["data"]["size"] > 0:
                     if position["data"]["side"].lower() == "buy":
                         positionside = "LONG"
                     else:
                         positionside = "SHORT"
-
+                    
                     position_row = (
                         float(position["data"]["unrealised_pnl"]),
                         int(position["data"]["leverage"]),
@@ -431,13 +437,9 @@ def _scrape(app=None):
                         position["data"]["symbol"],
                         positionside,
                     )
-                    unrealizedProfit = select_position(conn, [position["data"]["symbol"], positionside])
-                    if unrealizedProfit is None:
-                        create_position(conn, position_row)
-                        new_positions += 1
-                    elif float(unrealizedProfit[0]) != float(position["data"]["unrealised_pnl"]):
-                        update_position(conn, position_row)
-                        updated_positions += 1
+
+                    create_position(conn, position_row)
+                    updated_positions += 1
 
                     params = {
                         "symbol": position["data"]["symbol"],
