@@ -46,6 +46,7 @@
                             <td>{{ positions[coin][2][7]}}</td>
                             <td>{% if positions[coin][2][6] != "-" %}{{ ((positions[coin][2][7]|int/markprices[coin])*100)|round(2)}}% {% endif %}</td>
                         </tr>
+                    {% if positions[coin][0]|length > 1 %}
                         <tr>
                             <td>{{ coin }}</td>
                             <td>{{ positions[coin][0][1][5]}} {{ positions[coin][0][1][3] }}x</td>
@@ -63,6 +64,7 @@
                             <td>{{ positions[coin][2][11]}}</td>
                             <td>{% if positions[coin][2][10] != "-" %}{{ ((positions[coin][2][11]|int/markprices[coin])*100)|round(2)}}% {% endif %}</td>
                         </tr>
+                    {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
