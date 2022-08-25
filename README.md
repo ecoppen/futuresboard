@@ -46,6 +46,30 @@ The `/config/config.json` file allows you to customise the look and feel of your
 For example, setting `"NAVBAR_TITLE": "Custom title"` and `"NAVBAR_BG": "bg-primary",` would result in:
 <img width="1314" src="https://user-images.githubusercontent.com/51025241/145480528-408dff64-1742-41ea-baac-89bb5458d406.png">
 <img width="500" src="https://user-images.githubusercontent.com/51025241/145609351-631db009-ac04-47c9-ae82-0d76af0362d2.png">
+
+## Multiple Configs
+The `/directories.json` file allows you to add a list of different config files.
+- Each `config.json` file needs to be in its own `/config` directory. The database file will be generated and saved in the same folder.
+- Example: `/config/config.json` is the default config. We'll add `/coolconfig02/config.json` and `/coolerconfig03/config.json`. Following that we'll need to copy `directories.example.json` to `directories.json` and edit its contents to match the 2 new config directories we've made. The file should look like this:
+```
+[
+  {
+    "name":"Config",
+    "directory":"config"
+  },
+  {
+    "name":"My Cool Config",
+    "directory":"coolconfig02"
+  },
+  {
+    "name":"Cooler Config",
+    "directory":"coolerconfig03"
+  }
+]
+```
+- It is only from the main page of the futuresboard that you'll be able to switch between configurations.
+- Use with caution, there might be some scraper related bugs, this feature isn't yet fully tested.
+
 ## Screenshots
 <img width="600" alt="dashboard" src="https://user-images.githubusercontent.com/51025241/147236951-c87d1b2e-9eee-49bb-bc44-1769b9756f45.png">
 <img width="600" alt="calendar" src="https://user-images.githubusercontent.com/51025241/147236947-426ee144-fe30-4041-93b0-36a3073a9233.png">
