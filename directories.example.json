@@ -1,0 +1,10 @@
+[
+  {
+    "name":"Config",
+    "directory":"config"
+  },
+  {
+    "name":"2nd Condig",
+    "directory":"config02"
+  }
+]
