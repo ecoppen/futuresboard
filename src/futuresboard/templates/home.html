@@ -14,8 +14,27 @@
                 </form>
             </div>
           <a type="button" class="btn btn-sm btn-outline-secondary" href="https://www.binance.com/en/futures/{{ coin }}" target="_blank">
-            <i class="fas fa-external-link-alt"></i> View on Binance 
+            <i class="fas fa-external-link-alt"></i> View on Binance
           </a>
+
+        </div>
+        <div>
+
+          <form method='post'>
+            <select name="directory" class="form-select" id="directories" aria-label="Default select example" onchange="this.form.submit()" >
+
+                    <option  disabled selected value>Select directory</option>
+
+                    {% for key in directories %}
+                        <option  value="{{key['directory']}}">{{key['name']}}</option>
+
+                    {% endfor %}
+
+
+
+
+        </select>
+          </form>
         </div>
     </div>
     <div class="row">
@@ -122,7 +141,7 @@
         </div>
     </div>
 
-<script>    
+<script>
     $('input[name="daterange"]').daterangepicker({
         "showDropdowns": true,
         "autoApply": true,
@@ -173,11 +192,11 @@
         "endDate": "{{enddate}}",
         "opens": "left"
     });
-    
+
     $('input[name="daterange"]').on('apply.daterangepicker', (e, picker) => {
       document.forms["daterangeform"].submit();
     });
-    
+
 Chart.register(ChartDataLabels);
 const data = {
   labels: {{ data[1][0] | safe }},
@@ -196,7 +215,7 @@ const config = {
   options: {
       onClick: graphClickEvent,
       indexAxis: 'y',
-      plugins:{   
+      plugins:{
           legend: {
               display: false
         },
@@ -210,7 +229,7 @@ const config = {
 	  }
   }
 };
-    
+
 function graphClickEvent(event, array){
     if(array[0]){
         const value = data.labels[array[0].index];
@@ -222,7 +241,7 @@ var myChart = new Chart(
     document.getElementById('barChart'),
     config
 );
-    
+
 const data2 = {
   labels: {{ data[0][1] | safe }},
   datasets: [
@@ -247,7 +266,7 @@ const data2 = {
               title: null
             }
         }
-	  },	  
+	  },
   ]
 };
 const config2 = {
@@ -291,10 +310,11 @@ const config2 = {
 		}
 	}
 };
-    
+
 var myChart = new Chart(
     document.getElementById('lineChart'),
     config2
 );
 </script>
+
 {% endblock %}

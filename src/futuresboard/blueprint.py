@@ -6,18 +6,21 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 from typing import Any
-
+import pathlib
 import requests
 from flask import Blueprint
+from flask import Flask
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask.helpers import url_for
 from flask import current_app
 from typing_extensions import TypedDict
-
+from futuresboard.config import Config
+import futuresboard.app
 from futuresboard import db
-
+import subprocess
+import json
 app = Blueprint("main", __name__)
 
 
@@ -170,7 +173,7 @@ def get_coins():
         if symbol[0] not in active_symbols:
             coins["inactive"].append(symbol[0])
             coins["totals"]["inactive"] += 1
-    
+
     coins["totals"]["pbr_long"] = format_dp(coins["totals"]["pbr_long"])
     coins["totals"]["pbr_short"] = format_dp(coins["totals"]["pbr_short"])
     return coins
@@ -212,8 +215,27 @@ def timeranges():
     ]
 
 
-@app.route("/", methods=["GET"])
+@app.route("/", methods=["GET","POST"])
 def index_page():
+    diro = pathlib.Path.cwd()
+    cwd = diro / 'directories.json'
+    directories = []
+    with open(cwd,'r') as f:
+        directories = json.load(f)
+
+    if request.method == 'POST':
+
+        select = request.form.get('directory')
+
+        director = pathlib.Path.cwd() / select
+        config = Config.from_config_dir(director)
+
+        for key,val in json.loads(config.json()).items():
+            if key == 'CONFIG_DIR':
+                print(val)
+            current_app.config[key] = val
+        futuresboard.app.init_app(config)
+
     daterange = request.args.get("daterange")
     ranges = timeranges()
 
@@ -384,6 +406,7 @@ def index_page():
         enddate=enddate,
         timeranges=ranges,
         custom=current_app.config["CUSTOM"],
+        directories=directories,
     )
 
 
