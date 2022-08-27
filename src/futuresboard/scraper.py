@@ -326,18 +326,34 @@ def _scrape(app=None):
 
         if not overweight:
             with create_connection(current_app.config["DATABASE"]) as conn:
+                totalWalletBalance = float(responseJSON["totalWalletBalance"])
+                totalUnrealizedProfit = float(responseJSON["totalUnrealizedProfit"])
+                totalMarginBalance = float(responseJSON["totalMarginBalance"])
+                availableBalance = float(responseJSON["availableBalance"])
+                maxWithdrawAmount = float(responseJSON["maxWithdrawAmount"])
+                if "assets" in responseJSON:
+                    for data in responseJSON["assets"]:
+                        if data["asset"] not in ("USDT", "BUSD"):
+                            continue
+                        print(data)
+                        totalWalletBalance += float(data["walletBalance"])
+                        totalUnrealizedProfit += float(data["unrealizedProfit"])
+                        totalMarginBalance += float(data["marginBalance"])
+                        availableBalance += float(data["availableBalance"])
+                        maxWithdrawAmount += float(data["maxWithdrawAmount"])
                 totals_row = (
-                    float(responseJSON["totalWalletBalance"]),
-                    float(responseJSON["totalUnrealizedProfit"]),
-                    float(responseJSON["totalMarginBalance"]),
-                    float(responseJSON["availableBalance"]),
-                    float(responseJSON["maxWithdrawAmount"]),
+                    totalWalletBalance,
+                    totalUnrealizedProfit,
+                    totalMarginBalance,
+                    availableBalance,
+                    maxWithdrawAmount,
                     1,
                 )
+                print(totals_row)
                 accountCheck = select_account(conn)
                 if accountCheck is None:
                     create_account(conn, totals_row)
-                elif float(accountCheck[0]) != float(responseJSON["totalWalletBalance"]):
+                elif float(accountCheck[0]) != totalWalletBalance:
                     update_account(conn, totals_row)
 
                 delete_all_positions(conn)

@@ -343,7 +343,7 @@ def index_page():
         remove_incomeTypes + [start, end],
     )
 
-    fees = {"USDT": 0, "BNB": 0, "BUSD": 0, "BUSD": 0}
+    fees = {"USDT": 0, "BNB": 0, "BUSD": 0}
 
     balance = float(balance[0])
 
@@ -519,7 +519,7 @@ def dashboard_page(start, end):
         remove_incomeTypes + [start, end],
     )
 
-    fees = {"USDT": 0, "BNB": 0, "BUSD": 0, "BUSD": 0}
+    fees = {"USDT": 0, "BNB": 0, "BUSD": 0}
 
     balance = float(balance[0])
 
