@@ -7,10 +7,10 @@ import hmac
 import sqlite3
 import threading
 import time
+from collections import OrderedDict
 from datetime import timedelta
 from sqlite3 import Error
 from urllib.parse import urlencode
-from collections import OrderedDict
 
 import requests
 from flask import current_app
@@ -222,17 +222,23 @@ def update_position(conn, position):
     cur = conn.cursor()
     cur.execute(sql, position)
 
-    
+
 def delete_all_positions(conn):
     sql = """ DELETE FROM positions """
     cur = conn.cursor()
     cur.execute(sql)
     conn.commit()
-    
+
 
 def select_position(conn, symbol):
     cur = conn.cursor()
-    cur.execute("SELECT unrealizedProfit FROM positions WHERE symbol = ? AND positionSide = ? LIMIT 0, 1", (symbol[0], symbol[1], ))
+    cur.execute(
+        "SELECT unrealizedProfit FROM positions WHERE symbol = ? AND positionSide = ? LIMIT 0, 1",
+        (
+            symbol[0],
+            symbol[1],
+        ),
+    )
     return cur.fetchone()
 
 
@@ -333,9 +339,9 @@ def _scrape(app=None):
                     create_account(conn, totals_row)
                 elif float(accountCheck[0]) != float(responseJSON["totalWalletBalance"]):
                     update_account(conn, totals_row)
-                    
+
                 delete_all_positions(conn)
-                
+
                 for position in positions:
                     position_row = (
                         float(position["unrealizedProfit"]),
@@ -411,7 +417,7 @@ def _scrape(app=None):
         with create_connection(current_app.config["DATABASE"]) as conn:
             delete_all_orders(conn)
             delete_all_positions(conn)
-            
+
             for position in responseJSON["result"]:
                 if weightused < 10:
                     print(
@@ -422,13 +428,13 @@ def _scrape(app=None):
 
                 if position["data"]["symbol"] not in all_symbols:
                     all_symbols.append(position["data"]["symbol"])
-                    
+
                 if position["data"]["size"] > 0:
                     if position["data"]["side"].lower() == "buy":
                         positionside = "LONG"
                     else:
                         positionside = "SHORT"
-                    
+
                     position_row = (
                         float(position["data"]["unrealised_pnl"]),
                         int(position["data"]["leverage"]),
@@ -476,27 +482,30 @@ def _scrape(app=None):
                         )
                         create_orders(conn, row)
 
-            params = {"api_key": current_app.config["API_KEY"], "coin": "USDT"}
-            responseHeader, responseJSON = send_signed_request(
-                "GET", "/v2/private/wallet/balance", params, signature="sign"
-            )
+            for coin in ("USDT", "BUSD"):
+                params = {"api_key": current_app.config["API_KEY"], "coin": coin}
+                responseHeader, responseJSON = send_signed_request(
+                    "GET", "/v2/private/wallet/balance", params, signature="sign"
+                )
 
-            totals_row = (
-                float(responseJSON["result"]["USDT"]["wallet_balance"]),
-                float(responseJSON["result"]["USDT"]["unrealised_pnl"]),
-                float(responseJSON["result"]["USDT"]["used_margin"]),
-                float(responseJSON["result"]["USDT"]["available_balance"]),
-                float(0),
-                1,
-            )
+                totals_row = (
+                    float(responseJSON["result"][coin]["wallet_balance"]),
+                    float(responseJSON["result"][coin]["unrealised_pnl"]),
+                    float(responseJSON["result"][coin]["used_margin"]),
+                    float(responseJSON["result"][coin]["available_balance"]),
+                    float(0),
+                    1,
+                )
 
-            accountCheck = select_account(conn)
-            if accountCheck is None:
-                create_account(conn, totals_row)
-            elif float(accountCheck[0]) != float(responseJSON["result"]["USDT"]["wallet_balance"]):
-                update_account(conn, totals_row)
+                accountCheck = select_account(conn)
+                if accountCheck is None:
+                    create_account(conn, totals_row)
+                elif float(accountCheck[0]) != float(
+                    responseJSON["result"][coin]["wallet_balance"]
+                ):
+                    update_account(conn, totals_row)
 
-            conn.commit()
+                conn.commit()
 
         all_symbols = sorted(all_symbols)
 
@@ -546,12 +555,16 @@ def _scrape(app=None):
                 trades = OrderedDict(sorted(trades.items()))
                 with create_connection(current_app.config["DATABASE"]) as conn:
                     for trade in trades:
+                        if symbol.endswith("USDT"):
+                            coin = "USDT"
+                        else:
+                            coin = "BUSD"
                         income_row = (
                             int(trades[trade][0]),
                             symbol,
                             exec_type[trades[trade][1]],
                             trades[trade][2],
-                            "USDT",
+                            coin,
                             exec_type[trades[trade][1]],
                             int(trade * 1000),
                             int(trades[trade][0]),
