@@ -1,5 +1,6 @@
 {
     "EXCHANGE": "binance",
+    "TEST_MODE": false,
     "API_KEY": "",
     "API_SECRET": "",
     "AUTO_SCRAPE_INTERVAL": 300,

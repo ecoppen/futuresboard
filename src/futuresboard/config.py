@@ -55,6 +55,7 @@ class Config(BaseModel):
     CONFIG_DIR: DirectoryPath = pathlib.Path.cwd()
     DATABASE: Optional[pathlib.Path]
     EXCHANGE: Optional[Exchanges] = Exchanges.BINANCE
+    TEST_MODE: Optional[bool] = False
     API_BASE_URL: Optional[str]
     AUTO_SCRAPE_INTERVAL: int = 300
     DISABLE_AUTO_SCRAPE: bool = False
@@ -77,9 +78,15 @@ class Config(BaseModel):
     def _validate_api_base_url(cls, value, values):
         if not value:
             if values["EXCHANGE"] == Exchanges.BINANCE:
-                value = "https://fapi.binance.com"
+                if values["TEST_MODE"]:
+                    value = "https://testnet.binancefuture.com"
+                else:
+                    value = "https://fapi.binance.com"
             elif values["EXCHANGE"] == Exchanges.BYBIT:
-                value = "https://api.bybit.com"
+                if values["TEST_MODE"]:
+                    value = "https://api-testnet.bybit.com"
+                else:
+                    value = "https://api.bybit.com"
         return value
 
     @validator("AUTO_SCRAPE_INTERVAL")
