@@ -272,7 +272,7 @@ def create_orders(conn, orders):
 def scrape(app=None):
     try:
         _scrape(app=app)
-    except (HTTPRequestError, TypeError) as exc:
+    except (HTTPRequestError, TypeError, KeyError) as exc:
         if app is None:
             print(exc)
         else:
