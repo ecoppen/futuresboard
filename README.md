@@ -1,4 +1,6 @@
 # futuresboard
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fecoppen%2Ffuturesboard.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fecoppen%2Ffuturesboard?ref=badge_shield)
+
 A python (3.7+) based scraper and dashboard to monitor the performance of your Binance or Bybit Futures account.<br>
 <sub>Note: A local sqlite3 database `config/futures.db` will be created and automatically updated by the scraper every 5 minutes.</sub>
 
@@ -59,3 +61,7 @@ For example, setting `"NAVBAR_TITLE": "Custom title"` and `"NAVBAR_BG": "bg-prim
 
 - https://github.com/hoeckxer/exchanges_dashboard
 - https://github.com/SH-Stark/trading-dashboard
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fecoppen%2Ffuturesboard.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fecoppen%2Ffuturesboard?ref=badge_large)
