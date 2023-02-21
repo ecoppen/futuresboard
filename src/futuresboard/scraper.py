@@ -272,7 +272,7 @@ def create_orders(conn, orders):
 def scrape(app=None):
     try:
         _scrape(app=app)
-    except HTTPRequestError as exc:
+    except (HTTPRequestError, TypeError, KeyError) as exc:
         if app is None:
             print(exc)
         else:
@@ -526,20 +526,31 @@ def _scrape(app=None):
                 if "rate_limit_status" in responseJSON:
                     weightused = int(responseJSON["rate_limit_status"])
 
-                if responseJSON["result"] is not None:
-                    if responseJSON["result"]["data"] is not None:
-                        for trade in responseJSON["result"]["data"]:
-                            trades[trade["created_at"]] = [
-                                trade["id"],
-                                trade["exec_type"],
-                                trade["closed_pnl"],
-                                trade["order_id"],
-                            ]
-                        if len(responseJSON["result"]["data"]) < 50:
+                if "result" in responseJSON:
+                    if responseJSON["result"] is not None:
+                        if "data" in responseJSON["result"]:
+                            if responseJSON["result"]["data"] is not None:
+                                for trade in responseJSON["result"]["data"]:
+                                    trades[trade["created_at"]] = [
+                                        trade["id"],
+                                        trade["exec_type"],
+                                        trade["closed_pnl"],
+                                        trade["order_id"],
+                                    ]
+                                if len(responseJSON["result"]["data"]) < 50:
+                                    app.logger.info("Stop looping pages as data in current page < 50")
+                                    break
+                            else:
+                                app.logger.warning("'data' not found in responseJSON['result']")
+                                break
+                        else:
+                            app.logger.warning("'data' not found in responseJSON['result']")
                             break
                     else:
+                        app.logger.warning("'result' is None")
                         break
                 else:
+                    app.logger.warning("'result' not found in responseJSON")
                     break
 
             if len(trades) > 0:
