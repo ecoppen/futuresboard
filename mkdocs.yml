@@ -1,0 +1,27 @@
+site_name: futuresboard
+extra:
+  homepage: https://ecoppen.github.io/futuresboard
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+repo_url: https://github.com/ecoppen/futuresboard
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/git-alt
+  features:
+    - navigation.tabs
+    - navigation.top
+    - toc.integrate
+  palette:
+    - scheme: default
+      primary: black
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: black
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
