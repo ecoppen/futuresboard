@@ -1,4 +1,3 @@
-# https://github.com/binance/binance-signature-examples
 from __future__ import annotations
 
 import datetime
@@ -7,12 +6,12 @@ import hmac
 import sqlite3
 import threading
 import time
+from collections import OrderedDict
 from datetime import timedelta
 from sqlite3 import Error
 from urllib.parse import urlencode
-from collections import OrderedDict
 
-import requests
+import requests  # type: ignore
 from flask import current_app
 
 
@@ -41,7 +40,9 @@ def _auto_scrape(app):
         while True:
             app.logger.info("Auto scrape routines starting")
             scrape(app=app)
-            app.logger.info("Auto scrape routines terminated. Sleeping %s seconds...", interval)
+            app.logger.info(
+                f"Auto scrape routines terminated. Sleeping {interval} seconds...",
+            )
             time.sleep(interval)
 
 
@@ -77,7 +78,9 @@ def dispatch_request(http_method):
 def send_signed_request(http_method, url_path, payload={}, signature="signature"):
     payload["timestamp"] = get_timestamp()
     query_string = urlencode(OrderedDict(sorted(payload.items())))
-    query_string = query_string.replace("%27", "%22")  # replace single quote to double quote
+    query_string = query_string.replace(
+        "%27", "%22"
+    )  # replace single quote to double quote
 
     url = (
         current_app.config["API_BASE_URL"]
@@ -97,10 +100,12 @@ def send_signed_request(http_method, url_path, payload={}, signature="signature"
         headers = response.headers
         json_response = response.json()
         if "code" in json_response:
-            raise HTTPRequestError(url=url, code=json_response["code"], msg=json_response["msg"])
+            raise HTTPRequestError(
+                url=url, code=json_response["code"], msg=json_response["msg"]
+            )
         return headers, json_response
     except requests.exceptions.ConnectionError as e:
-        raise HTTPRequestError(url=url, code=-1, msg=str(e))
+        raise HTTPRequestError(url=url, code=-1, msg=f"{e}")
 
 
 # used for sending public data request
@@ -115,10 +120,12 @@ def send_public_request(url_path, payload={}):
         headers = response.headers
         json_response = response.json()
         if "code" in json_response:
-            raise HTTPRequestError(url=url, code=json_response["code"], msg=json_response["msg"])
+            raise HTTPRequestError(
+                url=url, code=json_response["code"], msg=json_response["msg"]
+            )
         return headers, json_response
     except requests.exceptions.ConnectionError as e:
-        raise HTTPRequestError(url=url, code=-2, msg=str(e))
+        raise HTTPRequestError(url=url, code=-2, msg=f"{e}")
 
 
 def create_connection(db_file):
@@ -212,7 +219,10 @@ def select_latest_income(conn):
 
 def select_latest_income_symbol(conn, symbol):
     cur = conn.cursor()
-    cur.execute("SELECT time FROM income WHERE symbol = ? ORDER BY time DESC LIMIT 0, 1", (symbol,))
+    cur.execute(
+        "SELECT time FROM income WHERE symbol = ? ORDER BY time DESC LIMIT 0, 1",
+        (symbol,),
+    )
     return cur.fetchone()
 
 
@@ -228,17 +238,23 @@ def update_position(conn, position):
     cur = conn.cursor()
     cur.execute(sql, position)
 
-    
+
 def delete_all_positions(conn):
     sql = """ DELETE FROM positions """
     cur = conn.cursor()
     cur.execute(sql)
     conn.commit()
-    
+
 
 def select_position(conn, symbol):
     cur = conn.cursor()
-    cur.execute("SELECT unrealizedProfit FROM positions WHERE symbol = ? AND positionSide = ? LIMIT 0, 1", (symbol[0], symbol[1], ))
+    cur.execute(
+        "SELECT unrealizedProfit FROM positions WHERE symbol = ? AND positionSide = ? LIMIT 0, 1",
+        (
+            symbol[0],
+            symbol[1],
+        ),
+    )
     return cur.fetchone()
 
 
@@ -282,9 +298,10 @@ def scrape(app=None):
         if app is None:
             print(exc)
         else:
-            app.logger.error(str(exc))
+            app.logger.error(f"{exc}")
 
 
+# flake8: noqa: C901
 def _scrape(app=None):
     start = time.time()
     db_setup(current_app.config["DATABASE"])
@@ -295,7 +312,9 @@ def _scrape(app=None):
 
     if current_app.config["EXCHANGE"].lower() == "binance":
         if weightused < 800:
-            responseHeader, responseJSON = send_signed_request("GET", "/fapi/v1/openOrders")
+            responseHeader, responseJSON = send_signed_request(
+                "GET", "/fapi/v1/openOrders"
+            )
             weightused = int(responseHeader["X-MBX-USED-WEIGHT-1M"])
 
             with create_connection(current_app.config["DATABASE"]) as conn:
@@ -337,11 +356,13 @@ def _scrape(app=None):
                 accountCheck = select_account(conn)
                 if accountCheck is None:
                     create_account(conn, totals_row)
-                elif float(accountCheck[0]) != float(responseJSON["totalWalletBalance"]):
+                elif float(accountCheck[0]) != float(
+                    responseJSON["totalWalletBalance"]
+                ):
                     update_account(conn, totals_row)
-                    
+
                 delete_all_positions(conn)
-                
+
                 for position in positions:
                     position_row = (
                         float(position["unrealizedProfit"]),
@@ -359,7 +380,9 @@ def _scrape(app=None):
 
         while not up_to_date:
             if weightused > 800:
-                print(f"Weight used: {weightused}/800\nProcessed: {processed}\nSleep: 1 minute")
+                print(
+                    f"Weight used: {weightused}/800\nProcessed: {processed}\nSleep: 1 minute"
+                )
                 sleeps += 1
                 time.sleep(60)
 
@@ -367,7 +390,9 @@ def _scrape(app=None):
                 startTime = select_latest_income(conn)
                 if startTime is None:
                     startTime = int(
-                        datetime.datetime.fromisoformat("2020-01-01 00:00:00+00:00").timestamp()
+                        datetime.datetime.fromisoformat(
+                            "2020-01-01 00:00:00+00:00"
+                        ).timestamp()
                         * 1000
                     )
                 else:
@@ -375,7 +400,9 @@ def _scrape(app=None):
 
                 params = {"startTime": startTime + 1, "limit": 1000}
 
-                responseHeader, responseJSON = send_signed_request("GET", "/fapi/v1/income", params)
+                responseHeader, responseJSON = send_signed_request(
+                    "GET", "/fapi/v1/income", params
+                )
                 weightused = int(responseHeader["X-MBX-USED-WEIGHT-1M"])
 
                 if len(responseJSON) == 0:
@@ -432,10 +459,8 @@ def _scrape(app=None):
                         all_symbols.append(position["data"]["symbol"])
 
                     if position["data"]["size"] > 0:
-                        if position["data"]["side"].lower() == "buy":
-                            positionside = "LONG"
-                        else:
-                            positionside = "SHORT"
+                        position_sides = {"buy": "LONG", "sell": "SHORT"}
+                        positionside = position_sides[position["data"]["side"].lower()]
 
                         position_row = (
                             float(position["data"]["unrealised_pnl"]),
@@ -454,19 +479,18 @@ def _scrape(app=None):
                             "api_key": current_app.config["API_KEY"],
                         }
                         responseHeader, responseJSON = send_signed_request(
-                            "GET", "/private/linear/order/search", params, signature="sign"
+                            "GET",
+                            "/private/linear/order/search",
+                            params,
+                            signature="sign",
                         )
                         if "rate_limit_status" in responseJSON:
                             weightused = int(responseJSON["rate_limit_status"])
 
                         for order in responseJSON["result"]:
-
                             updated_orders += 1
 
-                            if order["side"].lower() == "buy":
-                                orderside = "BUY"
-                            else:
-                                orderside = "SELL"
+                            orderside = order["side"].upper()
 
                             time_format = datetime.datetime.strptime(
                                 order["created_time"], "%Y-%m-%dT%H:%M:%SZ"
@@ -503,7 +527,9 @@ def _scrape(app=None):
             accountCheck = select_account(conn)
             if accountCheck is None:
                 create_account(conn, totals_row)
-            elif float(accountCheck[0]) != float(responseJSON["result"]["USDT"]["wallet_balance"]):
+            elif float(accountCheck[0]) != float(
+                responseJSON["result"]["USDT"]["wallet_balance"]
+            ):
                 update_account(conn, totals_row)
 
             conn.commit()
@@ -512,12 +538,18 @@ def _scrape(app=None):
 
         for symbol in all_symbols:
             trades = {}
-            params = {"api_key": current_app.config["API_KEY"], "symbol": symbol, "limit": 50}
+            params = {
+                "api_key": current_app.config["API_KEY"],
+                "symbol": symbol,
+                "limit": 50,
+            }
             with create_connection(current_app.config["DATABASE"]) as conn:
                 startTime = select_latest_income_symbol(conn, symbol)
                 if startTime is None:
                     startTime = int(
-                        datetime.datetime.fromisoformat("2020-01-01 00:00:00+00:00").timestamp()
+                        datetime.datetime.fromisoformat(
+                            "2020-01-01 00:00:00+00:00"
+                        ).timestamp()
                     )
                     params["start_time"] = startTime
                 else:
@@ -526,12 +558,17 @@ def _scrape(app=None):
 
             for page in range(1, 50):
                 if weightused < 20:
-                    print(f"Weight used: {weightused}/100\nProcessed: {processed}\nSleep: 1 minute")
+                    print(
+                        f"Weight used: {weightused}/100\nProcessed: {processed}\nSleep: 1 minute"
+                    )
                     sleeps += 1
                     time.sleep(60)
                 params["page"] = page
                 responseHeader, responseJSON = send_signed_request(
-                    "GET", "/private/linear/trade/closed-pnl/list", params, signature="sign"
+                    "GET",
+                    "/private/linear/trade/closed-pnl/list",
+                    params,
+                    signature="sign",
                 )
                 if "rate_limit_status" in responseJSON:
                     weightused = int(responseJSON["rate_limit_status"])
@@ -548,13 +585,19 @@ def _scrape(app=None):
                                         trade["order_id"],
                                     ]
                                 if len(responseJSON["result"]["data"]) < 50:
-                                    app.logger.info("Stop looping pages as data in current page < 50")
+                                    app.logger.info(
+                                        "Stop looping pages as data in current page < 50"
+                                    )
                                     break
                             else:
-                                app.logger.warning("'data' not found in responseJSON['result']")
+                                app.logger.warning(
+                                    "'data' not found in responseJSON['result']"
+                                )
                                 break
                         else:
-                            app.logger.warning("'data' not found in responseJSON['result']")
+                            app.logger.warning(
+                                "'data' not found in responseJSON['result']"
+                            )
                             break
                     else:
                         app.logger.warning("'result' is None")
@@ -583,28 +626,15 @@ def _scrape(app=None):
                     conn.commit()
     else:
         current_app.logger.info(
-            "Exchange; %s is not currently supported", current_app.config["EXCHANGE"]
+            f"Exchange: {current_app.config['EXCHANGE']} is not currently supported"
         )
 
     elapsed = time.time() - start
     if app is not None:
         current_app.logger.info(
-            "Orders updated: %s; Positions updated: %s (new: %s); Trades processed: %s; Time elapsed: %s; Sleeps: %s",
-            updated_orders,
-            updated_positions,
-            new_positions,
-            processed,
-            timedelta(seconds=elapsed),
-            sleeps,
+            f"Orders updated: {updated_orders}; Positions updated: {updated_positions} (new: {new_positions}); Trades processed: {processed}; Time elapsed: {timedelta(seconds=elapsed)}; Sleeps: {sleeps}",
         )
     else:
         print(
-            "Orders updated: {}\nPositions updated: {} (new: {})\nTrades processed: {}\nTime elapsed: {}\nSleeps: {}".format(
-                updated_orders,
-                updated_positions,
-                new_positions,
-                processed,
-                timedelta(seconds=elapsed),
-                sleeps,
-            )
+            f"Orders updated: {updated_orders}\nPositions updated: {updated_positions} (new: {new_positions})\nTrades processed: {processed}\nTime elapsed: {timedelta(seconds=elapsed)}\nSleeps: {sleeps}"
         )

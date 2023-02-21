@@ -40,11 +40,11 @@
                             <td>{{ positions[coin][2][0]}}</td>
                             <td>{{ positions[coin][2][4]}}</td>
                             <td>{{ positions[coin][2][5]}}</td>
-                            <td>{% if positions[coin][2][4] != "-" %}{{ ((positions[coin][2][5]|int/markprices[coin])*100)|round(2)}}% {% endif %}</td>
+                            <td>{% if positions[coin][2][4] != "-" %}{{ ((positions[coin][2][5]|float/markprices[coin])*100)|round(2)}}% {% endif %}</td>
                             <td>{{ positions[coin][2][1]}}</td>
                             <td>{{ positions[coin][2][6]}}</td>
                             <td>{{ positions[coin][2][7]}}</td>
-                            <td>{% if positions[coin][2][6] != "-" %}{{ ((positions[coin][2][7]|int/markprices[coin])*100)|round(2)}}% {% endif %}</td>
+                            <td>{% if positions[coin][2][6] != "-" %}{{ ((positions[coin][2][7]|float/markprices[coin])*100)|round(2)}}% {% endif %}</td>
                         </tr>
                     {% if positions[coin][0]|length > 1 %}
                         <tr>
@@ -58,11 +58,11 @@
                             <td>{{ positions[coin][2][2]}}</td>
                             <td>{{ positions[coin][2][8]}}</td>
                             <td>{{ positions[coin][2][9]}}</td>
-                            <td>{% if positions[coin][2][8] != "-" %}{{ ((positions[coin][2][9]|int/markprices[coin])*100)|round(2)}}% {% endif %}</td>
+                            <td>{% if positions[coin][2][8] != "-" %}{{ ((positions[coin][2][9]|float/markprices[coin])*100)|round(2)}}% {% endif %}</td>
                             <td>{{ positions[coin][2][3]}}</td>
                             <td>{{ positions[coin][2][10]}}</td>
                             <td>{{ positions[coin][2][11]}}</td>
-                            <td>{% if positions[coin][2][10] != "-" %}{{ ((positions[coin][2][11]|int/markprices[coin])*100)|round(2)}}% {% endif %}</td>
+                            <td>{% if positions[coin][2][10] != "-" %}{{ ((positions[coin][2][11]|float/markprices[coin])*100)|round(2)}}% {% endif %}</td>
                         </tr>
                     {% endif %}
                     {% endfor %}

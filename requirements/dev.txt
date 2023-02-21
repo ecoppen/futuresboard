@@ -1,7 +1,14 @@
 -r base.txt
+bandit
+black
+codecov
 flake8>=4.0.1
 flake8-mypy-fork
 flake8-typing-imports
+isort
+mkdocs-material
 mypy>=0.910
 pre-commit>=2.4.0
+pytest
+pytest-cov
 types-setuptools

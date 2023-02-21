@@ -1,0 +1,27 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "*"
+requests = "*"
+pydantic = "*"
+
+[dev-packages]
+bandit = "*"
+black = "*"
+codecov = "*"
+flake8 = "*"
+flake8-mypy-fork = "*"
+flake8-typing-imports = "*"
+isort = "*"
+mkdocs-material = "*"
+mypy = "*"
+pre-commit = "*"
+pytest = "*"
+pytest-cov = "*"
+
+[requires]
+python_version = "3.11"
+python_full_version = "3.11.0"

@@ -9,8 +9,7 @@ try:
 except ImportError:  # pragma: no cover
     __version__ = "0.0.0.not-installed"
     try:
-        from importlib.metadata import version  # type: ignore [attr-defined]
-        from importlib.metadata import PackageNotFoundError  # type: ignore [attr-defined]
+        from importlib.metadata import PackageNotFoundError, version
 
         try:
             __version__ = version("futuresboard")
@@ -19,8 +18,10 @@ except ImportError:  # pragma: no cover
             pass
     except ImportError:
         try:
-            from pkg_resources import get_distribution
-            from pkg_resources import DistributionNotFound
+            from pkg_resources import (  # type: ignore
+                DistributionNotFound,
+                get_distribution,
+            )
 
             try:
                 __version__ = get_distribution("futuresboard").version
