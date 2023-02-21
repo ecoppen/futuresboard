@@ -92,12 +92,15 @@ def send_signed_request(http_method, url_path, payload={}, signature="signature"
 
     # print("{} {}".format(http_method, url))
     params = {"url": url, "params": {}}
-    response = dispatch_request(http_method)(**params)
-    headers = response.headers
-    json_response = response.json()
-    if "code" in json_response:
-        raise HTTPRequestError(url=url, code=json_response["code"], msg=json_response["msg"])
-    return headers, json_response
+    try:
+        response = dispatch_request(http_method)(**params)
+        headers = response.headers
+        json_response = response.json()
+        if "code" in json_response:
+            raise HTTPRequestError(url=url, code=json_response["code"], msg=json_response["msg"])
+        return headers, json_response
+    except requests.exceptions.ConnectionError as e:
+        raise HTTPRequestError(url=url, code=-1, msg=str(e))
 
 
 # used for sending public data request
@@ -107,12 +110,15 @@ def send_public_request(url_path, payload={}):
     if query_string:
         url = url + "?" + query_string
     # print("{}".format(url))
-    response = dispatch_request("GET")(url=url)
-    headers = response.headers
-    json_response = response.json()
-    if "code" in json_response:
-        raise HTTPRequestError(url=url, code=json_response["code"], msg=json_response["msg"])
-    return headers, json_response
+    try:
+        response = dispatch_request("GET")(url=url)
+        headers = response.headers
+        json_response = response.json()
+        if "code" in json_response:
+            raise HTTPRequestError(url=url, code=json_response["code"], msg=json_response["msg"])
+        return headers, json_response
+    except requests.exceptions.ConnectionError as e:
+        raise HTTPRequestError(url=url, code=-2, msg=str(e))
 
 
 def create_connection(db_file):
