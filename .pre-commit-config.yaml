@@ -39,6 +39,7 @@ repos:
       additional_dependencies:
         - 'sqlalchemy[mypy]'
         - 'types-freezegun'
+        - 'pydantic'
 
 
 - repo: https://github.com/PyCQA/flake8
