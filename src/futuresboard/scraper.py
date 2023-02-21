@@ -415,72 +415,76 @@ def _scrape(app=None):
             weightused = int(responseJSON["rate_limit_status"])
 
         with create_connection(current_app.config["DATABASE"]) as conn:
+            app.logger.info("Deleting orders and positions from db")
             delete_all_orders(conn)
             delete_all_positions(conn)
-            
-            for position in responseJSON["result"]:
-                if weightused < 10:
-                    print(
-                        f"Weight used: {weightused}/{120-weightused}\nProcessed: {updated_positions + new_positions + updated_orders}\nSleep: 1 minute"
-                    )
-                    sleeps += 1
-                    time.sleep(60)
+            app.logger.info("Loading orders and positions from exchange")
+            if "result" in responseJSON:
+                for position in responseJSON["result"]:
+                    if weightused < 10:
+                        print(
+                            f"Weight used: {weightused}/{120-weightused}\nProcessed: {updated_positions + new_positions + updated_orders}\nSleep: 1 minute"
+                        )
+                        sleeps += 1
+                        time.sleep(60)
 
-                if position["data"]["symbol"] not in all_symbols:
-                    all_symbols.append(position["data"]["symbol"])
-                    
-                if position["data"]["size"] > 0:
-                    if position["data"]["side"].lower() == "buy":
-                        positionside = "LONG"
-                    else:
-                        positionside = "SHORT"
-                    
-                    position_row = (
-                        float(position["data"]["unrealised_pnl"]),
-                        int(position["data"]["leverage"]),
-                        float(position["data"]["entry_price"]),
-                        float(position["data"]["size"]),
-                        position["data"]["symbol"],
-                        positionside,
-                    )
+                    if position["data"]["symbol"] not in all_symbols:
+                        all_symbols.append(position["data"]["symbol"])
 
-                    create_position(conn, position_row)
-                    updated_positions += 1
-
-                    params = {
-                        "symbol": position["data"]["symbol"],
-                        "api_key": current_app.config["API_KEY"],
-                    }
-                    responseHeader, responseJSON = send_signed_request(
-                        "GET", "/private/linear/order/search", params, signature="sign"
-                    )
-                    if "rate_limit_status" in responseJSON:
-                        weightused = int(responseJSON["rate_limit_status"])
-
-                    for order in responseJSON["result"]:
-
-                        updated_orders += 1
-
-                        if order["side"].lower() == "buy":
-                            orderside = "BUY"
+                    if position["data"]["size"] > 0:
+                        if position["data"]["side"].lower() == "buy":
+                            positionside = "LONG"
                         else:
-                            orderside = "SELL"
+                            positionside = "SHORT"
 
-                        time_format = datetime.datetime.strptime(
-                            order["created_time"], "%Y-%m-%dT%H:%M:%SZ"
-                        )
-
-                        row = (
-                            float(order["qty"]),
-                            float(order["price"]),
-                            orderside,
+                        position_row = (
+                            float(position["data"]["unrealised_pnl"]),
+                            int(position["data"]["leverage"]),
+                            float(position["data"]["entry_price"]),
+                            float(position["data"]["size"]),
+                            position["data"]["symbol"],
                             positionside,
-                            order["order_status"],
-                            order["symbol"],
-                            int(time_format.timestamp() * 1000),
-                            order["order_type"],
                         )
-                        create_orders(conn, row)
+
+                        create_position(conn, position_row)
+                        updated_positions += 1
+
+                        params = {
+                            "symbol": position["data"]["symbol"],
+                            "api_key": current_app.config["API_KEY"],
+                        }
+                        responseHeader, responseJSON = send_signed_request(
+                            "GET", "/private/linear/order/search", params, signature="sign"
+                        )
+                        if "rate_limit_status" in responseJSON:
+                            weightused = int(responseJSON["rate_limit_status"])
+
+                        for order in responseJSON["result"]:
+
+                            updated_orders += 1
+
+                            if order["side"].lower() == "buy":
+                                orderside = "BUY"
+                            else:
+                                orderside = "SELL"
+
+                            time_format = datetime.datetime.strptime(
+                                order["created_time"], "%Y-%m-%dT%H:%M:%SZ"
+                            )
+
+                            row = (
+                                float(order["qty"]),
+                                float(order["price"]),
+                                orderside,
+                                positionside,
+                                order["order_status"],
+                                order["symbol"],
+                                int(time_format.timestamp() * 1000),
+                                order["order_type"],
+                            )
+                            create_orders(conn, row)
+            else:
+                app.logger.warning("'result' not in responseJSON")
 
             params = {"api_key": current_app.config["API_KEY"], "coin": "USDT"}
             responseHeader, responseJSON = send_signed_request(
