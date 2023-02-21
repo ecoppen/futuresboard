@@ -541,7 +541,8 @@ def _scrape(app=None):
             params = {
                 "api_key": current_app.config["API_KEY"],
                 "symbol": symbol,
-                "limit": 50,
+                "category": "linear",
+                "limit": 200,
             }
             with create_connection(current_app.config["DATABASE"]) as conn:
                 startTime = select_latest_income_symbol(conn, symbol)
@@ -563,10 +564,10 @@ def _scrape(app=None):
                     )
                     sleeps += 1
                     time.sleep(60)
-                params["page"] = page
+                params["cursor"] = f"{page}"
                 responseHeader, responseJSON = send_signed_request(
                     "GET",
-                    "/private/linear/trade/closed-pnl/list",
+                    "/v5/position/closed-pnl",
                     params,
                     signature="sign",
                 )
@@ -575,28 +576,28 @@ def _scrape(app=None):
 
                 if "result" in responseJSON:
                     if responseJSON["result"] is not None:
-                        if "data" in responseJSON["result"]:
-                            if responseJSON["result"]["data"] is not None:
-                                for trade in responseJSON["result"]["data"]:
-                                    trades[trade["created_at"]] = [
-                                        trade["id"],
-                                        trade["exec_type"],
-                                        trade["closed_pnl"],
-                                        trade["order_id"],
+                        if "list" in responseJSON["result"]:
+                            if responseJSON["result"]["list"] is not None:
+                                for trade in responseJSON["result"]["list"]:
+                                    trades[trade["createdTime"]] = [
+                                        trade["orderId"],
+                                        trade["execType"],
+                                        trade["closedPnl"],
+                                        trade["orderId"],
                                     ]
-                                if len(responseJSON["result"]["data"]) < 50:
+                                if len(responseJSON["result"]["list"]) < 50:
                                     app.logger.info(
                                         "Stop looping pages as data in current page < 50"
                                     )
                                     break
                             else:
                                 app.logger.warning(
-                                    "'data' not found in responseJSON['result']"
+                                    "responseJSON['result']['list'] is None"
                                 )
                                 break
                         else:
                             app.logger.warning(
-                                "'data' not found in responseJSON['result']"
+                                "'data' not found in responseJSON['result']['list']"
                             )
                             break
                     else:
