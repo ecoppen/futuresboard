@@ -538,14 +538,19 @@ def _scrape(app=None):
                                         trade["order_id"],
                                     ]
                                 if len(responseJSON["result"]["data"]) < 50:
+                                    app.logger.info("Stop looping pages as data in current page < 50")
                                     break
                             else:
+                                app.logger.warning("'data' not found in responseJSON['result']")
                                 break
                         else:
+                            app.logger.warning("'data' not found in responseJSON['result']")
                             break
                     else:
+                        app.logger.warning("'result' is None")
                         break
                 else:
+                    app.logger.warning("'result' not found in responseJSON")
                     break
 
             if len(trades) > 0:
