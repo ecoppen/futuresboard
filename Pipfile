@@ -21,8 +21,6 @@ mypy = "*"
 pre-commit = "*"
 pytest = "*"
 pytest-cov = "*"
-types-pkg-resources = "*"
-types-setuptools = "*"
 
 [requires]
 python_version = "3.11"
