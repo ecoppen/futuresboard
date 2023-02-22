@@ -518,10 +518,6 @@ def _scrape(app=None):
 
                                         orderside = order["side"].upper()
 
-                                        time_format = datetime.datetime.strptime(
-                                            order["createdTime"], "%Y-%m-%dT%H:%M:%SZ"
-                                        )
-
                                         row = (
                                             float(order["qty"]),
                                             float(order["price"]),
@@ -529,7 +525,7 @@ def _scrape(app=None):
                                             positionside,
                                             order["orderStatus"],
                                             order["symbol"],
-                                            int(time_format.timestamp() * 1000),
+                                            int(order["createdTime"]),
                                             order["orderType"],
                                         )
                                         create_orders(conn, row)
@@ -610,7 +606,7 @@ def _scrape(app=None):
             params = {
                 "symbol": symbol,
                 "category": "linear",
-                "limit": 200,
+                "limit": 100,
             }
             with create_connection(current_app.config["DATABASE"]) as conn:
                 startTime = select_latest_income_symbol(conn, symbol)
@@ -620,79 +616,78 @@ def _scrape(app=None):
                             "2020-01-01 00:00:00+00:00"
                         ).timestamp()
                     )
-                    params["start_time"] = startTime
+                    params["startTime"] = startTime * 1000
                 else:
-                    startTime = int(startTime[0]) / 1000
-                    params["start_time"] = int(startTime + 1)
+                    startTime = int(startTime[0])
+                    params["startTime"] = int(startTime + 1)
 
-            for page in range(1, 50):
-                if weightused > 50:
-                    print(
-                        f"Weight used: {weightused}/100\nProcessed: {processed}\nSleep: 1 minute"
-                    )
-                    sleeps += 1
-                    time.sleep(60)
-                    weightused = 0
-
-                params["cursor"] = f"{page}"
-                responseHeader, responseJSON = send_signed_request(
-                    http_method="GET",
-                    url_path="/v5/position/closed-pnl",
-                    payload=params,
-                    exchange="bybit",
+            if weightused > 50:
+                print(
+                    f"Weight used: {weightused}/100\nProcessed: {processed}\nSleep: 1 minute"
                 )
+                sleeps += 1
+                time.sleep(60)
+                weightused = 0
 
-                if "rate_limit_status" in responseJSON:
-                    weightused = int(responseJSON["rate_limit_status"])
-                else:
-                    weightused += 1
+            # params["cursor"] = f"{page}"
+            responseHeader, responseJSON = send_signed_request(
+                http_method="GET",
+                url_path="/v5/position/closed-pnl",
+                payload=params,
+                exchange="bybit",
+            )
 
-                if "result" in responseJSON:
-                    if responseJSON["result"] is not None:
-                        if "list" in responseJSON["result"]:
-                            if responseJSON["result"]["list"] is not None:
-                                for trade in responseJSON["result"]["list"]:
-                                    trades[trade["createdTime"]] = [
-                                        trade["orderId"],
-                                        trade["execType"],
-                                        trade["closedPnl"],
-                                        trade["orderId"],
-                                    ]
-                                if len(responseJSON["result"]["list"]) < 50:
-                                    app.logger.info(
-                                        "Stop looping pages as data in current page < 50"
-                                    )
-                                    break
-                            else:
-                                app.logger.warning(
-                                    "Closed PNL: responseJSON['result']['list'] is None"
+            if "rate_limit_status" in responseJSON:
+                weightused = int(responseJSON["rate_limit_status"])
+            else:
+                weightused += 1
+
+            if "result" in responseJSON:
+                if responseJSON["result"] is not None:
+                    if "list" in responseJSON["result"]:
+                        if responseJSON["result"]["list"] is not None:
+                            for trade in responseJSON["result"]["list"]:
+                                trades[trade["createdTime"]] = [
+                                    trade["orderId"],
+                                    trade["execType"],
+                                    trade["closedPnl"],
+                                    trade["orderId"],
+                                ]
+                            if len(responseJSON["result"]["list"]) < 50:
+                                app.logger.info(
+                                    "Stop looping pages as data in current page < 50"
                                 )
                                 break
                         else:
                             app.logger.warning(
-                                "Closed PNL: 'data' not found in responseJSON['result']['list']"
+                                "Closed PNL: responseJSON['result']['list'] is None"
                             )
                             break
                     else:
-                        app.logger.warning("Closed PNL: 'result' is None")
+                        app.logger.warning(
+                            "Closed PNL: 'data' not found in responseJSON['result']['list']"
+                        )
                         break
                 else:
-                    app.logger.warning("Closed PNL: 'result' not found in responseJSON")
+                    app.logger.warning("Closed PNL: 'result' is None")
                     break
+            else:
+                app.logger.warning("Closed PNL: 'result' not found in responseJSON")
+                break
 
             if len(trades) > 0:
                 trades = OrderedDict(sorted(trades.items()))
                 with create_connection(current_app.config["DATABASE"]) as conn:
                     for trade in trades:
                         income_row = (
-                            int(trades[trade][0]),
+                            1,
                             symbol,
                             exec_type[trades[trade][1]],
                             trades[trade][2],
                             "USDT",
                             exec_type[trades[trade][1]],
-                            int(trade * 1000),
-                            int(trades[trade][0]),
+                            int(trade),
+                            trades[trade][0],
                         )
 
                         create_income(conn, income_row)
