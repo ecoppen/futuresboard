@@ -46,9 +46,19 @@ def _auto_scrape(app):
             time.sleep(interval)
 
 
-def hashing(query_string):
+def hashing(query_string, exchange="binance"):
+    if exchange == "bybit":
+        query_string = (
+            f"{get_timestamp()}{current_app.config['API_KEY']}5000" + query_string
+        )
+        print(query_string, flush=True)
+        return hmac.new(
+            bytes(current_app.config["API_SECRET"].encode("utf-8")),
+            query_string.encode("utf-8"),
+            hashlib.sha256,
+        ).hexdigest()
     return hmac.new(
-        current_app.config["API_SECRET"].encode("utf-8"),
+        bytes(current_app.config["API_SECRET"].encode("utf-8")),
         query_string.encode("utf-8"),
         hashlib.sha256,
     ).hexdigest()
@@ -58,12 +68,18 @@ def get_timestamp():
     return int(time.time() * 1000)
 
 
-def dispatch_request(http_method):
+def dispatch_request(http_method, signature=None):
     session = requests.Session()
     session.headers.update(
         {
             "Content-Type": "application/json;charset=utf-8",
             "X-MBX-APIKEY": current_app.config["API_KEY"],
+            "X-BAPI-API-KEY": current_app.config["API_KEY"],
+            "X-BAPI-SIGN": signature,
+            "X-BAPI-SIGN-TYPE": "2",
+            "X-BAPI-TIMESTAMP": f"{get_timestamp()}",
+            "X-BAPI-RECV-WINDOW": "5000",
+            "Content-Type": "application/json",
         }
     )
     return {
@@ -75,34 +91,35 @@ def dispatch_request(http_method):
 
 
 # used for sending request requires the signature
-def send_signed_request(http_method, url_path, payload={}, signature="signature"):
-    payload["timestamp"] = get_timestamp()
+def send_signed_request(http_method, url_path, payload={}, exchange="binance"):
+    if exchange == "binance":
+        payload["timestamp"] = get_timestamp()
     query_string = urlencode(OrderedDict(sorted(payload.items())))
     query_string = query_string.replace(
         "%27", "%22"
     )  # replace single quote to double quote
 
-    url = (
-        current_app.config["API_BASE_URL"]
-        + url_path
-        + "?"
-        + query_string
-        + "&"
-        + signature
-        + "="
-        + hashing(query_string)
-    )
+    url = f"{current_app.config['API_BASE_URL']}{url_path}?{query_string}"
+    if exchange == "binance":
+        url += f"&signature={hashing(query_string, exchange)}"
 
-    # print("{} {}".format(http_method, url))
+    print("{} {}".format(http_method, url))
     params = {"url": url, "params": {}}
     try:
-        response = dispatch_request(http_method)(**params)
+        response = dispatch_request(
+            http_method, hashing(query_string=query_string, exchange=exchange)
+        )(**params)
         headers = response.headers
         json_response = response.json()
         if "code" in json_response:
             raise HTTPRequestError(
                 url=url, code=json_response["code"], msg=json_response["msg"]
             )
+        if "retCode" in json_response:
+            if json_response["retCode"] != 0:
+                raise HTTPRequestError(
+                    url=url, code=json_response["retCode"], msg=json_response["retMsg"]
+                )
         return headers, json_response
     except requests.exceptions.ConnectionError as e:
         raise HTTPRequestError(url=url, code=-1, msg=f"{e}")
@@ -294,7 +311,7 @@ def create_orders(conn, orders):
 def scrape(app=None):
     try:
         _scrape(app=app)
-    except (HTTPRequestError, TypeError, KeyError) as exc:
+    except HTTPRequestError as exc:
         if app is None:
             print(exc)
         else:
@@ -401,7 +418,7 @@ def _scrape(app=None):
                 params = {"startTime": startTime + 1, "limit": 1000}
 
                 responseHeader, responseJSON = send_signed_request(
-                    "GET", "/fapi/v1/income", params
+                    http_method="GET", url_path="/fapi/v1/income", payload=params
                 )
                 weightused = int(responseHeader["X-MBX-USED-WEIGHT-1M"])
 
@@ -434,9 +451,12 @@ def _scrape(app=None):
             "BustTrade": "BUSTTRADE",
         }
 
-        params = {"api_key": current_app.config["API_KEY"]}
+        params = {"category": "linear", "limit": 200, "settleCoin": "USDT"}
         responseHeader, responseJSON = send_signed_request(
-            "GET", "/private/linear/position/list", params, signature="sign"
+            http_method="GET",
+            url_path="/v5/position/list",
+            payload=params,
+            exchange="bybit",
         )
         if "rate_limit_status" in responseJSON:
             weightused = int(responseJSON["rate_limit_status"])
@@ -447,99 +467,147 @@ def _scrape(app=None):
             delete_all_positions(conn)
             app.logger.info("Loading orders and positions from exchange")
             if "result" in responseJSON:
-                for position in responseJSON["result"]:
-                    if weightused < 10:
-                        print(
-                            f"Weight used: {weightused}/{120-weightused}\nProcessed: {updated_positions + new_positions + updated_orders}\nSleep: 1 minute"
-                        )
-                        sleeps += 1
-                        time.sleep(60)
-
-                    if position["data"]["symbol"] not in all_symbols:
-                        all_symbols.append(position["data"]["symbol"])
-
-                    if position["data"]["size"] > 0:
-                        position_sides = {"buy": "LONG", "sell": "SHORT"}
-                        positionside = position_sides[position["data"]["side"].lower()]
-
-                        position_row = (
-                            float(position["data"]["unrealised_pnl"]),
-                            int(position["data"]["leverage"]),
-                            float(position["data"]["entry_price"]),
-                            float(position["data"]["size"]),
-                            position["data"]["symbol"],
-                            positionside,
-                        )
-
-                        create_position(conn, position_row)
-                        updated_positions += 1
-
-                        params = {
-                            "symbol": position["data"]["symbol"],
-                            "api_key": current_app.config["API_KEY"],
-                        }
-                        responseHeader, responseJSON = send_signed_request(
-                            "GET",
-                            "/private/linear/order/search",
-                            params,
-                            signature="sign",
-                        )
-                        if "rate_limit_status" in responseJSON:
-                            weightused = int(responseJSON["rate_limit_status"])
-
-                        for order in responseJSON["result"]:
-                            updated_orders += 1
-
-                            orderside = order["side"].upper()
-
-                            time_format = datetime.datetime.strptime(
-                                order["created_time"], "%Y-%m-%dT%H:%M:%SZ"
+                if "list" in responseJSON["result"]:
+                    for position in responseJSON["result"]["list"]:
+                        if weightused > 50:
+                            print(
+                                f"Weight used: {weightused}/{120-weightused}\nProcessed: {updated_positions + new_positions + updated_orders}\nSleep: 1 minute"
                             )
+                            sleeps += 1
+                            time.sleep(60)
+                            weightused = 0
 
-                            row = (
-                                float(order["qty"]),
-                                float(order["price"]),
-                                orderside,
+                        if position["symbol"] not in all_symbols:
+                            all_symbols.append(position["symbol"])
+
+                        if float(position["size"]) > 0:
+                            position_sides = {"buy": "LONG", "sell": "SHORT"}
+                            positionside = position_sides[position["side"].lower()]
+
+                            position_row = (
+                                float(position["unrealisedPnl"]),
+                                int(position["leverage"]),
+                                float(position["avgPrice"]),
+                                float(position["size"]),
+                                position["symbol"],
                                 positionside,
-                                order["order_status"],
-                                order["symbol"],
-                                int(time_format.timestamp() * 1000),
-                                order["order_type"],
                             )
-                            create_orders(conn, row)
+
+                            create_position(conn, position_row)
+                            updated_positions += 1
+
+                            params = {
+                                "symbol": position["symbol"],
+                                "category": "linear",
+                            }
+                            responseHeader, responseJSON = send_signed_request(
+                                http_method="GET",
+                                url_path="/v5/order/realtime",
+                                payload=params,
+                                exchange="bybit",
+                            )
+                            if "rate_limit_status" in responseJSON:
+                                weightused = int(responseJSON["rate_limit_status"])
+                            else:
+                                weightused += 1
+
+                            if "result" in responseJSON:
+                                if "list" in responseJSON["result"]:
+                                    for order in responseJSON["result"]["list"]:
+                                        updated_orders += 1
+
+                                        orderside = order["side"].upper()
+
+                                        time_format = datetime.datetime.strptime(
+                                            order["createdTime"], "%Y-%m-%dT%H:%M:%SZ"
+                                        )
+
+                                        row = (
+                                            float(order["qty"]),
+                                            float(order["price"]),
+                                            orderside,
+                                            positionside,
+                                            order["orderStatus"],
+                                            order["symbol"],
+                                            int(time_format.timestamp() * 1000),
+                                            order["orderType"],
+                                        )
+                                        create_orders(conn, row)
+                                else:
+                                    app.logger.warning(
+                                        "Orders: 'list' not in responseJSON['result']"
+                                    )
+                            else:
+                                app.logger.warning(
+                                    "Orders: 'result' not in responseJSON"
+                                )
+                else:
+                    app.logger.warning(
+                        "Positions: 'list' not in responseJSON['result']"
+                    )
             else:
-                app.logger.warning("'result' not in responseJSON")
+                app.logger.warning("Positions: 'result' not in responseJSON")
 
-            params = {"api_key": current_app.config["API_KEY"], "coin": "USDT"}
+            params = {"coin": "USDT", "accountType": "CONTRACT"}
             responseHeader, responseJSON = send_signed_request(
-                "GET", "/v2/private/wallet/balance", params, signature="sign"
+                http_method="GET",
+                url_path="/v5/account/wallet-balance",
+                payload=params,
+                exchange="bybit",
             )
+            app.logger.info("Updating wallet balance from exchange")
+            if "result" in responseJSON:
+                if "list" in responseJSON["result"]:
+                    if (
+                        responseJSON["result"]["list"][0]["totalMaintenanceMargin"]
+                        == ""
+                    ):
+                        maintenance_margin = 0.0
+                    else:
+                        maintenance_margin = float(
+                            responseJSON["result"]["list"][0]["totalMaintenanceMargin"]
+                        )
 
-            totals_row = (
-                float(responseJSON["result"]["USDT"]["wallet_balance"]),
-                float(responseJSON["result"]["USDT"]["unrealised_pnl"]),
-                float(responseJSON["result"]["USDT"]["used_margin"]),
-                float(responseJSON["result"]["USDT"]["available_balance"]),
-                float(0),
-                1,
-            )
+                    totals_row = (
+                        float(
+                            responseJSON["result"]["list"][0]["coin"][0][
+                                "walletBalance"
+                            ]
+                        ),
+                        float(
+                            responseJSON["result"]["list"][0]["coin"][0][
+                                "unrealisedPnl"
+                            ]
+                        ),
+                        maintenance_margin,
+                        float(
+                            responseJSON["result"]["list"][0]["coin"][0][
+                                "availableToWithdraw"
+                            ]
+                        ),
+                        float(0),
+                        1,
+                    )
 
-            accountCheck = select_account(conn)
-            if accountCheck is None:
-                create_account(conn, totals_row)
-            elif float(accountCheck[0]) != float(
-                responseJSON["result"]["USDT"]["wallet_balance"]
-            ):
-                update_account(conn, totals_row)
+                    accountCheck = select_account(conn)
+                    if accountCheck is None:
+                        create_account(conn, totals_row)
+                    elif float(accountCheck[0]) != float(
+                        responseJSON["result"]["list"][0]["coin"][0]["walletBalance"]
+                    ):
+                        update_account(conn, totals_row)
 
-            conn.commit()
+                    conn.commit()
+                else:
+                    app.logger.warning("Wallet: 'list' not in responseJSON['result']")
+            else:
+                app.logger.warning("Wallet: 'result' not in responseJSON")
 
         all_symbols = sorted(all_symbols)
-
+        app.logger.info("Updating closed PnL from exchange")
         for symbol in all_symbols:
             trades = {}
             params = {
-                "api_key": current_app.config["API_KEY"],
                 "symbol": symbol,
                 "category": "linear",
                 "limit": 200,
@@ -558,21 +626,26 @@ def _scrape(app=None):
                     params["start_time"] = int(startTime + 1)
 
             for page in range(1, 50):
-                if weightused < 20:
+                if weightused > 50:
                     print(
                         f"Weight used: {weightused}/100\nProcessed: {processed}\nSleep: 1 minute"
                     )
                     sleeps += 1
                     time.sleep(60)
+                    weightused = 0
+
                 params["cursor"] = f"{page}"
                 responseHeader, responseJSON = send_signed_request(
-                    "GET",
-                    "/v5/position/closed-pnl",
-                    params,
-                    signature="sign",
+                    http_method="GET",
+                    url_path="/v5/position/closed-pnl",
+                    payload=params,
+                    exchange="bybit",
                 )
+
                 if "rate_limit_status" in responseJSON:
                     weightused = int(responseJSON["rate_limit_status"])
+                else:
+                    weightused += 1
 
                 if "result" in responseJSON:
                     if responseJSON["result"] is not None:
@@ -592,19 +665,19 @@ def _scrape(app=None):
                                     break
                             else:
                                 app.logger.warning(
-                                    "responseJSON['result']['list'] is None"
+                                    "Closed PNL: responseJSON['result']['list'] is None"
                                 )
                                 break
                         else:
                             app.logger.warning(
-                                "'data' not found in responseJSON['result']['list']"
+                                "Closed PNL: 'data' not found in responseJSON['result']['list']"
                             )
                             break
                     else:
-                        app.logger.warning("'result' is None")
+                        app.logger.warning("Closed PNL: 'result' is None")
                         break
                 else:
-                    app.logger.warning("'result' not found in responseJSON")
+                    app.logger.warning("Closed PNL: 'result' not found in responseJSON")
                     break
 
             if len(trades) > 0:
