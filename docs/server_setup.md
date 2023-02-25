@@ -40,6 +40,9 @@ Make sure the system clock is always accurate with `apt-get install systemd-time
 
 Install the Python package installer with `apt-get install python3-pip` which will be used to install the libraries required for most python programs
 
+## Installing from requirements
+If you have installed Python 3.11 then you may have to include `--break-system-packages` at when installing any requirements to a project
+
 ## Session management
 
 Sessions can be managed through multiple `screen`s however we have already installed the session manager `tmuxp` that allows the creation and termination of sessions with `tmux` easily.
