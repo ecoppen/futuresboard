@@ -1,7 +1,7 @@
 # Setup
 
 ## Cloning and installing
-If the git framework is not installed already for downloading from GitHub, install with `apt-get install git` or through a package on `https://git-scm.com/downloads`
+If the git framework is not installed already for downloading from GitHub, install with `apt-get install git` or through a package on [gitscm](https://git-scm.com/downloads)
 
 Clone this repository: `git clone https://github.com/ecoppen/futuresboard.git`
 
