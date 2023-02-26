@@ -130,18 +130,40 @@ If your VPS reboots itself for whatever reason, you will want your bot to restar
 Firstly you need to decide whether you want a notification to be sent to you and via which medium. The code below offers both discord and telegram notifications. If you need to use telegram, make sure you install the required library with the command `pip3 install pyTelegramBotAPI`. Make sure you change the `WEBHOOK_URL` if you're using discord and the `TELEGRAM_HTTP_API` and `TELEGRAM_USER_ID` if you're using telegram. It should go without saying that you want these to be sent privately, so don't use an open discord server or telegram group.
 
 ```
-def send_to_discord():
+import argparse
+
+def init_argparse():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-a", "--action")
+    parser.add_argument("-m", "--message")
+    return parser
+    
+def send_to_discord(action, message_to_send):
     import requests
-    message = ":white_check_mark: VPS and passivbot rebooted"
+
+    message = ":white_check_mark: Script has run"
+    if action == "start":
+        message = ":exclamation: VPS booted and passivbot started"
+    elif action == "restart":
+        message = ":white_check_mark: passivbot restarted"
+    if message_to_send is not None:
+        message = f"{message_to_send}"
 
     mUrl = "WEBHOOK_URL"
 
     data = {"content": message}
     response = requests.post(mUrl, json=data)
 
-def send_to_telegram():
+def send_to_telegram(action, message_to_send):
     import telebot
-    message = "✅ VPS and passivbot rebooted"
+
+    message = "✅ Script has run"
+    if action == "start":
+        message = "❗ VPS booted and passivbot started"
+    elif action == "restart":
+        message = "✅ passivbot restarted"
+    if message_to_send is not None:
+        message = f"{message_to_send}"
 
     telegram_http_api = ""
     telegram_user_id = ""
@@ -149,18 +171,26 @@ def send_to_telegram():
     bot = telebot.TeleBot(telegram_http_api)
     bot.send_message(telegram_user_id, message)
 
-send_to_discord()
-send_to_telegram()
+parser = init_argparse()
+args = parser.parse_args()
+action, message_to_send = None, None
+if args.action is not None:
+    action = args.action
+if args.message is not None:
+    message_to_send = args.message
+
+send_to_discord(action, message_to_send)
+send_to_telegram(action, message_to_send)
 ```
 
-You can test that it works by typing `python3 notify.py`.
+You can test that it works by typing `python3 notify.py -m hello` or `python3 notify.py -a start`.
 
 There are two files required. One to start (reboot server) and one to restart (if you want it periodically to check it's alive). You can remove the notify.py from either or both files if you don't intend to use it
 
 ```
 `#!/bin/bash
 
-python3 notify.py
+python3 notify.py -a start
 sleep 0.5
 tmuxp load session.yaml
 ```
@@ -168,7 +198,7 @@ tmuxp load session.yaml
 ```
 #!/bin/bash
 
-python3 notify.py
+python3 notify.py -a restart
 sleep 0.5
 tmux kill-session
 sleep 0.5
