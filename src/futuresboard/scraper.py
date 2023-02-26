@@ -602,7 +602,6 @@ def _scrape(app=None):
         all_symbols = sorted(all_symbols)
         app.logger.info("Updating closed PnL from exchange")
         for symbol in all_symbols:
-            print(symbol, flush=True)
             trades = {}
             params = {
                 "symbol": symbol,
