@@ -46,12 +46,9 @@ def _auto_scrape(app):
             time.sleep(interval)
 
 
-def hashing(query_string, exchange="binance"):
+def hashing(query_string, exchange="binance", timestamp=None):
     if exchange == "bybit":
-        query_string = (
-            f"{get_timestamp()}{current_app.config['API_KEY']}5000" + query_string
-        )
-        print(query_string, flush=True)
+        query_string = f"{timestamp}{current_app.config['API_KEY']}5000" + query_string
         return hmac.new(
             bytes(current_app.config["API_SECRET"].encode("utf-8")),
             query_string.encode("utf-8"),
@@ -68,20 +65,20 @@ def get_timestamp():
     return int(time.time() * 1000)
 
 
-def dispatch_request(http_method, signature=None):
+def dispatch_request(http_method, signature=None, timestamp=None):
     session = requests.Session()
     session.headers.update(
         {
             "Content-Type": "application/json;charset=utf-8",
             "X-MBX-APIKEY": current_app.config["API_KEY"],
             "X-BAPI-API-KEY": current_app.config["API_KEY"],
-            "X-BAPI-SIGN": signature,
+            "X-BAPI-SIGN": f"{signature}",
             "X-BAPI-SIGN-TYPE": "2",
-            "X-BAPI-TIMESTAMP": f"{get_timestamp()}",
+            "X-BAPI-TIMESTAMP": f"{timestamp}",
             "X-BAPI-RECV-WINDOW": "5000",
-            "Content-Type": "application/json",
         }
     )
+
     return {
         "GET": session.get,
         "DELETE": session.delete,
@@ -103,11 +100,14 @@ def send_signed_request(http_method, url_path, payload={}, exchange="binance"):
     if exchange == "binance":
         url += f"&signature={hashing(query_string, exchange)}"
 
-    print("{} {}".format(http_method, url))
+    # print("{} {}".format(http_method, url))
     params = {"url": url, "params": {}}
     try:
+        timestamp = get_timestamp()
         response = dispatch_request(
-            http_method, hashing(query_string=query_string, exchange=exchange)
+            http_method,
+            hashing(query_string=query_string, exchange=exchange, timestamp=timestamp),
+            timestamp=timestamp,
         )(**params)
         headers = response.headers
         json_response = response.json()
@@ -166,7 +166,7 @@ def create_table(conn, create_table_sql):
 def db_setup(database):
     sql_create_income_table = """ CREATE TABLE IF NOT EXISTS income (
                                         IID integer PRIMARY KEY AUTOINCREMENT,
-                                        tranId integer,
+                                        tranId text,
                                         symbol text,
                                         incomeType text,
                                         income real,
@@ -602,6 +602,7 @@ def _scrape(app=None):
         all_symbols = sorted(all_symbols)
         app.logger.info("Updating closed PnL from exchange")
         for symbol in all_symbols:
+            print(symbol, flush=True)
             trades = {}
             params = {
                 "symbol": symbol,
@@ -653,11 +654,7 @@ def _scrape(app=None):
                                     trade["closedPnl"],
                                     trade["orderId"],
                                 ]
-                            if len(responseJSON["result"]["list"]) < 50:
-                                app.logger.info(
-                                    "Stop looping pages as data in current page < 50"
-                                )
-                                break
+
                         else:
                             app.logger.warning(
                                 "Closed PNL: responseJSON['result']['list'] is None"
@@ -680,7 +677,7 @@ def _scrape(app=None):
                 with create_connection(current_app.config["DATABASE"]) as conn:
                     for trade in trades:
                         income_row = (
-                            1,
+                            trades[trade][0],
                             symbol,
                             exec_type[trades[trade][1]],
                             trades[trade][2],
