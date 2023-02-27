@@ -56,7 +56,7 @@ class Binance(Exchange):
         start_time: int | None = None,
         end_time: int | None = None,
         interval: Intervals = Intervals.ONE_DAY,
-        limit: int = 500,
+        limit: int = 1000,
     ) -> list:
         self.check_weight()
         params: dict = {
