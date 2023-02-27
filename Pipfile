@@ -4,24 +4,30 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask = "*"
-requests = "*"
+anyio = "*"
+fastapi = "*"
+jinja2 = "*"
+psycopg = {extras = ["binary"], version = "*"}
 pydantic = "*"
+requests = "*"
+sqlalchemy = ">=2.0.0rc2"
+uvicorn = "*"
 
 [dev-packages]
 bandit = "*"
 black = "*"
+cfgv = "*"
 codecov = "*"
 flake8 = "*"
-flake8-mypy-fork = "*"
-flake8-typing-imports = "*"
+freezegun = "*"
 isort = "*"
 mkdocs-material = "*"
 mypy = "*"
 pre-commit = "*"
 pytest = "*"
 pytest-cov = "*"
+responses = "*"
+types-freezegun = "*"
 
 [requires]
 python_version = "3.11"
-python_full_version = "3.11.0"
