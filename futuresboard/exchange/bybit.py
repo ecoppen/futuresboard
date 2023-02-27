@@ -18,7 +18,7 @@ class Bybit(Exchange):
     exchange = "bybit"
     futures_api_url = "https://api.bybit.com"
     futures_trade_url = "https://www.bybit.com/trade/usdt/BASEQUOTE"
-    max_weight = 120
+    max_weight = 1200
 
     def get_futures_price(self, base: str, quote: str) -> Decimal:
         self.check_weight()
