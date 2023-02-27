@@ -1,0 +1,13 @@
+coverage:
+  status:
+    project:
+      default:
+        # basic
+        target: auto
+        threshold: 2% # allow cov to drop by 2% (just in case)
+
+ignore:
+  - "**/*.yaml"       # ignore all yaml files
+  - "**/*.yml"        # same as above
+  - "**/*.md"         # ignore all markdown files, those are not relevant for building/testing
+  - "tests"           # ignore tests folder, it'll inflate coverage
