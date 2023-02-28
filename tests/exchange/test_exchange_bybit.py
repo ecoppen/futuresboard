@@ -15,7 +15,7 @@ class TestBybitExchange(unittest.TestCase):
         assert bybit.futures_api_url == "https://api.bybit.com"
         assert bybit.futures_trade_url == "https://www.bybit.com/trade/usdt/BASEQUOTE"
         assert bybit.weight == 0
-        assert bybit.max_weight == 1000
+        assert bybit.max_weight == 1200
 
     @responses.activate
     def test_get_futures_price_valid(self):
