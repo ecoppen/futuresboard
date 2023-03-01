@@ -1,0 +1,20 @@
+{
+  "accounts": [
+    {
+      "api_key": "",
+      "api_secret": "",
+      "exchange": "binance",
+      "name": "binance_1"
+    }
+  ],
+  "dashboard_name": "futuresboard",
+  "database": {
+    "engine": "sqlite",
+    "host": "127.0.0.1",
+    "name": "futuresboard",
+    "password": "",
+    "port": 5432,
+    "username": "postgres"
+  },
+  "scrape_interval": 600
+}
