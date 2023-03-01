@@ -12,6 +12,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+from futuresboard.core.config import load_config
 from futuresboard.exchange.factory import load_exchanges
 from futuresboard.exchange.utils import Exchanges, Intervals, Markets
 
@@ -34,6 +35,8 @@ app.add_middleware(GZipMiddleware)
 templates = Jinja2Templates(directory="templates")
 
 exchanges = load_exchanges()
+config_file = Path(Path().resolve(), "config", "config.json")
+config = load_config(path=config_file)
 
 
 @app.get("/getprice")
