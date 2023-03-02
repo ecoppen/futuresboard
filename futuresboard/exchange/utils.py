@@ -9,6 +9,7 @@ log = logging.getLogger(__name__)
 class Exchanges(str, Enum):
     BINANCE = "binance"
     BYBIT = "bybit"
+    OKX = "okx"
 
 
 class Markets(str, Enum):
