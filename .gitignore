@@ -136,4 +136,3 @@ config.json
 log.txt
 *.db*
 node_modules
-coverage.xml
