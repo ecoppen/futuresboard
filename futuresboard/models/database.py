@@ -49,6 +49,7 @@ class Database:
             id: Mapped[intpk] = mapped_column(init=False)
             name: Mapped[str]
             exchange: Mapped[str]
+
             added: Mapped[int] = mapped_column(
                 BigInteger, default=self.timestamp(dt=datetime.now())
             )
@@ -57,6 +58,36 @@ class Database:
                 default=self.timestamp(dt=datetime.now()),
                 onupdate=self.timestamp(dt=datetime.now()),
             )
+
+        class Positions(self.Base):  # type: ignore
+            __tablename__ = "positions"
+
+            id: Mapped[intpk] = mapped_column(init=False)
+            symbol: Mapped[str]
+            unrealisedProfit: Mapped[float]
+            leverage: Mapped[float]
+            entryPrice: Mapped[float]
+            side: Mapped[str]
+            amount: Mapped[float]
+            liquidationPrice: Mapped[float]
+
+        class Orders(self.Base):  # type: ignore
+            __tablename__ = "order"
+
+            id: Mapped[intpk] = mapped_column(init=False)
+            quantity: Mapped[float]
+            price: Mapped[float]
+            side: Mapped[str]
+            positionSide: Mapped[str]
+            status: Mapped[str]
+            symbol: Mapped[str]
+            time: Mapped[int] = mapped_column(
+                BigInteger, default=self.timestamp(dt=datetime.now())
+            )
+            type: Mapped[str]
+
+        self.Base.metadata.create_all(self.engine)  # type: ignore
+        log.info("database tables loaded")
 
     def timestamp(self, dt) -> int:
         return int(dt.replace(tzinfo=timezone.utc).timestamp() * 1000)
