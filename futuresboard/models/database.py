@@ -122,6 +122,35 @@ class Database:
         self.Base.metadata.reflect(bind=self.engine)  # type: ignore
         return self.Base.metadata.tables[table_name]  # type: ignore
 
+    def add_get_account_ids(self, accounts: list):
+        table_object = self.get_table_object(table_name="accounts")
+
+        with Session(self.engine) as session:
+            for account in accounts:
+                check = session.scalars(
+                    select(table_object).filter_by(name=account.name).limit(1)
+                ).first()
+                if check is None:
+                    log.info(
+                        f"Adding account named '{account.name}' using exchange '{account.exchange}' to database"
+                    )
+                    session.execute(
+                        insert(table_object),
+                        {"name": account.name, "exchange": account.exchange},
+                    )
+                    log.info(f"Account named '{account.name}' saved")
+                    check = session.scalars(
+                        select(table_object).filter_by(name=account.name).limit(1)
+                    ).first()
+                    account.id = check
+                else:
+                    log.info(
+                        f"Account found in database with name '{account.name}', loading"
+                    )
+                    account.id = check
+            session.commit()
+        return accounts
+
     def delete_then_update_positions(self, account_id: int, data: dict):
         table_object = self.get_table_object(table_name="positions")
 
@@ -133,11 +162,10 @@ class Database:
             if check is not None:
                 if check > 0:
                     log.info(f"Position data found for account {account_id} - deleting")
-                    filters = []
-                    filters.append(table_object.c.id == account_id)
+                    filters = [table_object.c.id == account_id]
                     session.execute(delete(table_object).where(*filters))
             for item in data:
-                item["id"] = account_id
+                item["account_id"] = account_id
             session.execute(insert(table_object), data)
             session.commit()
         log.info(f"Position data updated for {account_id} - positions: {len(data)}")
