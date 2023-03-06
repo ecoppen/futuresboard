@@ -23,6 +23,7 @@ class Database(BaseModel):
 
 
 class Account(BaseModel):
+    id: int = Field(0, const=True)
     name: str
     exchange: str = Exchanges.BINANCE.value  # type: ignore
     api_key: str = Field(min_length=5)
