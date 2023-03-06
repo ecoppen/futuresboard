@@ -15,6 +15,7 @@ from fastapi.templating import Jinja2Templates
 from futuresboard.core.config import load_config
 from futuresboard.exchange.factory import load_exchanges
 from futuresboard.exchange.utils import Exchanges, Intervals, Markets
+from futuresboard.models.database import Database
 
 logs_file = Path(Path().resolve(), "log.txt")
 logs_file.touch(exist_ok=True)
@@ -37,6 +38,8 @@ templates = Jinja2Templates(directory="templates")
 exchanges = load_exchanges()
 config_file = Path(Path().resolve(), "config", "config.json")
 config = load_config(path=config_file)
+
+database = Database(config=config.database)
 
 
 @app.get("/getprice")
