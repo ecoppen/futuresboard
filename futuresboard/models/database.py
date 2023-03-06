@@ -61,8 +61,8 @@ class Database:
             name: Mapped[str]
             exchange: Mapped[str]
 
-            positions: Mapped[List["Positions"]] = relationship(back_populates="account")  # type: ignore # noqa: F821
-            orders: Mapped[List["Orders"]] = relationship(back_populates="account")  # type: ignore # noqa: F821
+            positions: Mapped[List["Positions"]] = relationship(back_populates="account", cascade="all, delete")  # type: ignore # noqa: F821
+            orders: Mapped[List["Orders"]] = relationship(back_populates="account", cascade="all, delete")  # type: ignore # noqa: F821
 
             added: Mapped[int] = mapped_column(
                 BigInteger, default=self.timestamp(dt=datetime.now())
