@@ -20,7 +20,7 @@ class Exchange:
     max_weight: int = 100
 
     def check_weight(self) -> None:
-        if self.weight > self.max_weight:
+        if self.weight >= self.max_weight:
             log.info(
                 f"Weight {self.weight} is greater than {self.max_weight}, sleeping for 60 seconds"
             )
@@ -48,3 +48,6 @@ class Exchange:
 
     def get_futures_trade_url(self):
         return self.futures_trade_url
+
+    def get_open_futures_positions(self, account: dict) -> list:
+        return []
