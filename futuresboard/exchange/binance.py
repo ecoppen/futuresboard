@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from decimal import Decimal
 
-from futuresboard.core.utils import send_public_request
+from futuresboard.core.utils import send_public_request, send_signed_request
 from futuresboard.exchange.exchange import Exchange
 from futuresboard.exchange.utils import Intervals
 
