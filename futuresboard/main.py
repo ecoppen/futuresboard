@@ -16,6 +16,7 @@ from futuresboard.core.config import load_config
 from futuresboard.exchange.factory import load_exchanges
 from futuresboard.exchange.utils import Exchanges, Intervals, Markets
 from futuresboard.models.database import Database
+from futuresboard.scraper.scraper import Scraper
 
 logs_file = Path(Path().resolve(), "log.txt")
 logs_file.touch(exist_ok=True)
@@ -40,6 +41,9 @@ config_file = Path(Path().resolve(), "config", "config.json")
 config = load_config(path=config_file)
 
 database = Database(config=config.database)
+accounts = database.add_get_account_ids(accounts=config.accounts)
+
+scraper = Scraper(accounts=accounts, database=database, exchanges=exchanges)
 
 
 @app.get("/getprice")
@@ -89,3 +93,20 @@ def get_kline(
         )
     else:
         return {"error": "not implemented yet"}
+
+
+def _auto_scrape():
+    while True:
+        log.info("Auto scrape routines starting")
+        scraper.scrape()
+        log.info(
+            f"Auto scrape routines terminated. Sleeping {config.scrape_interval} seconds..."
+        )
+        time.sleep(config.scrape_interval)
+
+
+@app.on_event("startup")
+def auto_scrape():
+    thread = threading.Thread(target=_auto_scrape)
+    thread.daemon = True
+    thread.start()
