@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from decimal import Decimal
 
-from futuresboard.core.utils import send_public_request
+from futuresboard.core.utils import send_public_request, send_signed_request
 from futuresboard.exchange.exchange import Exchange
 from futuresboard.exchange.utils import Intervals
 
@@ -116,3 +116,57 @@ class Bybit(Exchange):
                         for candle in raw_json["result"]["list"]
                     ]
         return []
+
+    def get_open_futures_positions(self, account: dict) -> list:
+        params = {"category": "linear", "limit": 200, "settleCoin": "USDT"}
+        position_sides = {"buy": "LONG", "sell": "SHORT"}
+
+        positions = []
+        complete = False
+        pagination = None
+        while not complete:
+            self.check_weight()
+            if pagination is not None:
+                params["cursor"] = pagination
+            responseHeader, responseJSON = send_signed_request(
+                http_method="GET",
+                url_path="/v5/position/list",
+                payload=params,
+                exchange="bybit",
+                base_url=self.futures_api_url,
+                keys=account,
+            )
+            if "rate_limit_status" in responseJSON:
+                self.update_weight(weight=self.max_weight)
+            else:
+                self.update_weight(weight=0)
+
+            if "result" in responseJSON:
+                if "nextPageCursor" in responseJSON["result"]:
+                    pagination = responseJSON["result"]["nextPageCursor"]
+                    if len(pagination) == 0:
+                        complete = True
+
+                if "list" in responseJSON["result"]:
+                    for position in responseJSON["result"]["list"]:
+                        if float(position["size"]) > 0:
+                            position_side = position_sides[position["side"].lower()]
+                            positions.append(
+                                {
+                                    "symbol": position["symbol"],
+                                    "unrealised_profit": Decimal(
+                                        position["unrealisedPnl"]
+                                    ),
+                                    "leverage": Decimal(position["leverage"]),
+                                    "entry_price": Decimal(position["avgPrice"]),
+                                    "side": position_side,
+                                    "amount": Decimal(position["size"]),
+                                    "liquidation_price": Decimal(position["liqPrice"]),
+                                }
+                            )
+                else:
+                    break
+            else:
+                break
+
+        return positions
