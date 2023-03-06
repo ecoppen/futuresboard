@@ -12,5 +12,31 @@ A python (3.11+) based scraper and dashboard to monitor the performance of your 
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 </p>
 
+### Supported exchanges for direct data 
+- <a target="_blank" href="https://www.binance.com">Binance</a>
+- <a target="_blank" href="https://www.bybit.com">Bybit</a>
+- <a target="_blank" href="https://www.okx.com">Okx</a>
+
+### Supported exchanges for account trading history
+- <a target="_blank" href="https://www.binance.com">Binance</a>
+- <a target="_blank" href="https://www.bybit.com">Bybit</a>
+
+## Quickstart
+
+- Clone the repo `git clone https://github.com/ecoppen/futuresboard.git`
+- Navigate to the repo root `cd futuresboard`
+- Navigate to the config folder `cd config`
+- Create the config file from template `cp config.example.json config.json`
+- Populate the `config.json` files as required using a text editor e.g. `nano config.json`
+- Navigate back to the repo root `cd ..`
+- Install pipenv `pip install pipenv`
+- Install required packages `pipenv install`
+- Activate the environment `pipenv shell`
+- Start the webserver in development mode `uvicorn futuresboard.main:app --reload`
+
+### Developers
+- Install developer requirements from pipenv `pipenv install --dev`
+- Install pre-commit hooks `pre-commit install`
+
 ## License
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fecoppen%2Ffuturesboard.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fecoppen%2Ffuturesboard?ref=badge_large)
