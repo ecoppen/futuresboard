@@ -24,7 +24,13 @@ class Scraper:
             positions = self.exchanges[account.exchange].get_open_futures_positions(
                 account=key_secret
             )
-            self.database.delete_then_update_positions(
-                account_id=account.id, data=positions
+            self.database.delete_then_update_by_account_id(
+                account_id=account.id, table="positions", data=positions
+            )
+            orders = self.exchanges[account.exchange].get_open_futures_orders(
+                account=key_secret
+            )
+            self.database.delete_then_update_by_account_id(
+                account_id=account.id, table="orders", data=orders
             )
             log.info(f"Scrape cycle for {account.name} complete")
