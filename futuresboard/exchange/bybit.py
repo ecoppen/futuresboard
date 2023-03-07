@@ -170,3 +170,49 @@ class Bybit(Exchange):
                 break
 
         return positions
+
+    def get_open_futures_orders(self, account: dict) -> list:
+        params = {"category": "linear", "limit": 50, "settleCoin": "USDT"}
+        orders = []
+
+        complete = False
+        pagination = None
+        while not complete:
+            self.check_weight()
+            if pagination is not None:
+                params["cursor"] = pagination
+            responseHeader, responseJSON = send_signed_request(
+                http_method="GET",
+                url_path="/v5/order/realtime",
+                payload=params,
+                exchange="bybit",
+                base_url=self.futures_api_url,
+                keys=account,
+            )
+            if "rate_limit_status" in responseJSON:
+                self.update_weight(weight=self.max_weight)
+            else:
+                self.update_weight(weight=0)
+
+            if "result" in responseJSON:
+                if "nextPageCursor" in responseJSON["result"]:
+                    pagination = responseJSON["result"]["nextPageCursor"]
+                    if len(pagination) == 0:
+                        complete = True
+
+                if "list" in responseJSON["result"]:
+                    for order in responseJSON["result"]["list"]:
+                        order_side = order["side"].upper()
+
+                        orders.append(
+                            {
+                                "quantity": Decimal(order["qty"]),
+                                "symbol": order["symbol"],
+                                "price": Decimal(order["price"]),
+                                "side": order_side,
+                                "status": order["orderStatus"],
+                                "type": order["orderType"],
+                            }
+                        )
+
+        return orders
