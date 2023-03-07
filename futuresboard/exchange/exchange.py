@@ -51,3 +51,6 @@ class Exchange:
 
     def get_open_futures_positions(self, account: dict) -> list:
         return []
+
+    def get_open_futures_orders(self, account: dict) -> list:
+        return []
