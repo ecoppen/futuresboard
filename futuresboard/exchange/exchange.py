@@ -19,6 +19,9 @@ class Exchange:
     weight: int = 0
     max_weight: int = 100
 
+    def check_api_permissions(self) -> None:
+        pass
+
     def check_weight(self) -> None:
         if self.weight >= self.max_weight:
             log.info(
@@ -53,4 +56,10 @@ class Exchange:
         return []
 
     def get_open_futures_orders(self, account: dict) -> list:
+        return []
+
+    def get_wallet_balance(self, account: dict) -> list:
+        return []
+
+    def get_profit_and_loss(self, account: dict) -> list:
         return []
