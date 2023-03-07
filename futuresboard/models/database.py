@@ -93,17 +93,15 @@ class Database:
             )
 
         class Orders(self.Base):  # type: ignore
-            __tablename__ = "order"
+            __tablename__ = "orders"
 
             id: Mapped[intpk] = mapped_column(init=False)
             account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"))
             quantity: Mapped[float]
             price: Mapped[float]
             side: Mapped[str]
-            position_side: Mapped[str]
             status: Mapped[str]
             symbol: Mapped[str]
-
             type: Mapped[str]
 
             account: Mapped["Accounts"] = relationship(back_populates="orders")
@@ -151,21 +149,26 @@ class Database:
             session.commit()
         return accounts
 
-    def delete_then_update_positions(self, account_id: int, data: dict):
-        table_object = self.get_table_object(table_name="positions")
+    def delete_then_update_by_account_id(self, account_id: int, table: str, data: dict):
+        if table in ["positions", "orders"]:
+            table_object = self.get_table_object(table_name=table)
 
-        with Session(self.engine) as session:
-            check = session.scalars(
-                select(table_object).filter_by(id=account_id).limit(1)
-            ).first()
+            with Session(self.engine) as session:
+                check = session.scalars(
+                    select(table_object).filter_by(id=account_id).limit(1)
+                ).first()
 
-            if check is not None:
-                if check > 0:
-                    log.info(f"Position data found for account {account_id} - deleting")
-                    filters = [table_object.c.id == account_id]
-                    session.execute(delete(table_object).where(*filters))
-            for item in data:
-                item["account_id"] = account_id
-            session.execute(insert(table_object), data)
-            session.commit()
-        log.info(f"Position data updated for {account_id} - positions: {len(data)}")
+                if check is not None:
+                    if check > 0:
+                        log.info(
+                            f"{table.title()} data found for account {account_id} - deleting"
+                        )
+                        filters = [table_object.c.account_id == account_id]
+                        session.execute(delete(table_object).where(*filters))
+                for item in data:
+                    item["account_id"] = account_id
+                session.execute(insert(table_object), data)
+                session.commit()
+            log.info(
+                f"{table.title()} data updated for {account_id} - {table}: {len(data)}"
+            )
