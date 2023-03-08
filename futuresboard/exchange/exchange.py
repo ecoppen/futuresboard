@@ -19,7 +19,7 @@ class Exchange:
     weight: int = 0
     max_weight: int = 100
 
-    def check_api_permissions(self) -> None:
+    def check_api_permissions(self, account: dict) -> None:
         pass
 
     def check_weight(self) -> None:
