@@ -21,6 +21,9 @@ class Scraper:
         for account in self.accounts:
             key_secret = {"key": account.api_key, "secret": account.api_secret}
             log.info(f"Starting scrape cycle for {account.name}")
+
+            self.exchanges[account.exchange].check_api_permissions(account=key_secret)
+
             positions = self.exchanges[account.exchange].get_open_futures_positions(
                 account=key_secret
             )
