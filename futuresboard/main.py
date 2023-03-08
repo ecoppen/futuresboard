@@ -46,6 +46,13 @@ accounts = database.add_get_account_ids(accounts=config.accounts)
 scraper = Scraper(accounts=accounts, database=database, exchanges=exchanges)
 
 
+@app.get("/", response_class=HTMLResponse)
+def index(request: Request):
+    return templates.TemplateResponse(
+        "index.html", {"request": request, "dashboard_title": config.dashboard_name}
+    )
+
+
 @app.get("/getprice")
 def get_price(
     exchange: Exchanges,
