@@ -109,6 +109,11 @@ def send_public_request(
                 raise HTTPRequestError(
                     url=url, code=json_response["code"], msg=json_response["msg"]
                 )
+        if "retCode" in json_response:
+            if json_response["retCode"] != 0:
+                raise HTTPRequestError(
+                    url=url, code=json_response["retCode"], msg=json_response["retMsg"]
+                )
         return headers, json_response
     except requests.exceptions.ConnectionError:
         log.warning("Connection error")
