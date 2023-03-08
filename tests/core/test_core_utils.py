@@ -72,12 +72,11 @@ class TestCoreUtils(unittest.TestCase):
             content_type="application/json",
             headers={"X-MBX-USED-WEIGHT-1M": "1"},
         )
-        with self.assertRaises(HTTPRequestError) as cm:
-            send_public_request(url="http://api.futuresboard.com/", url_path="error")
-            self.assertEqual(
-                "Request to 'http://api.futuresboard.com/error' failed. Code: 429; Message: Rate limited",
-                str(cm.exception),
-            )
+        header, response = send_public_request(
+            url="http://api.futuresboard.com/", url_path="error"
+        )
+        assert header == ""
+        assert response == ""
 
     @responses.activate
     def test_Timeout_exception(self):
