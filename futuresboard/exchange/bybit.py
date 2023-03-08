@@ -117,6 +117,30 @@ class Bybit(Exchange):
                     ]
         return []
 
+    def check_api_permissions(self, account: dict) -> None:
+        self.check_weight()
+        responseHeader, responseJSON = send_signed_request(
+            http_method="GET",
+            url_path="/v5/user/query-api",
+            exchange="bybit",
+            base_url=self.futures_api_url,
+            keys=account,
+        )
+        if "rate_limit_status" in responseJSON:
+            self.update_weight(weight=self.max_weight)
+        else:
+            self.update_weight(weight=0)
+
+        if "result" in responseJSON:
+            if responseJSON["result"]["readOnly"] == 0:
+                log.warning(
+                    "futuresboard does not need write access, API permissions should be read only"
+                )
+            if "*" in responseJSON["result"]["ips"]:
+                log.warning(
+                    "Each API key/secret should be set to a fixed IP unless absolutely necessary"
+                )
+
     def get_open_futures_positions(self, account: dict) -> list:
         params = {"category": "linear", "limit": 200, "settleCoin": "USDT"}
         position_sides = {"buy": "LONG", "sell": "SHORT"}
