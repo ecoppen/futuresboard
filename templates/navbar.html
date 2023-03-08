@@ -1,0 +1,46 @@
+<style>
+    .navbar-wrap {
+        overflow: hidden;
+        position: relative;
+    }
+
+    .logo-bg {
+        opacity: 0.15;
+        position: absolute;
+        left: auto;
+        top: auto;
+        width: auto;
+        height: 200%;
+    }
+
+    .site-name {
+        position: relative;
+    }
+</style>
+<nav class="navbar py-2 bg-dark navbar-dark border-bottom navbar-expand-lg">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="container d-flex flex-wrap">
+            <ul class="nav navbar-nav me-auto">
+
+                <li class="nav-item"><a href="{{url_for('index')}}" class="nav-link px-2 {% if request.path == "/" %}active{% endif %}"
+                                        aria-current="page">Home</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<header class="py-3 mb-4 border-bottom navbar-wrap">
+    <div class="container d-flex flex-wrap justify-content-center">
+        <a href="{{url_for('index')}}" class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto text-dark text-decoration-none">
+
+            <img class="logo-bg" src="{{url_for('static', path='/images/logo.png')}}" height="40px" alt="Logo">
+            &nbsp;<span class="fs-4 site-name">{{ dashboard_title }}</span>
+        </a>
+
+        <div class="btn-group btn-group-sm col-12 col-lg-auto mb-3 mb-lg-0 demo-wrap2" role="group">
+        </div>
+    </div>
+</header>

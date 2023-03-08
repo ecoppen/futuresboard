@@ -1,0 +1,17 @@
+</div>
+</body>
+<div class="container">
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+        <p class="col-md-4 mb-0 text-muted">&copy; {{ current_year }} futuresboard <a style="text-decoration: none; color:#000" target="_blank" href="https://github.com/ecoppen"><i
+                class="fab fa-github"></i></a></p>
+
+        <ul class="nav col-md-4 justify-content-end">
+            <li class="nav-item"><a href="{{url_for('index')}}" class="nav-link px-2 text-muted">Home</a></li>
+        </ul>
+    </footer>
+</div>
+<script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>
+</html>
