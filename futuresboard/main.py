@@ -41,6 +41,8 @@ config_file = Path(Path().resolve(), "config", "config.json")
 config = load_config(path=config_file)
 
 database = Database(config=config.database)
+database.set_accounts_inactive()
+
 accounts = database.add_get_account_ids(accounts=config.accounts)
 
 scraper = Scraper(accounts=accounts, database=database, exchanges=exchanges)
