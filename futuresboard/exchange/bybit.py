@@ -240,3 +240,31 @@ class Bybit(Exchange):
                         )
 
         return orders
+
+    def get_wallet_balance(self, account: dict) -> list:
+        self.check_weight()
+        params = {"accountType": "contract"}
+        balances = []
+
+        responseHeader, responseJSON = send_signed_request(
+            http_method="GET",
+            url_path="/v5/account/wallet-balance",
+            payload=params,
+            exchange="bybit",
+            base_url=self.futures_api_url,
+            keys=account,
+        )
+        if "rate_limit_status" in responseJSON:
+            self.update_weight(weight=self.max_weight)
+        else:
+            self.update_weight(weight=0)
+
+        if "result" in responseJSON:
+            if "list" in responseJSON["result"]:
+                if len(responseJSON["result"]["list"]) > 0:
+                    if "coin" in responseJSON["result"]["list"][0]:
+                        for coin in responseJSON["result"]["list"][0]["coin"]:
+                            balances.append(
+                                {"coin": coin["coin"], "amount": coin["equity"]}
+                            )
+        return balances
