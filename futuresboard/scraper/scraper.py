@@ -36,4 +36,12 @@ class Scraper:
             self.database.delete_then_update_by_account_id(
                 account_id=account.id, table="orders", data=orders
             )
+
+            balances = self.exchanges[account.exchange].get_wallet_balance(
+                account=key_secret
+            )
+            self.database.delete_then_update_by_account_id(
+                account_id=account.id, table="wallet", data=balances
+            )
+
             log.info(f"Scrape cycle for {account.name} complete")

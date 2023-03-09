@@ -63,7 +63,9 @@ class Database:
 
             positions: Mapped[List["Positions"]] = relationship(back_populates="account", cascade="all, delete")  # type: ignore # noqa: F821
             orders: Mapped[List["Orders"]] = relationship(back_populates="account", cascade="all, delete")  # type: ignore # noqa: F821
+            wallet: Mapped[List["Wallet"]] = relationship(back_populates="account", cascade="all, delete")  # type: ignore # noqa: F821
 
+            active: Mapped[int] = mapped_column(Integer, default=1)
             added: Mapped[int] = mapped_column(
                 BigInteger, default=self.timestamp(dt=datetime.now())
             )
@@ -110,6 +112,20 @@ class Database:
                 BigInteger, default=self.timestamp(dt=datetime.now())
             )
 
+        class Wallet(self.Base):  # type: ignore
+            __tablename__ = "wallet"
+
+            id: Mapped[intpk] = mapped_column(init=False)
+            account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"))
+            coin: Mapped[str]
+            amount: Mapped[float]
+
+            account: Mapped["Accounts"] = relationship(back_populates="wallet")
+
+            added: Mapped[int] = mapped_column(
+                BigInteger, default=self.timestamp(dt=datetime.now())
+            )
+
         self.Base.metadata.create_all(self.engine)  # type: ignore
         log.info("database tables loaded")
 
@@ -119,6 +135,13 @@ class Database:
     def get_table_object(self, table_name: str):
         self.Base.metadata.reflect(bind=self.engine)  # type: ignore
         return self.Base.metadata.tables[table_name]  # type: ignore
+
+    def set_accounts_inactive(self):
+        log.info("Setting all accounts inactive before loading config")
+        table_object = self.get_table_object(table_name="accounts")
+        with Session(self.engine) as session:
+            session.execute(update(table_object).values({"active": 0}))
+            session.commit()
 
     def add_get_account_ids(self, accounts: list):
         table_object = self.get_table_object(table_name="accounts")
@@ -145,12 +168,17 @@ class Database:
                     log.info(
                         f"Account found in database with name '{account.name}', loading"
                     )
+                    filters = [table_object.c.id == check]
+                    session.execute(
+                        update(table_object).where(*filters).values({"active": 1})
+                    )
+                    session.commit()
                     account.id = check
             session.commit()
         return accounts
 
     def delete_then_update_by_account_id(self, account_id: int, table: str, data: dict):
-        if table in ["positions", "orders"]:
+        if table in ["positions", "orders", "wallet"]:
             table_object = self.get_table_object(table_name=table)
 
             with Session(self.engine) as session:
