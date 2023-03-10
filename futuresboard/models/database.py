@@ -64,6 +64,7 @@ class Database:
             positions: Mapped[List["Positions"]] = relationship(back_populates="account", cascade="all, delete")  # type: ignore # noqa: F821
             orders: Mapped[List["Orders"]] = relationship(back_populates="account", cascade="all, delete")  # type: ignore # noqa: F821
             wallet: Mapped[List["Wallet"]] = relationship(back_populates="account", cascade="all, delete")  # type: ignore # noqa: F821
+            transactions: Mapped[List["Transactions"]] = relationship(back_populates="account", cascade="all, delete")  # type: ignore # noqa: F821
 
             active: Mapped[int] = mapped_column(Integer, default=1)
             added: Mapped[int] = mapped_column(
@@ -105,6 +106,8 @@ class Database:
             status: Mapped[str]
             symbol: Mapped[str]
             type: Mapped[str]
+            created_time: Mapped[int] = mapped_column(BigInteger)
+            updated_time: Mapped[int] = mapped_column(BigInteger)
 
             account: Mapped["Accounts"] = relationship(back_populates="orders")
 
@@ -126,6 +129,20 @@ class Database:
                 BigInteger, default=self.timestamp(dt=datetime.now())
             )
 
+        class Transactions(self.Base):  # type: ignore
+            __tablename__ = "transactions"
+
+            id: Mapped[intpk] = mapped_column(init=False)
+            account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"))
+            symbol: Mapped[str]
+            order_id: Mapped[str]
+            order_type: Mapped[str]
+            exec_type: Mapped[str]
+            profit: Mapped[float]
+            time: Mapped[int] = mapped_column(BigInteger)
+
+            account: Mapped["Accounts"] = relationship(back_populates="transactions")
+
         self.Base.metadata.create_all(self.engine)  # type: ignore
         log.info("database tables loaded")
 
@@ -142,6 +159,21 @@ class Database:
         with Session(self.engine) as session:
             session.execute(update(table_object).values({"active": 0}))
             session.commit()
+
+    def get_latest_transaction_symbol(self, account_id: int, symbol: str) -> int:
+        table_object = self.get_table_object(table_name="transactions")
+
+        with Session(self.engine) as session:
+            check = session.execute(
+                select(table_object).filter_by(id=account_id, symbol=symbol).limit(1)
+            ).first()
+            if check is None:
+                return int(
+                    datetime.fromisoformat("2019-01-01 00:00:00+00:00").timestamp()
+                    * 1000
+                )
+            else:
+                return int(check[7])
 
     def add_get_account_ids(self, accounts: list):
         table_object = self.get_table_object(table_name="accounts")
