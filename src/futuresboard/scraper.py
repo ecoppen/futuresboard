@@ -110,7 +110,10 @@ def send_signed_request(http_method, url_path, payload={}, exchange="binance"):
             timestamp=timestamp,
         )(**params)
         headers = response.headers
-        json_response = response.json()
+        try:
+            json_response = response.json()
+        except requests.exceptions.JSONDecodeError as e:
+            raise HTTPRequestError(url=url, code=-3, msg=f"{e}")
         if "code" in json_response:
             raise HTTPRequestError(
                 url=url, code=json_response["code"], msg=json_response["msg"]
@@ -135,7 +138,10 @@ def send_public_request(url_path, payload={}):
     try:
         response = dispatch_request("GET")(url=url)
         headers = response.headers
-        json_response = response.json()
+        try:
+            json_response = response.json()
+        except requests.exceptions.JSONDecodeError as e:
+            raise HTTPRequestError(url=url, code=-3, msg=f"{e}")
         if "code" in json_response:
             raise HTTPRequestError(
                 url=url, code=json_response["code"], msg=json_response["msg"]
