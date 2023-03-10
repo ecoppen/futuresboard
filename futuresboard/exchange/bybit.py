@@ -236,6 +236,8 @@ class Bybit(Exchange):
                                 "side": order_side,
                                 "status": order["orderStatus"],
                                 "type": order["orderType"],
+                                "created_time": order["createdTime"],
+                                "updated_time": order["updatedTime"],
                             }
                         )
 
@@ -268,3 +270,56 @@ class Bybit(Exchange):
                                 {"coin": coin["coin"], "amount": coin["equity"]}
                             )
         return balances
+
+    def get_profit_and_loss(self, account: dict, symbol: str, start: int) -> list:
+        params = {
+            "category": "linear",
+            "limit": 100,
+            "symbol": symbol,
+            "startTime": start,
+        }
+        closed_pnl = []
+
+        complete = False
+        pagination = None
+        while not complete:
+            self.check_weight()
+            if pagination is not None:
+                params["cursor"] = pagination
+            responseHeader, responseJSON = send_signed_request(
+                http_method="GET",
+                url_path="/v5/position/closed-pnl",
+                payload=params,
+                exchange="bybit",
+                base_url=self.futures_api_url,
+                keys=account,
+            )
+
+            if "rate_limit_status" in responseJSON:
+                self.update_weight(weight=self.max_weight)
+            else:
+                self.update_weight(weight=0)
+
+            if "result" in responseJSON:
+                if "nextPageCursor" in responseJSON["result"]:
+                    pagination = responseJSON["result"]["nextPageCursor"]
+                    if len(pagination) == 0:
+                        complete = True
+
+                if "list" in responseJSON["result"]:
+                    for transaction in responseJSON["result"]["list"]:
+                        closed_pnl.append(
+                            {
+                                "symbol": transaction["symbol"],
+                                "order_id": transaction["orderId"],
+                                "order_type": transaction["orderType"],
+                                "exec_type": transaction["execType"],
+                                "profit": Decimal(transaction["closedPnl"]),
+                                "created_time": int(transaction["createdTime"]),
+                                "updated_time": int(transaction["updatedTime"]),
+                            }
+                        )
+            else:
+                complete = True
+
+        return closed_pnl
