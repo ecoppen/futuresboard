@@ -61,5 +61,5 @@ class Exchange:
     def get_wallet_balance(self, account: dict) -> list:
         return []
 
-    def get_profit_and_loss(self, account: dict) -> list:
+    def get_profit_and_loss(self, account: dict, symbol: str, start: int) -> list:
         return []
