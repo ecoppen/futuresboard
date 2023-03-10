@@ -217,7 +217,7 @@ class Database:
 
             with Session(self.engine) as session:
                 check = session.scalars(
-                    select(table_object).filter_by(id=account_id).limit(1)
+                    select(table_object).filter_by(account_id=account_id).limit(1)
                 ).first()
 
                 if check is not None:
@@ -227,9 +227,10 @@ class Database:
                         )
                         filters = [table_object.c.account_id == account_id]
                         session.execute(delete(table_object).where(*filters))
-                for item in data:
-                    item["account_id"] = account_id
-                session.execute(insert(table_object), data)
+                if len(data) > 0:
+                    for item in data:
+                        item["account_id"] = account_id
+                    session.execute(insert(table_object), data)
                 session.commit()
             log.info(
                 f"{table.title()} data updated for {account_id} - {table}: {len(data)}"
