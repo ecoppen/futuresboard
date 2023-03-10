@@ -44,4 +44,20 @@ class Scraper:
                 account_id=account.id, table="wallet", data=balances
             )
 
+            pairs = self.exchanges[account.exchange].get_futures_prices()
+            pairs = [symbol["symbol"] for symbol in pairs]
+            log.info(f"Checking PnL for {len(pairs)} pairs")
+            for pair in pairs:
+                start = self.database.get_latest_transaction_symbol(
+                    account_id=account.id, symbol=pair
+                )
+                profit = self.exchanges[account.exchange].get_profit_and_loss(
+                    account=key_secret, symbol=pair, start=start
+                )
+
+                if len(profit) > 0:
+                    self.database.check_then_add_transaction(
+                        account_id=account.id, data=profit
+                    )
+
             log.info(f"Scrape cycle for {account.name} complete")
