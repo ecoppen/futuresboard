@@ -139,7 +139,8 @@ class Database:
             order_type: Mapped[str]
             exec_type: Mapped[str]
             profit: Mapped[float]
-            time: Mapped[int] = mapped_column(BigInteger)
+            created_time: Mapped[int] = mapped_column(BigInteger)
+            updated_time: Mapped[int] = mapped_column(BigInteger)
 
             account: Mapped["Accounts"] = relationship(back_populates="transactions")
 
@@ -167,6 +168,7 @@ class Database:
             check = session.execute(
                 select(table_object).filter_by(id=account_id, symbol=symbol).limit(1)
             ).first()
+
             if check is None:
                 return int(
                     datetime.fromisoformat("2019-01-01 00:00:00+00:00").timestamp()
@@ -232,3 +234,25 @@ class Database:
             log.info(
                 f"{table.title()} data updated for {account_id} - {table}: {len(data)}"
             )
+
+    def check_then_add_transaction(self, account_id: int, data: dict):
+        table_object = self.get_table_object(table_name="transactions")
+        added = 0
+        with Session(self.engine) as session:
+            for transaction in data:
+                check = session.scalars(
+                    select(table_object)
+                    .filter_by(
+                        account_id=account_id,
+                        symbol=transaction["symbol"],
+                        order_id=transaction["order_id"],
+                        created_time=transaction["created_time"],
+                    )
+                    .limit(1)
+                ).first()
+                if check is None:
+                    transaction["account_id"] = account_id
+                    session.execute(insert(table_object), transaction)
+                    added += 1
+            session.commit()
+        log.info(f"Transaction data updated for {transaction['symbol']}: {added}")
