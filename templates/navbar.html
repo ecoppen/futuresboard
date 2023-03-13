@@ -37,7 +37,7 @@
         <a href="{{url_for('index')}}" class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto text-light text-decoration-none">
 
             <img class="logo-bg" src="{{url_for('static', path='/images/logo.png')}}" height="40px" alt="Logo">
-            &nbsp;<span class="fs-4 site-name">{{ dashboard_title }}</span>
+            &nbsp;<span class="fs-4 site-name">{{ page_data['dashboard_title'] }}</span>
         </a>
 
         <div class="btn-group btn-group-sm col-12 col-lg-auto mb-3 mb-lg-0 demo-wrap2" role="group">
