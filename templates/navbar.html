@@ -25,9 +25,10 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <div class="container d-flex flex-wrap">
             <ul class="nav navbar-nav me-auto">
-
                 <li class="nav-item"><a href="{{url_for('index')}}" class="nav-link px-2 {% if request.path == "/" %}active{% endif %}"
                                         aria-current="page">Home</a></li>
+                <li class="nav-item"><a href="/docs" class="nav-link px-2"
+                                        aria-current="page">API</a></li>
             </ul>
         </div>
     </div>
