@@ -4,6 +4,7 @@ import logging
 import os
 import threading
 import time
+from datetime import date
 from pathlib import Path
 
 from fastapi import FastAPI, Request
@@ -48,10 +49,12 @@ accounts = database.add_get_account_ids(accounts=config.accounts)
 scraper = Scraper(accounts=accounts, database=database, exchanges=exchanges)
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
 def index(request: Request):
+    accounts = database.get_accounts()
+    page_data = {"dashboard_title": config.dashboard_name, "year": date.today().year}
     return templates.TemplateResponse(
-        "index.html", {"request": request, "dashboard_title": config.dashboard_name}
+        "index.html", {"request": request, "page_data": page_data, "accounts": accounts}
     )
 
 
