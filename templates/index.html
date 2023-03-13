@@ -4,8 +4,124 @@
 </style>
 
 <div class="row">
-    <div class="col-12">
-        test
+    <div class="col-8">
+        <div class="accordion" id="accordionAccounts">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingActive">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseActive" aria-expanded="true" aria-controls="collapseActive">
+                        Active
+                    </button>
+                </h2>
+                <div id="collapseActive" class="accordion-collapse collapse show" aria-labelledby="headingActive"
+                     data-bs-parent="#accordionAccounts">
+                    <div class="accordion-body" style="max-height: 30rem; overflow-y: auto;">
+                        <table class="table table-bordered table-sm text-center">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Exchange</th>
+                                <th scope="col">Long positions</th>
+                                <th scope="col">Short positions</th>
+                                <th scope="col">Buy orders</th>
+                                <th scope="col">Sell orders</th>
+                                <th scope="col">uPnL</th>
+                                <th scope="col">PnL</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if accounts["active"]|length > 0 %}
+                                {% for account in accounts["active"] %}
+                                    <tr>
+                                        <td>{{ account["id"] }}</td>
+                                        <td>{{ account["name"] }}</td>
+                                        <td>{{ account["exchange"] }}</td>
+                                        <td>{{ account["long"] }}</td>
+                                        <td>{{ account["short"] }}</td>
+                                        <td>{{ account["buy"] }}</td>
+                                        <td>{{ account["sell"] }}</td>
+                                        {% if account["upnl"] >= 0 %}
+                                            <td class="table-success">
+                                        {% else %}
+                                            <td class="table-danger">
+                                        {% endif %}
+                                        {{ "%.3g"|format(account["upnl"]) }}</td>
+                                        {% if account["pnl"] >= 0 %}
+                                            <td class="table-success">
+                                        {% else %}
+                                            <td class="table-danger">
+                                        {% endif %}
+                                        {{ "%.3g"|format(account["pnl"]) }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr><td colspan="9">No active accounts</td></tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingInactive">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseInactive" aria-expanded="false" aria-controls="collapseInactive">
+                        Inactive
+                    </button>
+                </h2>
+                <div id="collapseInactive" class="accordion-collapse collapse" aria-labelledby="headingInactive"
+                     data-bs-parent="#accordionAccounts">
+                    <div class="accordion-body" style="max-height: 30rem; overflow-y: auto;">
+                        <table class="table table-bordered table-sm text-center">
+                           <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Exchange</th>
+                                <th scope="col">Long positions</th>
+                                <th scope="col">Short positions</th>
+                                <th scope="col">Buy orders</th>
+                                <th scope="col">Sell orders</th>
+                                <th scope="col">uPnL</th>
+                                <th scope="col">PnL</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if accounts["inactive"]|length > 0 %}
+                                {% for account in accounts["inactive"] %}
+                                    <tr>
+                                        <td>{{ account["id"] }}</td>
+                                        <td>{{ account["name"] }}</td>
+                                        <td>{{ account["exchange"] }}</td>
+                                        <td>{{ account["long"] }}</td>
+                                        <td>{{ account["short"] }}</td>
+                                        <td>{{ account["buy"] }}</td>
+                                        <td>{{ account["sell"] }}</td>
+                                        {% if account["upnl"] >= 0 %}
+                                            <td class="table-success">
+                                        {% else %}
+                                            <td class="table-danger">
+                                        {% endif %}
+                                        {{ "%.3g"|format(account["upnl"]) }}</td>
+
+                                        {% if account["pnl"] >= 0 %}
+                                            <td class="table-success">
+                                        {% else %}
+                                            <td class="table-danger">
+                                        {% endif %}
+                                        {{ "%.3g"|format(account["pnl"]) }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr><td colspan="9">No inactive accounts</td></tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
