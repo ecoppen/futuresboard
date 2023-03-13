@@ -154,7 +154,7 @@ class Database:
         self.Base.metadata.reflect(bind=self.engine)  # type: ignore
         return self.Base.metadata.tables[table_name]  # type: ignore
 
-    def set_accounts_inactive(self):
+    def set_accounts_inactive(self) -> None:
         log.info("Setting all accounts inactive before loading config")
         table_object = self.get_table_object(table_name="accounts")
         with Session(self.engine) as session:
@@ -177,7 +177,7 @@ class Database:
             else:
                 return int(check[7])
 
-    def add_get_account_ids(self, accounts: list):
+    def add_get_account_ids(self, accounts: list) -> list:
         table_object = self.get_table_object(table_name="accounts")
 
         with Session(self.engine) as session:
@@ -211,7 +211,9 @@ class Database:
             session.commit()
         return accounts
 
-    def delete_then_update_by_account_id(self, account_id: int, table: str, data: dict):
+    def delete_then_update_by_account_id(
+        self, account_id: int, table: str, data: dict
+    ) -> None:
         if table in ["positions", "orders", "wallet"]:
             table_object = self.get_table_object(table_name=table)
 
@@ -236,7 +238,7 @@ class Database:
                 f"{table.title()} data updated for {account_id} - {table}: {len(data)}"
             )
 
-    def check_then_add_transaction(self, account_id: int, data: dict):
+    def check_then_add_transaction(self, account_id: int, data: dict) -> None:
         table_object = self.get_table_object(table_name="transactions")
         added = 0
         with Session(self.engine) as session:
@@ -257,3 +259,111 @@ class Database:
                     added += 1
             session.commit()
         log.info(f"Transaction data updated for {transaction['symbol']}: {added}")
+
+    def get_accounts(self) -> dict:
+        table_object = self.get_table_object(table_name="accounts")
+        accounts: dict = {"active": [], "inactive": []}
+        with Session(self.engine) as session:
+            all_accounts = session.execute(
+                select(table_object).order_by(table_object.c.id.asc())
+            ).all()
+            active = ["inactive", "active"]
+            for account in all_accounts:
+                positions = self.get_count_positions(account_id=account[0])
+                orders = self.get_count_orders(account_id=account[0])
+                upnl = self.get_unrealised_profit(account_id=account[0])
+                pnl = self.get_closed_profit(account_id=account[0])
+                accounts[active[account[3]]].append(
+                    {
+                        "id": account[0],
+                        "name": account[1],
+                        "exchange": account[2],
+                        "last_update": account[5],
+                        "long": positions["long"],
+                        "short": positions["short"],
+                        "buy": orders["buy"],
+                        "sell": orders["sell"],
+                        "upnl": upnl,
+                        "pnl": pnl,
+                    }
+                )
+        return accounts
+
+    def get_count_positions(self, account_id: int) -> dict:
+        table_object = self.get_table_object(table_name="positions")
+        positions: dict = {"long": 0, "short": 0}
+        with Session(self.engine) as session:
+            filters = [
+                table_object.c.account_id == account_id,
+                table_object.c.side == "LONG",
+            ]
+            count_long = session.scalar(
+                select(func.count()).select_from(table_object).filter(*filters)
+            )
+
+            filters = [
+                table_object.c.account_id == account_id,
+                table_object.c.side == "SHORT",
+            ]
+            count_short = session.scalar(
+                select(func.count()).select_from(table_object).filter(*filters)
+            )
+
+        if count_long is not None:
+            positions["long"] = count_long
+        if count_short is not None:
+            positions["short"] = count_short
+        return positions
+
+    def get_count_orders(self, account_id: int) -> dict:
+        table_object = self.get_table_object(table_name="orders")
+        orders: dict = {"buy": 0, "sell": 0}
+        with Session(self.engine) as session:
+            filters = [
+                table_object.c.account_id == account_id,
+                table_object.c.side == "BUY",
+            ]
+            count_buy = session.scalar(
+                select(func.count()).select_from(table_object).filter(*filters)
+            )
+
+            filters = [
+                table_object.c.account_id == account_id,
+                table_object.c.side == "SELL",
+            ]
+            count_sell = session.scalar(
+                select(func.count()).select_from(table_object).filter(*filters)
+            )
+
+        if count_buy is not None:
+            orders["buy"] = count_buy
+        if count_sell is not None:
+            orders["sell"] = count_sell
+
+        return orders
+
+    def get_unrealised_profit(self, account_id: int) -> float:
+        table_object = self.get_table_object(table_name="positions")
+        with Session(self.engine) as session:
+            result = session.scalar(
+                select(func.sum(table_object.c.unrealised_profit))
+                .select_from(table_object)
+                .filter_by(account_id=account_id)
+            )
+        if result is None:
+            return 0.0
+        else:
+            return result
+
+    def get_closed_profit(self, account_id: int) -> float:
+        table_object = self.get_table_object(table_name="transactions")
+        with Session(self.engine) as session:
+            result = session.scalar(
+                select(func.sum(table_object.c.profit))
+                .select_from(table_object)
+                .filter_by(account_id=account_id)
+            )
+        if result is None:
+            return 0.0
+        else:
+            return result
