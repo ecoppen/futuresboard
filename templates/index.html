@@ -4,7 +4,7 @@
 </style>
 
 <div class="row">
-    <div class="col-8">
+    <div class="col-9">
         <div class="accordion" id="accordionAccounts">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="headingActive">
@@ -22,12 +22,14 @@
                                 <th scope="col">#</th>
                                 <th scope="col">Name</th>
                                 <th scope="col">Exchange</th>
-                                <th scope="col">Long positions</th>
-                                <th scope="col">Short positions</th>
+                                <th scope="col">Long pos.</th>
+                                <th scope="col">Short pos.</th>
                                 <th scope="col">Buy orders</th>
                                 <th scope="col">Sell orders</th>
                                 <th scope="col">uPnL</th>
                                 <th scope="col">PnL</th>
+                                <th scope="col">Last updated</th>
+                                <th scope="col">View</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -53,6 +55,8 @@
                                             <td class="table-danger">
                                         {% endif %}
                                         {{ "%.3g"|format(account["pnl"]) }}</td>
+                                        <td>{{ account["last_update"] }}m</td>
+                                        <td><a class="btn btn-primary btn-sm" href="{{ url_for('account', account_id=account["id"])}}" role="button"><i class="fa-solid fa-angles-right"></i></a></td>
                                     </tr>
                                 {% endfor %}
                             {% else %}
@@ -79,12 +83,14 @@
                                 <th scope="col">#</th>
                                 <th scope="col">Name</th>
                                 <th scope="col">Exchange</th>
-                                <th scope="col">Long positions</th>
-                                <th scope="col">Short positions</th>
+                                <th scope="col">Long pos.</th>
+                                <th scope="col">Short pos.</th>
                                 <th scope="col">Buy orders</th>
                                 <th scope="col">Sell orders</th>
                                 <th scope="col">uPnL</th>
                                 <th scope="col">PnL</th>
+                                <th scope="col">Last updated</th>
+                                <th scope="col">View</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -111,6 +117,8 @@
                                             <td class="table-danger">
                                         {% endif %}
                                         {{ "%.3g"|format(account["pnl"]) }}</td>
+                                        <td>{{ account["last_update"] }}</td>
+                                        <td><a class="btn btn-primary btn-sm" href="{{ url_for('account')}}/{{ account["id"] }}" role="button"><i class="fa-solid fa-angles-right"></i></a></td>
                                     </tr>
                                 {% endfor %}
                             {% else %}
