@@ -7,9 +7,11 @@ import time
 from datetime import date
 from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
+from fastapi import Path as fPath
+from fastapi import Request
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -55,6 +57,22 @@ def index(request: Request):
     page_data = {"dashboard_title": config.dashboard_name, "year": date.today().year}
     return templates.TemplateResponse(
         "index.html", {"request": request, "page_data": page_data, "accounts": accounts}
+    )
+
+
+@app.get("/account/{account_id}", response_class=HTMLResponse, include_in_schema=False)
+def account(
+    request: Request,
+    account_id: int = fPath(title="The ID of the account to get", gt=0),
+):
+    log.info(account_id)
+    account = database.get_account(account_id=account_id)
+    if not account:
+        return RedirectResponse("/")
+
+    page_data = {"dashboard_title": config.dashboard_name, "year": date.today().year}
+    return templates.TemplateResponse(
+        "account.html", {"request": request, "page_data": page_data, "account": account}
     )
 
 
