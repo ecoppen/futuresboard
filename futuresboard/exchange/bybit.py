@@ -271,13 +271,17 @@ class Bybit(Exchange):
                             )
         return balances
 
-    def get_profit_and_loss(self, account: dict, symbol: str, start: int) -> list:
+    def get_profit_and_loss(
+        self, account: dict, start: int, symbol: str | None = None
+    ) -> list:
         params = {
             "category": "linear",
             "limit": 100,
-            "symbol": symbol,
             "startTime": start,
         }
+        if symbol is not None:
+            params["symbol"] = symbol
+
         closed_pnl = []
 
         complete = False
