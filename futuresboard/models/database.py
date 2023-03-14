@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from datetime import datetime, timezone
 from typing import List, Optional
@@ -161,13 +163,24 @@ class Database:
             session.execute(update(table_object).values({"active": 0}))
             session.commit()
 
-    def get_latest_transaction_symbol(self, account_id: int, symbol: str) -> int:
+    def get_latest_transaction(self, account_id: int, symbol: str | None = None) -> int:
         table_object = self.get_table_object(table_name="transactions")
 
         with Session(self.engine) as session:
-            check = session.execute(
-                select(table_object).filter_by(id=account_id, symbol=symbol).limit(1)
-            ).first()
+            if symbol is None:
+                check = session.execute(
+                    select(table_object)
+                    .filter_by(id=account_id)
+                    .order_by(table_object.c.created_time.desc())
+                    .limit(1)
+                ).first()
+            else:
+                check = session.execute(
+                    select(table_object)
+                    .filter_by(id=account_id, symbol=symbol)
+                    .order_by(table_object.c.created_time.desc())
+                    .limit(1)
+                ).first()
 
             if check is None:
                 return int(
@@ -273,12 +286,17 @@ class Database:
                 orders = self.get_count_orders(account_id=account[0])
                 upnl = self.get_unrealised_profit(account_id=account[0])
                 pnl = self.get_closed_profit(account_id=account[0])
+
+                today = datetime.now()
+                last_checked = datetime.utcfromtimestamp(account[5] / 1000.0)
+                delta = today - last_checked
+
                 accounts[active[account[3]]].append(
                     {
                         "id": account[0],
                         "name": account[1],
                         "exchange": account[2],
-                        "last_update": account[5],
+                        "last_update": delta.seconds // 60,
                         "long": positions["long"],
                         "short": positions["short"],
                         "buy": orders["buy"],
@@ -288,6 +306,24 @@ class Database:
                     }
                 )
         return accounts
+
+    def get_account(self, account_id: int) -> dict:
+        table_object = self.get_table_object(table_name="accounts")
+        account_data: dict = {}
+        with Session(self.engine) as session:
+            account = session.execute(
+                select(table_object).filter_by(id=account_id)
+            ).first()
+            if account:
+                account_data = {
+                    "id": account[0],
+                    "name": account[1],
+                    "exchange": account[2],
+                    "active": account[3],
+                    "added": account[4],
+                    "last_checked": account[5],
+                }
+        return account_data
 
     def get_count_positions(self, account_id: int) -> dict:
         table_object = self.get_table_object(table_name="positions")
