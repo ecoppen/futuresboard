@@ -48,7 +48,7 @@ class Scraper:
             pairs = [symbol["symbol"] for symbol in pairs]
             log.info(f"Checking PnL for {len(pairs)} pairs")
             for pair in pairs:
-                start = self.database.get_latest_transaction_symbol(
+                start = self.database.get_latest_transaction(
                     account_id=account.id, symbol=pair
                 )
                 profit = self.exchanges[account.exchange].get_profit_and_loss(
