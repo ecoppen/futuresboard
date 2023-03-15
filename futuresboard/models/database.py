@@ -403,3 +403,35 @@ class Database:
             return 0.0
         else:
             return result
+
+    def get_trades(
+        self,
+        account_id: int | None = None,
+        limit: int | None = None,
+        sort: bool = False,
+        order: str = "",
+    ):
+        table_object = self.get_table_object(table_name="transactions")
+        filters = []
+        if account_id is not None:
+            filters.append(table_object.c.account_id == account_id)
+
+        with Session(self.engine) as session:
+            if sort:
+                if order == "asc":
+                    trades = session.execute(
+                        select(table_object)
+                        .filter(*filters)
+                        .order_by(table_object.c.created_time.asc())
+                    ).all()
+                else:
+                    trades = session.execute(
+                        select(table_object)
+                        .filter(*filters)
+                        .order_by(table_object.c.created_time.desc())
+                    ).all()
+            else:
+                trades = session.execute(select(table_object).filter(*filters)).all()
+        if limit is not None:
+            return trades[:limit]
+        return trades
