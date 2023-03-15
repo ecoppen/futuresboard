@@ -45,22 +45,26 @@
                                         <td>{{ account["sell"] }}</td>
                                         {% if account["upnl"] >= 0 %}
                                             <td class="table-success">
-                                        {% else %}
+                                                {% else %}
                                             <td class="table-danger">
                                         {% endif %}
                                         {{ "%.3g"|format(account["upnl"]) }}</td>
                                         {% if account["pnl"] >= 0 %}
                                             <td class="table-success">
-                                        {% else %}
+                                                {% else %}
                                             <td class="table-danger">
                                         {% endif %}
                                         {{ "%.3g"|format(account["pnl"]) }}</td>
                                         <td>{{ account["last_update"] }}m</td>
-                                        <td><a class="btn btn-primary btn-sm" href="{{ url_for('account', account_id=account["id"])}}" role="button"><i class="fa-solid fa-angles-right"></i></a></td>
+                                        <td><a class="btn btn-primary btn-sm"
+                                               href="{{ url_for('account', account_id=account["id"]) }}"
+                                               role="button"><i class="fa-solid fa-angles-right"></i></a></td>
                                     </tr>
                                 {% endfor %}
                             {% else %}
-                                <tr><td colspan="9">No active accounts</td></tr>
+                                <tr>
+                                    <td colspan="9">No active accounts</td>
+                                </tr>
                             {% endif %}
                             </tbody>
                         </table>
@@ -78,7 +82,7 @@
                      data-bs-parent="#accordionAccounts">
                     <div class="accordion-body" style="max-height: 30rem; overflow-y: auto;">
                         <table class="table table-bordered table-sm text-center">
-                           <thead>
+                            <thead>
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">Name</th>
@@ -106,29 +110,85 @@
                                         <td>{{ account["sell"] }}</td>
                                         {% if account["upnl"] >= 0 %}
                                             <td class="table-success">
-                                        {% else %}
+                                                {% else %}
                                             <td class="table-danger">
                                         {% endif %}
                                         {{ "%.3g"|format(account["upnl"]) }}</td>
 
                                         {% if account["pnl"] >= 0 %}
                                             <td class="table-success">
-                                        {% else %}
+                                                {% else %}
                                             <td class="table-danger">
                                         {% endif %}
                                         {{ "%.3g"|format(account["pnl"]) }}</td>
                                         <td>{{ account["last_update"] }}</td>
-                                        <td><a class="btn btn-primary btn-sm" href="{{ url_for('account')}}/{{ account["id"] }}" role="button"><i class="fa-solid fa-angles-right"></i></a></td>
+                                        <td><a class="btn btn-primary btn-sm"
+                                               href="{{ url_for('account') }}/{{ account["id"] }}" role="button"><i
+                                                class="fa-solid fa-angles-right"></i></a></td>
                                     </tr>
                                 {% endfor %}
                             {% else %}
-                                <tr><td colspan="9">No inactive accounts</td></tr>
+                                <tr>
+                                    <td colspan="9">No inactive accounts</td>
+                                </tr>
                             {% endif %}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card">
+            <div class="card-header">
+                Latest news
+            </div>
+            <div class="card-body">
+
+<div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    <div class="carousel-item active text-center">
+        <h5>First slide label</h5>
+        <p>Some representative placeholder content for the first slide.</p>
+    </div>
+    <div class="carousel-item text-center">
+        <h5>Second slide label</h5>
+        <p>Some representative placeholder content for the second slide.</p>
+    </div>
+    <div class="carousel-item text-center">
+        <h5>Third slide label</h5>
+        <p>Some representative placeholder content for the third slide.</p>
+    </div>
+  </div>
+</div>
+
+            </div>
+        </div>
+        <br>
+        <div class="card">
+            <div class="card-header">
+                Recent trades
+            </div>
+            <ul class="list-group list-group-flush">
+                {% if recent_trades|length > 0 %}
+                    {% for trade in recent_trades %}
+                        <li class="list-group-item">
+                            <span class="badge bg-primary">#{{ trade[1] }}</span>
+                            <span class="badge bg-secondary">{{ trade[2] }}</span>
+                            {% if trade[6] >= 0 %}
+                                <span class="badge bg-success">
+                            {% else %}
+                                <span class="badge bg-danger">
+                            {% endif %}
+                            {{ "%.3g"|format(trade[6]) }}
+                            </span>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <li class="list-group-item">No recent trades</li>
+                {% endif %}
+            </ul>
         </div>
     </div>
 </div>
