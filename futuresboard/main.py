@@ -54,9 +54,16 @@ scraper = Scraper(accounts=accounts, database=database, exchanges=exchanges)
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 def index(request: Request):
     accounts = database.get_accounts()
+    recent_trades = database.get_trades(limit=10, sort=True, order="desc")
     page_data = {"dashboard_title": config.dashboard_name, "year": date.today().year}
     return templates.TemplateResponse(
-        "index.html", {"request": request, "page_data": page_data, "accounts": accounts}
+        "index.html",
+        {
+            "request": request,
+            "page_data": page_data,
+            "accounts": accounts,
+            "recent_trades": recent_trades,
+        },
     )
 
 
