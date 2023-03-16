@@ -1,4 +1,4 @@
-# Servers
+# Optional - Servers
 !!! note
     An external server setup is recommended over one in your home because of speed, reliability and location. This guide is going to assume you're running Debian 10+
 

@@ -1,4 +1,6 @@
-# passivbot
+# Optional - passivbot
+!!! note
+    There is no requiremenmt to use passivbot. I started my futures journey using it and created futuresboard as a result. This page documents some of my insight from using it.
 
 [Passivbot](https://www.passivbot.com/en/latest/) is a fully automated trading bot built in Python (3.8 for most things, 3.8+ for live) by [@enarjord](https://github.com/enarjord/).
 
