@@ -1,4 +1,5 @@
 import logging
+from datetime import date
 
 import requests  # type: ignore
 
@@ -13,11 +14,16 @@ class Scraper:
         self.accounts = accounts
         self.database = database
         self.exchanges = exchanges
+        self.first_run = True
+        self.today = date.today()
 
     def scrape(self) -> None:
         self.scrape_cycle()
 
     def scrape_cycle(self) -> None:
+        if date.today() != self.today:
+            self.first_run = True
+            self.today = date.today()
         for account in self.accounts:
             key_secret = {"key": account.api_key, "secret": account.api_secret}
             log.info(f"Starting scrape cycle for {account.name}")
@@ -44,9 +50,18 @@ class Scraper:
                 account_id=account.id, table="wallet", data=balances
             )
 
-            pairs = self.exchanges[account.exchange].get_futures_prices()
-            pairs = [symbol["symbol"] for symbol in pairs]
-            log.info(f"Checking PnL for {len(pairs)} pairs")
+            if self.first_run:
+                pairs = self.exchanges[account.exchange].get_futures_prices()
+                log.info(
+                    f"Checking PnL for {len(pairs)} pairs listed on {account.exchange}"
+                )
+                pairs = [symbol["symbol"] for symbol in pairs]
+            else:
+                pairs = self.database.get_previously_traded_pairs(account_id=account.id)
+                log.info(
+                    f"Checking PnL for {len(pairs)} pairs that have previously been traded"
+                )
+
             for pair in pairs:
                 start = self.database.get_latest_transaction(
                     account_id=account.id, symbol=pair
@@ -59,5 +74,6 @@ class Scraper:
                     self.database.check_then_add_transaction(
                         account_id=account.id, data=profit
                     )
-
             log.info(f"Scrape cycle for {account.name} complete")
+        if self.first_run:
+            self.first_run = False

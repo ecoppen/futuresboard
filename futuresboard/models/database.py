@@ -271,7 +271,8 @@ class Database:
                     session.execute(insert(table_object), transaction)
                     added += 1
             session.commit()
-        log.info(f"Transaction data updated for {transaction['symbol']}: {added}")
+        if added > 0:
+            log.info(f"Transaction data updated for {transaction['symbol']}: {added}")
 
     def get_accounts(self) -> dict:
         table_object = self.get_table_object(table_name="accounts")
@@ -435,3 +436,14 @@ class Database:
         if limit is not None:
             return trades[:limit]
         return trades
+
+    def get_previously_traded_pairs(self, account_id: int) -> list:
+        table_object = self.get_table_object(table_name="transactions")
+        filters = [table_object.c.account_id == account_id]
+        with Session(self.engine) as session:
+            pairs = session.execute(
+                select(table_object.c.symbol).filter(*filters).distinct()
+            ).all()
+        if len(pairs) > 0:
+            return [pair[0] for pair in pairs]
+        return []
