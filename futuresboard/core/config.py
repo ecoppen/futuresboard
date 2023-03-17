@@ -35,6 +35,8 @@ class Config(BaseModel):
     scrape_interval: int = 600
     database: Database
     dashboard_name: str = "futuresboard"
+    log_level: str = "info"
+    news_source: list[Exchanges] = ["binance", "bybit", "okx"]  # type: ignore
 
     @validator("accounts")
     def duplicate_accounts(cls, v):
@@ -42,6 +44,13 @@ class Config(BaseModel):
         unique_names = set(names)
         if len(names) != len(unique_names):
             raise ValueError("Each account must be uniquely named")
+        return v
+
+    @validator("news_source")
+    def duplicate_news_source(cls, v):
+        unique_sources = set(v)
+        if len(v) != len(unique_sources):
+            raise ValueError("Each news source must be uniquely named")
         return v
 
     @validator("scrape_interval")

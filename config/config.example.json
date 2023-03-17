@@ -16,5 +16,11 @@
     "port": 5432,
     "username": "postgres"
   },
+  "log_level": "debug",
+  "news_source": [
+    "binance",
+    "bybit",
+    "okx"
+  ],
   "scrape_interval": 600
 }
