@@ -21,13 +21,16 @@ from futuresboard.exchange.utils import Exchanges, Intervals, Markets
 from futuresboard.models.database import Database
 from futuresboard.scraper.scraper import Scraper
 
+config_file = Path(Path().resolve(), "config", "config.json")
+config = load_config(path=config_file)
+
 logs_file = Path(Path().resolve(), "log.txt")
 logs_file.touch(exist_ok=True)
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
-    level=os.environ.get("LOGLEVEL", "INFO"),
+    level=os.environ.get("LOGLEVEL", config.log_level.upper()),
     handlers=[logging.FileHandler(logs_file), logging.StreamHandler()],
 )
 
@@ -40,8 +43,6 @@ app.add_middleware(GZipMiddleware)
 templates = Jinja2Templates(directory="templates")
 
 exchanges = load_exchanges()
-config_file = Path(Path().resolve(), "config", "config.json")
-config = load_config(path=config_file)
 
 database = Database(config=config.database)
 database.set_accounts_inactive()
