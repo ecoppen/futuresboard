@@ -95,7 +95,7 @@ def send_public_request(
     if query_string:
         url = url + "?" + query_string
 
-    log.info(f"Requesting {url}")
+    log.debug(f"Requesting {url}")
 
     try:
         response = dispatch_request(method)(
@@ -155,7 +155,7 @@ def send_signed_request(
         url += f"&signature={hashing(query_string=query_string, exchange=exchange, keys=keys)}"
     params = {"url": url, "params": {}}
 
-    log.info(f"Requesting {url}")
+    log.debug(f"Requesting {url}")
     try:
         response = dispatch_request(
             http_method=http_method,
