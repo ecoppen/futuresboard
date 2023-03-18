@@ -146,6 +146,18 @@ class Database:
 
             account: Mapped["Accounts"] = relationship(back_populates="transactions")
 
+        class News(self.Base):  # type: ignore
+            __tablename__ = "news"
+
+            id: Mapped[intpk] = mapped_column(init=False)
+            exchange: Mapped[str]
+            headline: Mapped[str]
+            hyperlink: Mapped[str]
+            news_time: Mapped[int] = mapped_column(BigInteger)
+            added: Mapped[int] = mapped_column(
+                BigInteger, default=self.timestamp(dt=datetime.now())
+            )
+
         self.Base.metadata.create_all(self.engine)  # type: ignore
         log.info("database tables loaded")
 
