@@ -15,8 +15,8 @@ class Databases(Enum):
 
 class Database(BaseModel):
     engine: str = Databases.SQLITE.value  # type: ignore
-    username: str | None
-    password: str | None
+    username: str = ""
+    password: str = ""
     host: IPvAnyAddress = IPvAnyAddress.validate("127.0.0.1")  # type: ignore
     port: int = Field(5432, ge=1, le=65535)
     name: str = "futuresboard"
