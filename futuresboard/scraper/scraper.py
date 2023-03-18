@@ -49,7 +49,6 @@ class Scraper:
             self.database.delete_then_update_by_account_id(
                 account_id=account.id, table="wallet", data=balances
             )
-
             if self.first_run:
                 pairs = self.exchanges[account.exchange].get_futures_prices()
                 log.info(
@@ -59,9 +58,11 @@ class Scraper:
             else:
                 pairs = self.database.get_previously_traded_pairs(account_id=account.id)
                 log.info(
-                    f"Checking PnL for {len(pairs)} pairs that have previously been traded"
+                    f"Checking PnL for {len(pairs)} pairs that have previously been traded or in position"
                 )
-
+            if positions:
+                pairs += [position["symbol"] for position in positions]
+                pairs = list(set(pairs))
             for pair in pairs:
                 start = self.database.get_latest_transaction(
                     account_id=account.id, symbol=pair
