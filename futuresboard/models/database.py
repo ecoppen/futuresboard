@@ -152,6 +152,7 @@ class Database:
             id: Mapped[intpk] = mapped_column(init=False)
             exchange: Mapped[str]
             headline: Mapped[str]
+            category: Mapped[str]
             hyperlink: Mapped[str]
             news_time: Mapped[int] = mapped_column(BigInteger)
             added: Mapped[int] = mapped_column(
@@ -235,6 +236,26 @@ class Database:
                     account.id = check
             session.commit()
         return accounts
+
+    def delete_then_update_news(self, exchange: str, data: dict) -> None:
+        table_object = self.get_table_object(table_name="news")
+
+        with Session(self.engine) as session:
+            check = session.scalars(
+                select(table_object).filter_by(exchange=exchange).limit(1)
+            ).first()
+
+            if check is not None:
+                if check > 0:
+                    log.info(f"News data found for account {exchange} - deleting")
+                    filters = [table_object.c.exchange == exchange]
+                    session.execute(delete(table_object).where(*filters))
+            if len(data) > 0:
+                for item in data:
+                    item["exchange"] = exchange
+                session.execute(insert(table_object), data)
+            session.commit()
+        log.info(f"News data updated for {exchange}: {len(data)}")
 
     def delete_then_update_by_account_id(
         self, account_id: int, table: str, data: dict
