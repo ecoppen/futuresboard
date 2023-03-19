@@ -14,6 +14,7 @@ class Exchange:
         pass
 
     exchange: str | None = None
+    news_url: str | None = None
     futures_api_url: str | None = None
     futures_trade_url: str | None = None
     weight: int = 0
@@ -64,4 +65,7 @@ class Exchange:
     def get_profit_and_loss(
         self, account: dict, start: int, symbol: str | None = None
     ) -> list:
+        return []
+
+    def get_news(self) -> list:
         return []
