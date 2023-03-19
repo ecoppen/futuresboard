@@ -32,11 +32,13 @@ A python (3.11+) based scraper and dashboard to monitor the performance of your 
 - Install pipenv `pip install pipenv`
 - Install required packages `pipenv install`
 - Activate the environment `pipenv shell`
-- Start the webserver in development mode `uvicorn futuresboard.main:app --reload`
+- Start the webserver `uvicorn futuresboard.main:app`
+- You can add `--host "0.0.0.0"` and/or `--port 5050` if you don't want to serve to `127.0.0.1:8000`
 
 ### Developers
 - Install developer requirements from pipenv `pipenv install --dev`
 - Install pre-commit hooks `pre-commit install`
+- Start the webserver in development mode `uvicorn futuresboard.main:app --reload`
 
 ## License
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fecoppen%2Ffuturesboard.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fecoppen%2Ffuturesboard?ref=badge_large)
