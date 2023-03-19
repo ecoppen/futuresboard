@@ -123,11 +123,11 @@
     },
     "fastapi": {
       "hashes": [
-        "sha256:451387550c2d25a972193f22e408a82e75a8e7867c834a03076704fe20df3256",
-        "sha256:4a75936dbf9eb74be5eb0d41a793adefe9f3fc6ba66dbdabd160120fd3c2d9cd"
+        "sha256:99d4fdb10e9dd9a24027ac1d0bd4b56702652056ca17a6c8721eec4ad2f14e18",
+        "sha256:daf73bbe844180200be7966f68e8ec9fd8be57079dff1bacb366db32729e6eb5"
       ],
       "index": "pypi",
-      "version": "==0.94.1"
+      "version": "==0.95.0"
     },
     "greenlet": {
       "hashes": [
