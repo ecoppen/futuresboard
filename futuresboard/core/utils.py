@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import json
 import logging
+import re
 import time
 from collections import OrderedDict
 from datetime import datetime, timedelta
@@ -85,6 +87,7 @@ def send_public_request(
     method: str = "GET",
     url_path: str | None = None,
     payload: dict | None = None,
+    json: bool = True,
 ):
     empty_response = BlankResponse().content
     if url_path is not None:
@@ -103,6 +106,8 @@ def send_public_request(
             timeout=5,
         )
         headers = response.headers
+        if not json:
+            return headers, response.text
         json_response = response.json()
         if "code" in json_response and "msg" in json_response:
             if len(json_response["msg"]) > 0:
@@ -221,3 +226,24 @@ def end_milliseconds_ago(days: int) -> int:
         datetime.now() - timedelta(days=days), datetime.max.time()
     )
     return int(start_datetime.timestamp() * 1000)
+
+
+def find_in_string(
+    string: str, start_substring: str, end_substring: str, return_json: bool = False
+) -> str:
+    text = ""
+    start_index = string.find(start_substring)
+    if start_index > -1:
+        end_index = string.find(end_substring, start_index)
+        if end_index > -1:
+            text = string[start_index + len(start_substring) : end_index]
+            if return_json:
+                try:
+                    text = json.loads(text)
+                except ValueError as e:
+                    log.warning(f"JSON decode error: {e}")
+    return text
+
+
+def remove_non_alphanumeric(string: str) -> str:
+    return re.sub("[^0-9a-zA-Z ]+", "", string)
