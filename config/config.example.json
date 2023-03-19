@@ -16,7 +16,7 @@
     "port": 5432,
     "username": "postgres"
   },
-  "log_level": "debug",
+  "log_level": "info",
   "news_source": [
     "binance",
     "bybit",
