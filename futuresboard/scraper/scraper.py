@@ -10,10 +10,14 @@ log = logging.getLogger(__name__)
 
 
 class Scraper:
-    def __init__(self, accounts: list, database: Database, exchanges: dict) -> None:
+    def __init__(
+        self, accounts: list, database: Database, exchanges: dict, news: list
+    ) -> None:
         self.accounts = accounts
         self.database = database
         self.exchanges = exchanges
+        self.news = news
+
         self.first_run = True
         self.today = date.today()
 
@@ -24,6 +28,9 @@ class Scraper:
         if date.today() != self.today:
             self.first_run = True
             self.today = date.today()
+        for exchange in ["binance", "bybit"]:  # self.news:
+            news = self.exchanges[exchange].get_news()
+            self.database.delete_then_update_news(exchange=exchange, data=news)
         for account in self.accounts:
             key_secret = {"key": account.api_key, "secret": account.api_secret}
             log.info(f"Starting scrape cycle for {account.name}")

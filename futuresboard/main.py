@@ -49,7 +49,9 @@ database.set_accounts_inactive()
 
 accounts = database.add_get_account_ids(accounts=config.accounts)
 
-scraper = Scraper(accounts=accounts, database=database, exchanges=exchanges)
+scraper = Scraper(
+    accounts=accounts, database=database, exchanges=exchanges, news=config.news_source
+)
 
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
