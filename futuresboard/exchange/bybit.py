@@ -3,7 +3,11 @@ from __future__ import annotations
 import logging
 from decimal import Decimal
 
-from futuresboard.core.utils import send_public_request, send_signed_request
+from futuresboard.core.utils import (
+    find_in_string,
+    send_public_request,
+    send_signed_request,
+)
 from futuresboard.exchange.exchange import Exchange
 from futuresboard.exchange.utils import Intervals
 
@@ -16,6 +20,7 @@ class Bybit(Exchange):
         log.info("Bybit initialised")
 
     exchange = "bybit"
+    news_url = "https://announcements.bybit.com/en-US/"
     futures_api_url = "https://api.bybit.com"
     futures_trade_url = "https://www.bybit.com/trade/usdt/BASEQUOTE"
     max_weight = 1200
@@ -327,3 +332,63 @@ class Bybit(Exchange):
                 complete = True
 
         return closed_pnl
+
+    def get_news(self) -> list:
+        all_categories = [
+            "new_crypto",
+            "latest_activities",
+            "latest_bybit_news",
+            "product_updates",
+            "new_fiat_listings",
+            "maintenance_updates",
+            "delistings",
+            "other",
+        ]
+        news_type = {
+            "new_crypto": "New crypto",
+            "latest_bybit_news": "Latest news",
+            "latest_activities": "Latest activities",
+            "new_fiat_listings": "New fiat",
+            "delistings": "Delisting",
+            "product_updates": "Product",
+            "maintenance_updates": "API",
+            "other": "Other",
+        }
+        news: list = []
+        for category in all_categories:
+            params: dict = {"category": category, "page": 1}
+            header, raw_text = send_public_request(
+                url=self.news_url, payload=params, json=False
+            )
+            to_find_start = '<script id="__NEXT_DATA__" type="application/json">'
+            to_find_end = "</script>"
+
+            text = find_in_string(
+                string=raw_text,
+                start_substring=to_find_start,
+                end_substring=to_find_end,
+                return_json=True,
+            )
+            if len(text) > 0:
+                if "props" in text:
+                    if "pageProps" in text["props"]:
+                        if "articleInitEntity" in text["props"]["pageProps"]:
+                            if (
+                                "list"
+                                in text["props"]["pageProps"]["articleInitEntity"]
+                            ):
+                                for item in text["props"]["pageProps"][
+                                    "articleInitEntity"
+                                ]["list"]:
+                                    headline = item["title"]
+                                    release = item["date_timestamp"] * 1000
+                                    code = item["url"]
+                                    news.append(
+                                        {
+                                            "headline": headline,
+                                            "category": news_type[category],
+                                            "hyperlink": f"{self.news_url}{code}",
+                                            "news_time": release,
+                                        }
+                                    )
+        return news
