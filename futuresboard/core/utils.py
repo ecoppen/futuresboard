@@ -229,20 +229,41 @@ def end_milliseconds_ago(days: int) -> int:
 
 
 def find_in_string(
-    string: str, start_substring: str, end_substring: str, return_json: bool = False
+    string: str,
+    start_substring: str,
+    end_substring: str | None,
+    return_json: bool = False,
 ):
     text = ""
     start_index = string.find(start_substring)
     if start_index > -1:
-        end_index = string.find(end_substring, start_index)
-        if end_index > -1:
-            text = string[start_index + len(start_substring) : end_index]
-            if return_json:
-                try:
-                    text = json.loads(text)
-                except ValueError as e:
-                    log.warning(f"JSON decode error: {e}")
+        if end_substring is None:
+            text = string[start_index + len(start_substring) :]
+        else:
+            end_index = string.find(end_substring, start_index)
+            if end_index > -1:
+                text = string[start_index + len(start_substring) : end_index]
+        if len(text) > 0 and return_json:
+            try:
+                text = json.loads(text)
+            except ValueError as e:
+                log.warning(f"JSON decode error: {e}")
     return text
+
+
+def find_all_occurrences_in_string(
+    string: str, start_substring: str, end_substring: str
+) -> list:
+    occurences = []
+    start_index = string.find(start_substring)
+    while start_index > -1:
+        end_index = string.find(end_substring, start_index + len(start_substring))
+        if end_index == -1:
+            break
+        text = string[start_index + len(start_substring) : end_index]
+        occurences.append(text)
+        start_index = string.find(start_substring, start_index + 1)
+    return occurences
 
 
 def remove_non_alphanumeric(string: str) -> str:
