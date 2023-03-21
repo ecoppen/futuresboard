@@ -231,7 +231,7 @@ def end_milliseconds_ago(days: int) -> int:
 def find_in_string(
     string: str,
     start_substring: str,
-    end_substring: str | None,
+    end_substring: str | None = None,
     return_json: bool = False,
 ):
     text = ""
@@ -240,7 +240,7 @@ def find_in_string(
         if end_substring is None:
             text = string[start_index + len(start_substring) :]
         else:
-            end_index = string.find(end_substring, start_index)
+            end_index = string.find(end_substring, start_index + len(start_substring))
             if end_index > -1:
                 text = string[start_index + len(start_substring) : end_index]
         if len(text) > 0 and return_json:
