@@ -1,9 +1,14 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from decimal import Decimal
 
-from futuresboard.core.utils import send_public_request
+from futuresboard.core.utils import (
+    find_all_occurrences_in_string,
+    find_in_string,
+    send_public_request,
+)
 from futuresboard.exchange.exchange import Exchange
 from futuresboard.exchange.utils import Intervals
 
@@ -16,6 +21,7 @@ class Okx(Exchange):
         log.info("Okx initialised")
 
     exchange = "okx"
+    news_url = "https://www.okx.com/support"
     futures_api_url = "https://www.okx.com"
     futures_trade_url = "https://www.okx.com/trade-futures/base-quote"
     max_weight = 600
@@ -122,3 +128,87 @@ class Okx(Exchange):
                         for candle in raw_json["data"]
                     ]
         return []
+
+    def get_news(self) -> list:
+        news_type = {
+            "New-Token": "New crypto",
+            "Latest-Announcements": "Latest news",
+            "Latest-Event": "Latest activities",
+            "Fiat-Gateway": "New fiat",
+            "Spot-Margin-Trading": "Spot Crypto",
+            "Derivatives": "Derivatives Crypto",
+            "Deposit-Withdrawal-Suspension-Resumption": "Wallet",
+            "Product-Updates": "Product",
+            "API": "API",
+            "Others": "Other",
+        }
+        header, raw_text = send_public_request(
+            url=self.news_url,
+            url_path="/hc/en-us/categories/115000275131-Announcements",
+            json=False,
+        )
+        to_find_start = '<section class="section">'
+        to_find_end = "</section>"
+        news: list = []
+        sections = find_all_occurrences_in_string(
+            string=raw_text, start_substring=to_find_start, end_substring=to_find_end
+        )
+        to_find_start = 'href="'
+        to_find_end = '"'
+        for section in sections:
+            section_link = find_in_string(
+                string=section, start_substring=to_find_start, end_substring=to_find_end
+            )
+            if len(section_link) > 0:
+                section_name = find_in_string(
+                    string=section_link, start_substring="/hc/en-us/sections/"
+                )
+                section_name = find_in_string(string=section_name, start_substring="-")
+                section_name = section_name.strip()
+                if section_name in [
+                    "OKB-Buy-back-Burn",
+                    "Introduction-to-Digital-Assets",
+                    "OKX-Pool-Announcement",
+                    "OKX-Broker",
+                    "OKC",
+                    "P2P-Trading",
+                ]:
+                    continue
+                header, raw_text = send_public_request(
+                    url=self.news_url, url_path=f"{section_link}", json=False
+                )
+                articles = find_all_occurrences_in_string(
+                    string=raw_text,
+                    start_substring='<li class="article-list-item',
+                    end_substring="</li>",
+                )
+                for article in articles:
+                    article_link = find_in_string(
+                        string=article,
+                        start_substring=to_find_start,
+                        end_substring=to_find_end,
+                    )
+                    header, raw_text = send_public_request(
+                        url=self.news_url, url_path=f"{article_link}", json=False
+                    )
+                    title = find_in_string(
+                        string=raw_text, start_substring="<h1", end_substring="</h1>"
+                    )
+                    title = find_in_string(string=title, start_substring=">")
+                    title = title.strip()
+                    release = find_in_string(
+                        string=raw_text,
+                        start_substring='<time datetime="',
+                        end_substring='"',
+                    )
+                    release = datetime.strptime(release, "%Y-%m-%dT%H:%M:%SZ")
+                    release = int(release.timestamp() * 1000)
+                    news.append(
+                        {
+                            "headline": title,
+                            "category": news_type[section_name],
+                            "hyperlink": f"{self.news_url}{article_link}",
+                            "news_time": release,
+                        }
+                    )
+        return news
