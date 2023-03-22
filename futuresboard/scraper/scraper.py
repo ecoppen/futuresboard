@@ -28,7 +28,7 @@ class Scraper:
         if date.today() != self.today:
             self.first_run = True
             self.today = date.today()
-        for exchange in self.news:  # self.news:
+        for exchange in self.news:
             log.info(f"Scraping news from {exchange}")
             news = self.exchanges[exchange].get_news()
             self.database.delete_then_update_news(exchange=exchange, data=news)
