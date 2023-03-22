@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from futuresboard.core.utils import (
@@ -279,6 +280,12 @@ class Bybit(Exchange):
     def get_profit_and_loss(
         self, account: dict, start: int, symbol: str | None = None
     ) -> list:
+        two_years_ago = datetime.now() - timedelta(days=729)
+        two_years_ago_timestamp = int(two_years_ago.timestamp() * 1000)
+
+        if start < two_years_ago_timestamp:
+            start = two_years_ago_timestamp
+
         params = {
             "category": "linear",
             "limit": 100,
