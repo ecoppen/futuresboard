@@ -268,3 +268,7 @@ def find_all_occurrences_in_string(
 
 def remove_non_alphanumeric(string: str) -> str:
     return re.sub("[^0-9a-zA-Z ]+", "", string)
+
+
+def dt_to_ts(date) -> int:
+    return int(date.timestamp() * 1000)
