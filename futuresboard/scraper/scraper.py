@@ -31,7 +31,7 @@ class Scraper:
         for exchange in self.news:
             log.info(f"Scraping news from {exchange}")
             news = self.exchanges[exchange].get_news()
-            self.database.delete_then_update_news(exchange=exchange, data=news)
+            self.database.delete_then_add_news(exchange=exchange, data=news)
         for account in self.accounts:
             key_secret = {"key": account.api_key, "secret": account.api_secret}
             log.info(f"Starting scrape cycle for {account.name}")
@@ -41,20 +41,20 @@ class Scraper:
             positions = self.exchanges[account.exchange].get_open_futures_positions(
                 account=key_secret
             )
-            self.database.delete_then_update_by_account_id(
+            self.database.delete_then_add_by_account_id(
                 account_id=account.id, table="positions", data=positions
             )
             orders = self.exchanges[account.exchange].get_open_futures_orders(
                 account=key_secret
             )
-            self.database.delete_then_update_by_account_id(
+            self.database.delete_then_add_by_account_id(
                 account_id=account.id, table="orders", data=orders
             )
 
             balances = self.exchanges[account.exchange].get_wallet_balance(
                 account=key_secret
             )
-            self.database.delete_then_update_by_account_id(
+            self.database.delete_then_add_by_account_id(
                 account_id=account.id, table="wallet", data=balances
             )
             if self.first_run:
@@ -83,6 +83,7 @@ class Scraper:
                     self.database.check_then_add_transaction(
                         account_id=account.id, data=profit
                     )
+            self.database.update_account_checked_time(account_id=account.id)
             log.info(f"Scrape cycle for {account.name} complete")
         if self.first_run:
             self.first_run = False
