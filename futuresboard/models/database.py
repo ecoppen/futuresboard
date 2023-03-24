@@ -176,6 +176,16 @@ class Database:
             session.execute(update(table_object).values({"active": 0}))
             session.commit()
 
+    def update_account_checked_time(self, account_id: int):
+        table_object = self.get_table_object(table_name="accounts")
+        with Session(self.engine) as session:
+            session.execute(
+                update(table_object)
+                .filter_by(id=account_id)
+                .values({"last_checked": self.timestamp(dt=datetime.now())})
+            )
+            session.commit()
+
     def get_latest_transaction(self, account_id: int, symbol: str | None = None) -> int:
         table_object = self.get_table_object(table_name="transactions")
 
@@ -183,14 +193,14 @@ class Database:
             if symbol is None:
                 check = session.execute(
                     select(table_object)
-                    .filter_by(id=account_id)
+                    .filter_by(account_id=account_id)
                     .order_by(table_object.c.created_time.desc())
                     .limit(1)
                 ).first()
             else:
                 check = session.execute(
                     select(table_object)
-                    .filter_by(id=account_id, symbol=symbol)
+                    .filter_by(account_id=account_id, symbol=symbol)
                     .order_by(table_object.c.created_time.desc())
                     .limit(1)
                 ).first()
@@ -237,7 +247,7 @@ class Database:
             session.commit()
         return accounts
 
-    def delete_then_update_news(self, exchange: str, data: dict) -> None:
+    def delete_then_add_news(self, exchange: str, data: dict) -> None:
         table_object = self.get_table_object(table_name="news")
 
         with Session(self.engine) as session:
@@ -257,7 +267,7 @@ class Database:
             session.commit()
         log.info(f"News data updated for {exchange}: {len(data)}")
 
-    def delete_then_update_by_account_id(
+    def delete_then_add_by_account_id(
         self, account_id: int, table: str, data: dict
     ) -> None:
         if table in ["positions", "orders", "wallet"]:
@@ -480,3 +490,17 @@ class Database:
         if len(pairs) > 0:
             return [pair[0] for pair in pairs]
         return []
+
+    def get_count_news_items(self, start: int, end: int) -> int:
+        table_object = self.get_table_object(table_name="news")
+        with Session(self.engine) as session:
+            filters = [
+                table_object.c.news_time >= start,
+                table_object.c.news_time < end,
+            ]
+            count = session.scalar(
+                select(func.count()).select_from(table_object).filter(*filters)
+            )
+        if count is not None:
+            return count
+        return 0
