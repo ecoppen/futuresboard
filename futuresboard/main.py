@@ -4,7 +4,9 @@ import logging
 import os
 import threading
 import time
-from datetime import date
+from datetime import date, datetime
+from datetime import time as dt_time
+from datetime import timedelta
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -16,6 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from futuresboard.core.config import load_config
+from futuresboard.core.utils import dt_to_ts
 from futuresboard.exchange.factory import load_exchanges
 from futuresboard.exchange.utils import Exchanges, Intervals, Markets
 from futuresboard.models.database import Database
@@ -59,6 +62,24 @@ def index(request: Request):
     accounts = database.get_accounts()
     recent_trades = database.get_trades(limit=10, sort=True, order="desc")
     page_data = {"dashboard_title": config.dashboard_name, "year": date.today().year}
+
+    now = datetime.now()
+    one_hour_ago = now - timedelta(hours=1)
+    today_start = datetime.combine(datetime.today(), dt_time.min)
+    all_time = now - timedelta(weeks=104)
+
+    news: dict = {
+        "1h": database.get_count_news_items(
+            start=dt_to_ts(one_hour_ago), end=dt_to_ts(now)
+        ),
+        "1d": database.get_count_news_items(
+            start=dt_to_ts(today_start), end=dt_to_ts(now)
+        ),
+        "all": database.get_count_news_items(
+            start=dt_to_ts(all_time), end=dt_to_ts(now)
+        ),
+    }
+
     return templates.TemplateResponse(
         "index.html",
         {
@@ -66,6 +87,7 @@ def index(request: Request):
             "page_data": page_data,
             "accounts": accounts,
             "recent_trades": recent_trades,
+            "news": news,
         },
     )
 
@@ -75,7 +97,6 @@ def account(
     request: Request,
     account_id: int = fPath(title="The ID of the account to get", gt=0),
 ):
-    log.info(account_id)
     account = database.get_account(account_id=account_id)
     if not account:
         return RedirectResponse("/")
@@ -83,6 +104,16 @@ def account(
     page_data = {"dashboard_title": config.dashboard_name, "year": date.today().year}
     return templates.TemplateResponse(
         "account.html", {"request": request, "page_data": page_data, "account": account}
+    )
+
+
+@app.get("/news", response_class=HTMLResponse, include_in_schema=False)
+def news(
+    request: Request, exchange: Exchanges | None = None, timeframe: str | None = None
+):
+    page_data = {"dashboard_title": config.dashboard_name, "year": date.today().year}
+    return templates.TemplateResponse(
+        "news.html", {"request": request, "page_data": page_data}
     )
 
 
