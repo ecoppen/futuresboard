@@ -12,14 +12,13 @@ A python (3.11+) based scraper and dashboard to monitor the performance of your 
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 </p>
 
-### Supported exchanges for direct data 
-- <a target="_blank" href="https://www.binance.com">Binance</a>
-- <a target="_blank" href="https://www.bybit.com">Bybit</a>
-- <a target="_blank" href="https://www.okx.com">Okx</a>
-
-### Supported exchanges for account trading history
-- <a target="_blank" href="https://www.binance.com">Binance</a>
-- <a target="_blank" href="https://www.bybit.com">Bybit</a>
+### Exchange support
+| Exchange | Direct data | Trading history | News |
+|:--------:|:-----------:|:---------------:|:----:|
+| Binance  |      ✅      |        ✅        |   ✅  |
+| Bitget   |      ➖      |        ➖        |   ➖  |
+| Bybit    |      ✅      |        ✅        |   ✅  |
+| Okx      |      ✅      |        ❌        |   ✅  |
 
 ## Quickstart
 
@@ -39,6 +38,13 @@ A python (3.11+) based scraper and dashboard to monitor the performance of your 
 - Install developer requirements from pipenv `pipenv install --dev`
 - Install pre-commit hooks `pre-commit install`
 - Start the webserver in development mode `uvicorn futuresboard.main:app --reload`
+
+### Screenshots
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/51025241/227767373-95afac03-27b2-4a19-ac1b-92d748d702eb.png">
+
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/51025241/227767401-e3cb86b6-e9d6-44bf-955e-dcc64e6d414e.png">
+
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/51025241/227767495-196a0f16-feab-4af2-93dd-31f3b6e73bfe.png">
 
 ## License
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fecoppen%2Ffuturesboard.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fecoppen%2Ffuturesboard?ref=badge_large)
