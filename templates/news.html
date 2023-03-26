@@ -1,12 +1,41 @@
 {% include "header.html" %}
 <meta http-equiv="refresh" content="300">
-<style>
-</style>
 
 <div class="row">
-    <div class="col-9">
-
+    <div class="col-12">
+        <table id="news" class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Exchange</th>
+                    <th>Category</th>
+                    <th>Headline</th>
+                    <th>Link</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% if news|length > 0 %}
+                    {% for news_item in news %}
+                        <tr>
+                            <td>{{ news_item["exchange"] }}</td>
+                            <td>{{ news_item["category"] }}</td>
+                            <td>{{ news_item["headline"] }}</td>
+                            <td><a class="btn btn-outline-info btn-sm" target="_blank" href="{{ news_item["hyperlink"] }}" role="button"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
+                            <td>{{ news_item["timestamp"] }}</td>
+                        </tr>
+                    {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $('#news').DataTable({
+            order: [[4, "desc"]]
+        });
+    });
+</script>
 
 {% include "footer.html" %}

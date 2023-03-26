@@ -491,16 +491,58 @@ class Database:
             return [pair[0] for pair in pairs]
         return []
 
-    def get_count_news_items(self, start: int, end: int) -> int:
+    def get_count_news_items(
+        self,
+        start: int | None = None,
+        end: int | None = None,
+        exchange: str | None = None,
+    ) -> int:
         table_object = self.get_table_object(table_name="news")
         with Session(self.engine) as session:
-            filters = [
-                table_object.c.news_time >= start,
-                table_object.c.news_time < end,
-            ]
+            filters = []
+            if start is not None:
+                filters.append(table_object.c.news_time >= start)
+            if end is not None:
+                filters.append(table_object.c.news_time < end)
+            if exchange is not None:
+                filters.append(table_object.c.exchange == exchange)
             count = session.scalar(
                 select(func.count()).select_from(table_object).filter(*filters)
             )
         if count is not None:
             return count
         return 0
+
+    def get_news_items(
+        self, start: int | None, end: int | None, exchange: str | None
+    ) -> list:
+        table_object = self.get_table_object(table_name="news")
+        all_news: list = []
+        with Session(self.engine) as session:
+            filters = []
+            if start is not None:
+                filters.append(table_object.c.news_time >= start)
+            if end is not None:
+                filters.append(table_object.c.news_time < end)
+            if exchange is not None:
+                filters.append(table_object.c.exchange == exchange)
+            news = session.execute(
+                select(table_object)
+                .filter(*filters)
+                .order_by(table_object.c.news_time.desc())
+            ).all()
+        if news is None:
+            return all_news
+        if len(news) == 0:
+            return all_news
+        for news_item in news:
+            all_news.append(
+                {
+                    "exchange": news_item[1],
+                    "headline": news_item[2],
+                    "category": news_item[3],
+                    "hyperlink": news_item[4],
+                    "timestamp": news_item[5],
+                }
+            )
+        return all_news

@@ -146,17 +146,14 @@
             </div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    Last hour <span class="badge bg-secondary float-end">{{ news["1h"] }}</span>
-                </li>
-                <li class="list-group-item">
-                    Today <span class="badge bg-secondary float-end">{{ news["1d"] }}</span>
-                </li>
-                <li class="list-group-item">
-                    Total <span class="badge bg-secondary float-end">{{ news["all"] }}</span>
+                    <div class="row align-items-center">
+                        <div class="col"><div class="d-grid gap-2"><a class="btn btn-outline-info btn-sm" href="{{ url_for('news').include_query_params(start=news["1h"][1]) }}" role="button">1h ({{ news["1h"][0] }})</a></div></div>
+                        <div class="col"><div class="d-grid gap-2"><a class="btn btn-outline-info btn-sm" href="{{ url_for('news').include_query_params(start=news["1d"][1]) }}" role="button">1d ({{ news["1d"][0] }})</a></div></div>
+                        <div class="col"><div class="d-grid gap-2"><a class="btn btn-outline-info btn-sm" href="{{ url_for('news') }}" role="button">all ({{ news["all"][0] }})</a></div></div>
+                    </div>
                 </li>
             </ul>
         </div>
-        <br>
         <br>
         <div class="card">
             <div class="card-header">

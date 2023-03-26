@@ -66,18 +66,17 @@ def index(request: Request):
     now = datetime.now()
     one_hour_ago = now - timedelta(hours=1)
     today_start = datetime.combine(datetime.today(), dt_time.min)
-    all_time = now - timedelta(weeks=104)
 
     news: dict = {
-        "1h": database.get_count_news_items(
-            start=dt_to_ts(one_hour_ago), end=dt_to_ts(now)
-        ),
-        "1d": database.get_count_news_items(
-            start=dt_to_ts(today_start), end=dt_to_ts(now)
-        ),
-        "all": database.get_count_news_items(
-            start=dt_to_ts(all_time), end=dt_to_ts(now)
-        ),
+        "1h": [
+            database.get_count_news_items(start=dt_to_ts(one_hour_ago)),
+            dt_to_ts(one_hour_ago),
+        ],
+        "1d": [
+            database.get_count_news_items(start=dt_to_ts(today_start)),
+            dt_to_ts(today_start),
+        ],
+        "all": [database.get_count_news_items(), 0],
     }
 
     return templates.TemplateResponse(
@@ -109,12 +108,24 @@ def account(
 
 @app.get("/news", response_class=HTMLResponse, include_in_schema=False)
 def news(
-    request: Request, exchange: Exchanges | None = None, timeframe: str | None = None
+    request: Request,
+    exchange: Exchanges | None = None,
+    start: int | None = None,
+    end: int | None = None,
 ):
     page_data = {"dashboard_title": config.dashboard_name, "year": date.today().year}
+    news = get_news(exchange=exchange, start=start, end=end)
+
     return templates.TemplateResponse(
-        "news.html", {"request": request, "page_data": page_data}
+        "news.html", {"request": request, "page_data": page_data, "news": news}
     )
+
+
+@app.get("/getnews")
+def get_news(
+    exchange: Exchanges | None = None, start: int | None = None, end: int | None = None
+):
+    return database.get_news_items(start=start, end=end, exchange=exchange)
 
 
 @app.get("/getprice")
