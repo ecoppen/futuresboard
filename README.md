@@ -39,7 +39,7 @@ A python (3.11+) based scraper and dashboard to monitor the performance of your 
 - Install pre-commit hooks `pre-commit install`
 - Start the webserver in development mode `uvicorn futuresboard.main:app --reload`
 
-### Screenshots
+## Screenshots
 <img width="600" alt="image" src="https://user-images.githubusercontent.com/51025241/227767373-95afac03-27b2-4a19-ac1b-92d748d702eb.png">
 
 <img width="600" alt="image" src="https://user-images.githubusercontent.com/51025241/227767401-e3cb86b6-e9d6-44bf-955e-dcc64e6d414e.png">
