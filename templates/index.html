@@ -16,20 +16,20 @@
                 <div id="collapseActive" class="accordion-collapse collapse show" aria-labelledby="headingActive"
                      data-bs-parent="#accordionAccounts">
                     <div class="accordion-body" style="max-height: 30rem; overflow-y: auto;">
-                        <table class="table table-bordered table-sm text-center">
+                        <table id="active" class="table table-bordered table-sm text-center">
                             <thead>
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Exchange</th>
-                                <th scope="col">Long pos.</th>
-                                <th scope="col">Short pos.</th>
-                                <th scope="col">Buy orders</th>
-                                <th scope="col">Sell orders</th>
-                                <th scope="col">uPnL</th>
-                                <th scope="col">PnL</th>
-                                <th scope="col">Last updated</th>
-                                <th scope="col">View</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Instance number">#</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Instance name (from config.json)">Name</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Exchange name">Exchange</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of long positions">Long</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of short positions">Short</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of buy orders">Buy</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of sell orders">Sell</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Unrealised Profit and Loss">uPnL</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Realised Profit and Loss">PnL</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Last scraped (mins)">Updated</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Click to view more">View</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -61,10 +61,6 @@
                                                role="button"><i class="fa-solid fa-angles-right"></i></a></td>
                                     </tr>
                                 {% endfor %}
-                            {% else %}
-                                <tr>
-                                    <td colspan="11">No active accounts</td>
-                                </tr>
                             {% endif %}
                             </tbody>
                         </table>
@@ -81,20 +77,20 @@
                 <div id="collapseInactive" class="accordion-collapse collapse" aria-labelledby="headingInactive"
                      data-bs-parent="#accordionAccounts">
                     <div class="accordion-body" style="max-height: 30rem; overflow-y: auto;">
-                        <table class="table table-bordered table-sm text-center">
+                        <table id="inactive" class="table table-bordered table-sm text-center">
                             <thead>
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Exchange</th>
-                                <th scope="col">Long pos.</th>
-                                <th scope="col">Short pos.</th>
-                                <th scope="col">Buy orders</th>
-                                <th scope="col">Sell orders</th>
-                                <th scope="col">uPnL</th>
-                                <th scope="col">PnL</th>
-                                <th scope="col">Last updated</th>
-                                <th scope="col">View</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Instance number">#</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Instance name (from config.json)">Name</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Exchange name">Exchange</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of long positions">Long</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of short positions">Short</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of buy orders">Buy</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of sell orders">Sell</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Unrealised Profit and Loss">uPnL</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Realised Profit and Loss">PnL</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Last scraped (mins)">Updated</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Click to view more">View</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -123,14 +119,10 @@
                                         {{ "%.3g"|format(account["pnl"]) }}</td>
                                         <td>{{ account["last_update"] }}</td>
                                         <td><a class="btn btn-primary btn-sm"
-                                               href="{{ url_for('account') }}/{{ account["id"] }}" role="button"><i
+                                               href="{{ url_for('account', account_id=account["id"]) }}" role="button"><i
                                                 class="fa-solid fa-angles-right"></i></a></td>
                                     </tr>
                                 {% endfor %}
-                            {% else %}
-                                <tr>
-                                    <td colspan="11">No inactive accounts</td>
-                                </tr>
                             {% endif %}
                             </tbody>
                         </table>
@@ -163,15 +155,20 @@
                 {% if recent_trades|length > 0 %}
                     {% for trade in recent_trades %}
                         <li class="list-group-item">
-                            <span class="badge bg-primary">#{{ trade[1] }}</span>
-                            <span class="badge bg-secondary">{{ trade[2] }}</span>
-                            {% if trade[6] >= 0 %}
-                                <span class="badge bg-success">
+                        <div class="row">
+                            <div class="col-2"><a href="{{ url_for('account', account_id=trade["account_id"]) }}"><span class="badge bg-primary" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Instance number">#{{ trade['account_id'] }}</span></a></div>
+                            <div class="col-4"><span class="badge bg-secondary" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Symbol BASEQUOTE">{{ trade['symbol'] }}</span></div>
+                            <div class="col-3">
+                                {% if trade['profit'] >= 0 %}
+                                <span class="badge bg-success" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Profit">
                             {% else %}
-                                <span class="badge bg-danger">
+                                <span class="badge bg-danger" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Loss">
                             {% endif %}
-                            {{ "%.3g"|format(trade[6]) }}
+                            {{ "%.3g"|format(trade['profit']) }}
                             </span>
+                                </div>
+                            <div class="col"><span class="badge bg-dark" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Minutes since trade">{{ trade['mins_ago'] }}m</span></div>
+                        </div>
                         </li>
                     {% endfor %}
                 {% else %}
@@ -182,4 +179,26 @@
     </div>
 </div>
 
+<script>
+    $(document).ready(function () {
+        $('#active').DataTable({
+            paging: false,
+            info: false,
+            searching: false,
+            order: [[0, "asc"]],
+            "columnDefs": [
+                { "orderable": false, "targets": 10 }
+            ]
+        });
+        $('#inactive').DataTable({
+            paging: false,
+            info: false,
+            searching: false,
+            order: [[0, "asc"]],
+            "columnDefs": [
+                { "orderable": false, "targets": 10 }
+            ]
+        });
+    });
+</script>
 {% include "footer.html" %}
