@@ -165,6 +165,14 @@ class Database:
     def timestamp(self, dt) -> int:
         return int(dt.replace(tzinfo=timezone.utc).timestamp() * 1000)
 
+    def mins_since_timestamp(self, ts: int, utc: bool = False) -> int:
+        now = datetime.now()
+        if utc:
+            now = datetime.utcnow()
+        timestamp = datetime.utcfromtimestamp(ts / 1000.0)
+        delta = now - timestamp
+        return delta.seconds // 60
+
     def get_table_object(self, table_name: str):
         self.Base.metadata.reflect(bind=self.engine)  # type: ignore
         return self.Base.metadata.tables[table_name]  # type: ignore
@@ -331,16 +339,12 @@ class Database:
                 upnl = self.get_unrealised_profit(account_id=account[0])
                 pnl = self.get_closed_profit(account_id=account[0])
 
-                today = datetime.now()
-                last_checked = datetime.utcfromtimestamp(account[5] / 1000.0)
-                delta = today - last_checked
-
                 accounts[active[account[3]]].append(
                     {
                         "id": account[0],
                         "name": account[1],
                         "exchange": account[2],
-                        "last_update": delta.seconds // 60,
+                        "last_update": self.mins_since_timestamp(ts=account[5]),
                         "long": positions["long"],
                         "short": positions["short"],
                         "buy": orders["buy"],
@@ -454,12 +458,12 @@ class Database:
         limit: int | None = None,
         sort: bool = False,
         order: str = "",
-    ):
+    ) -> list:
         table_object = self.get_table_object(table_name="transactions")
         filters = []
         if account_id is not None:
             filters.append(table_object.c.account_id == account_id)
-
+        all_trades: list = []
         with Session(self.engine) as session:
             if sort:
                 if order == "asc":
@@ -477,8 +481,24 @@ class Database:
             else:
                 trades = session.execute(select(table_object).filter(*filters)).all()
         if limit is not None:
-            return trades[:limit]
-        return trades
+            trades = trades[:limit]
+
+        for trade in trades:
+            all_trades.append(
+                {
+                    "account_id": trade[1],
+                    "symbol": trade[2],
+                    "order_id": trade[3],
+                    "order_type": trade[4],
+                    "exec_type": trade[5],
+                    "profit": trade[6],
+                    "created_time": trade[7],
+                    "updated_time": trade[8],
+                    "mins_ago": self.mins_since_timestamp(ts=trade[8], utc=True),
+                }
+            )
+
+        return all_trades
 
     def get_previously_traded_pairs(self, account_id: int) -> list:
         table_object = self.get_table_object(table_name="transactions")
