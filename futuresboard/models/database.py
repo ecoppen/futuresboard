@@ -171,7 +171,7 @@ class Database:
             now = datetime.utcnow()
         timestamp = datetime.utcfromtimestamp(ts / 1000.0)
         delta = now - timestamp
-        return delta.seconds // 60
+        return (delta.days * 24 * 60 * 60) + (delta.seconds // 60)
 
     def get_table_object(self, table_name: str):
         self.Base.metadata.reflect(bind=self.engine)  # type: ignore
@@ -562,7 +562,7 @@ class Database:
                     "headline": news_item[2],
                     "category": news_item[3],
                     "hyperlink": news_item[4],
-                    "timestamp": news_item[5],
+                    "timestamp": self.mins_since_timestamp(ts=news_item[5], utc=True),
                 }
             )
         return all_news

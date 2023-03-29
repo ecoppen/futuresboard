@@ -10,7 +10,7 @@
                     <th>Category</th>
                     <th>Headline</th>
                     <th>Link</th>
-                    <th>Time</th>
+                    <th>Minutes ago</th>
                 </tr>
             </thead>
             <tbody>
@@ -33,7 +33,7 @@
 <script>
     $(document).ready(function () {
         $('#news').DataTable({
-            order: [[4, "desc"]]
+            order: [[4, "asc"]]
         });
     });
 </script>
