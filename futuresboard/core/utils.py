@@ -7,7 +7,7 @@ import logging
 import re
 import time
 from collections import OrderedDict
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from urllib.parse import urlencode
 
 import requests  # type: ignore
@@ -272,3 +272,57 @@ def remove_non_alphanumeric(string: str) -> str:
 
 def dt_to_ts(date) -> int:
     return int(date.timestamp() * 1000)
+
+
+def string_to_dt(string: str, format: str = "%Y-%m-%d %H:%M:%S"):
+    return datetime.strptime(string, format)
+
+
+def start_end_timerange_helper(start, end) -> dict:
+    template = {
+        "start_string": start.strftime("%Y-%m-%d 00:00:00"),
+        "end_string": end.strftime("%Y-%m-%d 23:59:59"),
+        "start_ts": 0,
+        "end_ts": 0,
+    }
+    template["start_ts"] = dt_to_ts(date=string_to_dt(string=template["start_string"]))
+    template["end_ts"] = dt_to_ts(date=string_to_dt(string=template["end_string"]))
+    return template
+
+
+def timeranges():
+    today = date.today()
+    yesterday_start = today - timedelta(days=1)
+
+    this_week_start = today - timedelta(days=today.weekday())
+    last_week_start = this_week_start - timedelta(days=7)
+    last_week_end = this_week_start - timedelta(days=1)
+
+    this_month_start = today.replace(day=1)
+    last_month_start = (this_month_start - timedelta(days=1)).replace(day=1)
+    last_month_end = this_month_start - timedelta(days=1)
+
+    this_year_start = today.replace(day=1).replace(month=1)
+    last_year_start = (
+        (this_year_start - timedelta(days=1)).replace(day=1).replace(month=1)
+    )
+    last_year_end = this_year_start - timedelta(days=1)
+
+    return {
+        "today": start_end_timerange_helper(start=today, end=today),
+        "yesterday": start_end_timerange_helper(
+            start=yesterday_start, end=yesterday_start
+        ),
+        "this_week": start_end_timerange_helper(start=this_week_start, end=today),
+        "last_week": start_end_timerange_helper(
+            start=last_week_start, end=last_week_end
+        ),
+        "this_month": start_end_timerange_helper(start=this_month_start, end=today),
+        "last_month": start_end_timerange_helper(
+            start=last_month_start, end=last_month_end
+        ),
+        "this_year": start_end_timerange_helper(start=this_year_start, end=today),
+        "last_year": start_end_timerange_helper(
+            start=last_year_start, end=last_year_end
+        ),
+    }
