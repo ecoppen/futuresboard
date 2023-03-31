@@ -439,13 +439,20 @@ class Database:
         else:
             return result
 
-    def get_closed_profit(self, account_id: int) -> float:
+    def get_closed_profit(
+        self, account_id: int, start: int | None = None, end: int | None = None
+    ) -> float:
         table_object = self.get_table_object(table_name="transactions")
+        filters = [table_object.c.account_id == account_id]
+        if start is not None:
+            filters.append(table_object.c.created_time >= start)
+        if end is not None:
+            filters.append(table_object.c.created_time < end)
         with Session(self.engine) as session:
             result = session.scalar(
                 select(func.sum(table_object.c.profit))
                 .select_from(table_object)
-                .filter_by(account_id=account_id)
+                .filter(*filters)
             )
         if result is None:
             return 0.0
