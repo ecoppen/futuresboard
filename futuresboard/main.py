@@ -18,7 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from futuresboard.core.config import load_config
-from futuresboard.core.utils import dt_to_ts
+from futuresboard.core.utils import dt_to_ts, timeranges
 from futuresboard.exchange.factory import load_exchanges
 from futuresboard.exchange.utils import Exchanges, Intervals, Markets
 from futuresboard.models.database import Database
@@ -99,10 +99,29 @@ def account(
     account = database.get_account(account_id=account_id)
     if not account:
         return RedirectResponse("/")
-
+    ranges = timeranges()
+    data = {
+        "profit_today": database.get_closed_profit(
+            account_id=account_id,
+            start=ranges["today"]["start_ts"],
+            end=ranges["today"]["end_ts"],
+        ),
+        "profit_week": database.get_closed_profit(
+            account_id=account_id,
+            start=ranges["this_week"]["start_ts"],
+            end=ranges["this_week"]["end_ts"],
+        ),
+        "profit_month": database.get_closed_profit(
+            account_id=account_id,
+            start=ranges["this_month"]["start_ts"],
+            end=ranges["this_month"]["end_ts"],
+        ),
+        "total": database.get_closed_profit(account_id=account_id),
+    }
     page_data = {"dashboard_title": config.dashboard_name, "year": date.today().year}
     return templates.TemplateResponse(
-        "account.html", {"request": request, "page_data": page_data, "account": account}
+        "account.html",
+        {"request": request, "page_data": page_data, "account": account, "data": data},
     )
 
 
