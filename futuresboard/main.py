@@ -139,6 +139,15 @@ def account(
         "balance": wallet_balances[wallet_key],
         "quote": wallet_key,
     }
+    if data["balance"] == 0:
+        data["profit_percentages"] = {"today": 0, "week": 0, "month": 0, "total": 0}
+    else:
+        data["profit_percentages"] = {
+            "today": data["profit_today"] / data["balance"] * 100,
+            "week": data["profit_week"] / data["balance"] * 100,
+            "month": data["profit_month"] / data["balance"] * 100,
+            "total": data["total"] / data["balance"] * 100,
+        }
     page_data = {"dashboard_title": config.dashboard_name, "year": date.today().year}
     return templates.TemplateResponse(
         "account.html",

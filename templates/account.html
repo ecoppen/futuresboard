@@ -10,6 +10,7 @@
                 Profit today
             </div>
             <div class="card-body">
+                <h3>{{ "%.3g"|format(data["profit_percentages"]["today"]) }}%</h3>
                 {{ "%.3g"|format(data["profit_today"]) }}
             </div>
         </div>
@@ -20,6 +21,7 @@
                 Profit this week
             </div>
             <div class="card-body">
+                <h3>{{ "%.3g"|format(data["profit_percentages"]["week"]) }}%</h3>
                 {{ "%.3g"|format(data["profit_week"]) }}
             </div>
         </div>
@@ -30,6 +32,7 @@
                 Profit this month
             </div>
             <div class="card-body">
+                <h3>{{ "%.3g"|format(data["profit_percentages"]["month"]) }}%</h3>
                 {{ "%.3g"|format(data["profit_month"]) }}
             </div>
         </div>
@@ -40,6 +43,7 @@
                 Total profit
             </div>
             <div class="card-body">
+                <h3>{{ "%.3g"|format(data["profit_percentages"]["total"]) }}%</h3>
                 {{ "%.3g"|format(data["total"]) }}
             </div>
         </div>
@@ -50,7 +54,7 @@
                 Unrealised PnL
             </div>
             <div class="card-body">
-                {{ "%.3g"|format(data["unrealised"]) }}
+                <h3>{{ "%.3g"|format(data["unrealised"]) }}</h3>
             </div>
         </div>
     </div>
@@ -60,7 +64,8 @@
                 Wallet balance
             </div>
             <div class="card-body">
-                {{ "%.3g"|format(data["balance"]) }} {{ data["quote"] }}
+                <h3>{{ "%.3g"|format(data["balance"]) }}</h3>
+                {{ data["quote"] }}
             </div>
         </div>
     </div>
