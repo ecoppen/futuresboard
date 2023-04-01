@@ -436,8 +436,7 @@ class Database:
             )
         if result is None:
             return 0.0
-        else:
-            return result
+        return result
 
     def get_closed_profit(
         self, account_id: int, start: int | None = None, end: int | None = None
@@ -456,8 +455,35 @@ class Database:
             )
         if result is None:
             return 0.0
-        else:
-            return result
+        return result
+
+    def get_wallet_balance(self, account_id: int, symbol: str | None = None) -> float:
+        table_object = self.get_table_object(table_name="wallet")
+        filters = [table_object.c.account_id == account_id]
+        if symbol is not None:
+            filters.append(table_object.c.coin >= symbol)
+        with Session(self.engine) as session:
+            result = session.scalar(
+                select(func.sum(table_object.c.profit))
+                .select_from(table_object)
+                .filter(*filters)
+            )
+        if result is None:
+            return 0.0
+        return result
+
+    def get_wallet_balances(self, account_id: int) -> dict:
+        table_object = self.get_table_object(table_name="wallet")
+        filters = [table_object.c.account_id == account_id]
+        wallet = {}
+        with Session(self.engine) as session:
+            result = session.execute(select(table_object).filter(*filters)).all()
+        if result is None:
+            return wallet
+        for row in result:
+            log.info(row)
+            wallet[row[2]] = row[3]
+        return wallet
 
     def get_trades(
         self,
@@ -501,7 +527,7 @@ class Database:
                     "profit": trade[6],
                     "created_time": trade[7],
                     "updated_time": trade[8],
-                    "mins_ago": self.mins_since_timestamp(ts=trade[8], utc=True),
+                    "mins_ago": self.mins_since_timestamp(ts=trade[7], utc=True),
                 }
             )
 
