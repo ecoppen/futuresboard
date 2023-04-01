@@ -99,7 +99,25 @@ def account(
     account = database.get_account(account_id=account_id)
     if not account:
         return RedirectResponse("/")
+
     ranges = timeranges()
+
+    wallet_balances = database.get_wallet_balances(account_id=account_id)
+    wallet_key = ""
+    if len(wallet_balances) == 1:
+        wallet_key = next(iter(wallet_balances))
+    else:
+        keys = [*wallet_balances]
+        last_traded = database.get_trades(account_id=account_id, limit=1)
+        if len(last_traded) > 0:
+            symbol = last_traded[0]["symbol"]
+            for key in keys:
+                if symbol.endswith(key):
+                    wallet_key = key
+                    break
+        if wallet_key == "":
+            wallet_key = next(iter(wallet_balances))
+
     data = {
         "profit_today": database.get_closed_profit(
             account_id=account_id,
@@ -117,6 +135,9 @@ def account(
             end=ranges["this_month"]["end_ts"],
         ),
         "total": database.get_closed_profit(account_id=account_id),
+        "unrealised": database.get_unrealised_profit(account_id=account_id),
+        "balance": wallet_balances[wallet_key],
+        "quote": wallet_key,
     }
     page_data = {"dashboard_title": config.dashboard_name, "year": date.today().year}
     return templates.TemplateResponse(
