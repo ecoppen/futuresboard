@@ -61,7 +61,11 @@ scraper = Scraper(
 def index(request: Request):
     accounts = database.get_accounts()
     recent_trades = database.get_trades(limit=10, sort=True, order="desc")
-    page_data = {"dashboard_title": config.dashboard_name, "year": date.today().year}
+    page_data = {
+        "dashboard_title": config.dashboard_name,
+        "year": date.today().year,
+        "page": "",
+    }
 
     now = datetime.now()
     one_hour_ago = now - timedelta(hours=1)
@@ -148,7 +152,11 @@ def account(
             "month": data["profit_month"] / data["balance"] * 100,
             "total": data["total"] / data["balance"] * 100,
         }
-    page_data = {"dashboard_title": config.dashboard_name, "year": date.today().year}
+    page_data = {
+        "dashboard_title": config.dashboard_name,
+        "year": date.today().year,
+        "page": f"{account['name']} ({account['exchange']})",
+    }
     return templates.TemplateResponse(
         "account.html",
         {"request": request, "page_data": page_data, "account": account, "data": data},
@@ -162,7 +170,11 @@ def news(
     start: int | None = None,
     end: int | None = None,
 ):
-    page_data = {"dashboard_title": config.dashboard_name, "year": date.today().year}
+    page_data = {
+        "dashboard_title": config.dashboard_name,
+        "year": date.today().year,
+        "page": "news",
+    }
     news = get_news(exchange=exchange, start=start, end=end)
 
     return templates.TemplateResponse(
