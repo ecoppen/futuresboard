@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import logging.handlers as handlers
 import os
 import threading
 import time
@@ -30,14 +31,21 @@ config = load_config(path=config_file)
 logs_file = Path(Path().resolve(), "log.txt")
 logs_file.touch(exist_ok=True)
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+log = logging.getLogger()
+formatter = logging.Formatter(
+    fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
-    level=os.environ.get("LOGLEVEL", config.log_level.upper()),
-    handlers=[logging.FileHandler(logs_file), logging.StreamHandler()],
 )
+rotatingHandler = handlers.RotatingFileHandler(
+    "log.txt", maxBytes=5000000, backupCount=4
+)
+rotatingHandler.setFormatter(formatter)
+log.setLevel(os.environ.get("LOGLEVEL", config.log_level.upper()))
+log.addHandler(rotatingHandler)
+streamHandler = logging.StreamHandler()
+streamHandler.setFormatter(formatter)
+log.addHandler(streamHandler)
 
-log = logging.getLogger(__name__)
 log.info("futuresboard started")
 
 app = FastAPI()
