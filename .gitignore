@@ -133,6 +133,6 @@ dmypy.json
 
 # Project specific
 config.json
-log.txt
+log.txt*
 *.db*
 node_modules
