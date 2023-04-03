@@ -1,8 +1,6 @@
 import logging
 from enum import Enum
 
-import requests  # type: ignore
-
 log = logging.getLogger(__name__)
 
 
