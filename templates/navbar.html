@@ -44,9 +44,11 @@
         </a>
 
         <div class="btn-group btn-group-sm col-12 col-lg-auto mb-3 mb-lg-0 demo-wrap2" role="group">
-            {% for button in navbar_buttons %}
-                
-            {% endfor %}
+            {% if "buttons" in navbar %}
+                {% for button in navbar["buttons"] %}
+                    <a href="{% if navbar["buttons"][button]["news_params"] %} {{ url_for(navbar["buttons"][button]["url"]).include_query_params(start=navbar["buttons"][button]["news_value"]) }} {% else %} {{ url_for(navbar["buttons"][button]["url"]) }}{%  endif %}" class="btn btn-outline-info {% if navbar["buttons"][button]["active"] %}active{% endif %}" >{{ button }}</a>
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </header>

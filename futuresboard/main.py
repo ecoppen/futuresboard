@@ -99,6 +99,7 @@ def index(request: Request):
             "accounts": accounts,
             "recent_trades": recent_trades,
             "news": news,
+            "navbar": {},
         },
     )
 
@@ -167,7 +168,13 @@ def account(
     }
     return templates.TemplateResponse(
         "account.html",
-        {"request": request, "page_data": page_data, "account": account, "data": data},
+        {
+            "request": request,
+            "page_data": page_data,
+            "account": account,
+            "data": data,
+            "navbar": {},
+        },
     )
 
 
@@ -185,8 +192,37 @@ def news(
     }
     news = get_news(exchange=exchange, start=start, end=end)
 
+    now = datetime.now()
+    one_hour_ago = now - timedelta(hours=1)
+    today_start = datetime.combine(datetime.today(), dt_time.min)
+
+    navbar = {
+        "buttons": {
+            "1h": {
+                "url": "news",
+                "active": False,
+                "news_params": True,
+                "news_value": dt_to_ts(one_hour_ago),
+            },
+            "1d": {
+                "url": "news",
+                "active": False,
+                "news_params": True,
+                "news_value": dt_to_ts(today_start),
+            },
+            "all": {"url": "news", "active": False, "news_params": False},
+        }
+    }
+    if start is None:
+        navbar["buttons"]["all"]["active"] = True
+    elif start == dt_to_ts(today_start):
+        navbar["buttons"]["1d"]["active"] = True
+    elif start == dt_to_ts(one_hour_ago):
+        navbar["buttons"]["1h"]["active"] = True
+
     return templates.TemplateResponse(
-        "news.html", {"request": request, "page_data": page_data, "news": news}
+        "news.html",
+        {"request": request, "page_data": page_data, "news": news, "navbar": navbar},
     )
 
 
