@@ -481,7 +481,6 @@ class Database:
         if result is None:
             return wallet
         for row in result:
-            log.info(row)
             wallet[row[2]] = row[3]
         return wallet
 
