@@ -1,5 +1,8 @@
 # Home
 
+!!! note
+    Futuresboard v2 is currently in development and can be found in it's own branch, this page is for v1
+
 <h1 align="center">Futuresboard</h1>
 <p align="center">
 A python (3.7+) based scraper and dashboard to monitor the performance of your Binance or Bybit Futures account.<br>

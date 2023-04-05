@@ -12,6 +12,9 @@ A python (3.7+) based scraper and dashboard to monitor the performance of your B
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 </p>
 
+## Version 2
+Version 2 is currently in development and can be found in a separate branch. In short it manage multiple accounts from one dashboard and comes in darkmode.
+
 ## Getting started
 
 - Create a fresh new API on Binance or Bybit, with only read rights.

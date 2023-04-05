@@ -22,6 +22,9 @@ Open the repository settings file with `nano /etc/apt/sources.list`
 
 Add `deb http://http.us.debian.org/debian/ testing non-free contrib main` to the end of the file. This will allow the filesystem to be updated with the latest versions of software.
 
+!!! note
+    This will include Python 3.11
+
 `ctrl+x` to quit, `y` to save changes and then press `enter/return` to keep the same file name
 
 `apt-get update --allow-releaseinfo-change` to update the repository list in the OS
@@ -40,8 +43,10 @@ Make sure the system clock is always accurate with `apt-get install systemd-time
 
 Install the Python package installer with `apt-get install python3-pip` which will be used to install the libraries required for most python programs
 
+Install the Python virtual enviroment manager pipenv `pip install pipenv`
+
 ## Installing from requirements
-If you have installed Python 3.11 then you may have to include `--break-system-packages` at when installing any requirements to a project
+If you have installed Python 3.11 then you may have to include `--break-system-packages` at when installing any requirements to a project. Ideally you'll be using a virtual environment and won't need this, for example we installed pipenv for this purpose.
 
 ## Session management
 
