@@ -9,7 +9,6 @@ fastapi = "*"
 jinja2 = "*"
 psycopg = {extras = ["binary"], version = "*"}
 pydantic = "*"
-python-multipart = "*"
 requests = "*"
 sqlalchemy = ">=2.0.8"
 uvicorn = "*"
