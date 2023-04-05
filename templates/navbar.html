@@ -49,6 +49,20 @@
                     <a href="{% if navbar["buttons"][button]["news_params"] %} {{ url_for(navbar["buttons"][button]["url"]).include_query_params(start=navbar["buttons"][button]["news_value"]) }} {% else %} {{ url_for(navbar["buttons"][button]["url"]) }}{%  endif %}" class="btn btn-outline-info {% if navbar["buttons"][button]["active"] %}active{% endif %}" >{{ button }}</a>
                 {% endfor %}
             {% endif %}
+            {% if "select" in navbar %}
+                    <form action="{{ url_for("account_switcher") }}" method="get">
+                        <div class="input-group">
+                            <select class="form-select" name="id" required>
+                                <option value="">{{ navbar["select"]["placeholder"] }}</option>
+                                {% for item in navbar["select"]["items"] %}
+                                    <option value="{{ item["account_id"] }}" {% if item["selected"] %} selected {% endif %}>{{ item["item"] }}</option>
+                                {% endfor %}
+                            </select>
+                            <button class="btn btn-primary btn-sm" type="submit"><i
+                                                        class="fa-solid fa-angles-right"></i></button>
+                        </div>
+                    </form>
+            {% endif %}
         </div>
     </div>
 </header>

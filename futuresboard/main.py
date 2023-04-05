@@ -9,6 +9,7 @@ from datetime import date, datetime
 from datetime import time as dt_time
 from datetime import timedelta
 from pathlib import Path
+from typing import Any
 
 from fastapi import FastAPI
 from fastapi import Path as fPath
@@ -91,6 +92,19 @@ def index(request: Request):
         "all": [database.get_count_news_items(), 0],
     }
 
+    navbar: dict[str, dict[str, Any]] = {
+        "select": {"placeholder": "Select an account", "items": []}
+    }
+
+    for each_account in accounts["active"] + accounts["inactive"]:
+        navbar["select"]["items"].append(
+            {
+                "item": f"{each_account['id']} - {each_account['name']} ({each_account['exchange']})",
+                "selected": False,
+                "account_id": each_account["id"],
+            }
+        )
+
     return templates.TemplateResponse(
         "index.html",
         {
@@ -99,9 +113,17 @@ def index(request: Request):
             "accounts": accounts,
             "recent_trades": recent_trades,
             "news": news,
-            "navbar": {},
+            "navbar": navbar,
         },
     )
+
+
+@app.get("/account_switch", include_in_schema=False)
+async def account_switcher(id: int):
+    account_check = database.get_account(account_id=id)
+    if not account_check:
+        return RedirectResponse("/")
+    return RedirectResponse(f"/account/{id}")
 
 
 @app.get("/account/{account_id}", response_class=HTMLResponse, include_in_schema=False)
@@ -109,8 +131,9 @@ def account(
     request: Request,
     account_id: int = fPath(title="The ID of the account to get", gt=0),
 ):
-    account = database.get_account(account_id=account_id)
-    if not account:
+    accounts = database.get_accounts()
+    account_check = database.get_account(account_id=account_id)
+    if not account_check:
         return RedirectResponse("/")
 
     ranges = timeranges()
@@ -164,16 +187,32 @@ def account(
     page_data = {
         "dashboard_title": config.dashboard_name,
         "year": date.today().year,
-        "page": f"{account['name']} ({account['exchange']})",
+        "page": f"{account_check['name']} ({account_check['exchange']})",
     }
+    navbar: dict[str, dict[str, Any]] = {
+        "select": {"placeholder": "Select an account", "items": []}
+    }
+
+    for each_account in accounts["active"] + accounts["inactive"]:
+        selected = False
+        if account_id == each_account["id"]:
+            selected = True
+        navbar["select"]["items"].append(
+            {
+                "item": f"{each_account['id']} - {each_account['name']} ({each_account['exchange']})",
+                "selected": selected,
+                "account_id": each_account["id"],
+            }
+        )
+
     return templates.TemplateResponse(
         "account.html",
         {
             "request": request,
             "page_data": page_data,
-            "account": account,
+            "account": account_check,
             "data": data,
-            "navbar": {},
+            "navbar": navbar,
         },
     )
 
