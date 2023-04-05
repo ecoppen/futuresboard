@@ -22,6 +22,10 @@ Open the repository settings file with `nano /etc/apt/sources.list`
 
 Add `deb http://http.us.debian.org/debian/ testing non-free contrib main` to the end of the file. This will allow the filesystem to be updated with the latest versions of software.
 
+!!! note
+    This will install Python 3.11
+
+
 `ctrl+x` to quit, `y` to save changes and then press `enter/return` to keep the same file name
 
 `apt-get update --allow-releaseinfo-change` to update the repository list in the OS
@@ -38,10 +42,12 @@ Install the session manager for tmux with `apt-get install tmuxp`
 
 Make sure the system clock is always accurate with `apt-get install systemd-timesyncd`
 
-Install the Python package installer with `apt-get install python3-pip` which will be used to install the libraries required for most python programs
+Install the virtual environment manager pipenv `pip install pipenv`
 
 ## Installing from requirements
-If you have installed Python 3.11 then you may have to include `--break-system-packages` at when installing any requirements to a project
+If you have installed Python 3.11 (if you've followed this guide then you will have) then you may have to include `--break-system-packages` at when installing any requirements to a project if you are not using a virtual environment. 
+
+For more information on why virtual environments are good, click [here](https://realpython.com/python-virtual-environments-a-primer/#why-do-you-need-virtual-environments)
 
 ## Session management
 
