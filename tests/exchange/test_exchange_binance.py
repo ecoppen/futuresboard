@@ -58,10 +58,10 @@ class TestBinanceExchange(unittest.TestCase):
             headers={"X-MBX-USED-WEIGHT-1M": "10"},
         )
         futures_prices = binance.get_futures_prices()
-        assert futures_prices == [
-            {"symbol": "XRPBUSD", "price": Decimal("0.3592")},
-            {"symbol": "MKRUSDT", "price": Decimal("526.2")},
-        ]
+        assert futures_prices == {
+            "XRPBUSD": Decimal("0.3592"),
+            "MKRUSDT": Decimal("526.2"),
+        }
         assert binance.weight == 10
 
     @responses.activate
@@ -75,7 +75,7 @@ class TestBinanceExchange(unittest.TestCase):
             headers={"X-MBX-USED-WEIGHT-1M": "10"},
         )
         futures_prices = binance.get_futures_prices()
-        assert futures_prices == []
+        assert futures_prices == {}
         assert binance.weight == 10
 
     @responses.activate

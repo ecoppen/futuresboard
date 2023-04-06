@@ -51,10 +51,10 @@ class TestBybitExchange(unittest.TestCase):
             content_type="application/json",
         )
         futures_prices = bybit.get_futures_prices()
-        assert futures_prices == [
-            {"symbol": "10000NFTUSDT", "price": Decimal("0.004890")},
-            {"symbol": "1000BONKUSDT", "price": Decimal("0.000753")},
-        ]
+        assert futures_prices == {
+            "10000NFTUSDT": Decimal("0.004890"),
+            "1000BONKUSDT": Decimal("0.000753"),
+        }
 
     @responses.activate
     def test_get_futures_prices_invalid(self):
@@ -66,7 +66,7 @@ class TestBybitExchange(unittest.TestCase):
             content_type="application/json",
         )
         futures_prices = bybit.get_futures_prices()
-        assert futures_prices == []
+        assert futures_prices == {}
 
     @responses.activate
     def test_get_futures_kline_valid_end_time(self):

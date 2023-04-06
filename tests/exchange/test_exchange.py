@@ -33,7 +33,7 @@ class TestExchange(unittest.TestCase):
 
     def test_get_futures_prices(self):
         exchange = Exchange()
-        assert exchange.get_futures_prices() == []
+        assert exchange.get_futures_prices() == {}
 
     def test_get_futures_kline(self):
         exchange = Exchange()

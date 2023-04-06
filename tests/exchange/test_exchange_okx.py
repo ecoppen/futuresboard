@@ -9,7 +9,7 @@ from futuresboard.exchange.okx import Okx
 from futuresboard.exchange.utils import Intervals
 
 
-class TestBybitExchange(unittest.TestCase):
+class TestOkxExchange(unittest.TestCase):
     def test_attributes(self):
         okx = Okx()
         assert okx.exchange == "okx"
@@ -52,10 +52,10 @@ class TestBybitExchange(unittest.TestCase):
             content_type="application/json",
         )
         futures_prices = okx.get_futures_prices()
-        assert futures_prices == [
-            {"symbol": "ADAUSD230106", "price": Decimal("0.26327")},
-            {"symbol": "BCHUSD230106", "price": Decimal("100.49")},
-        ]
+        assert futures_prices == {
+            "ADAUSD230106": Decimal("0.26327"),
+            "BCHUSD230106": Decimal("100.49"),
+        }
 
     @responses.activate
     def test_get_futures_prices_invalid(self):
@@ -67,7 +67,7 @@ class TestBybitExchange(unittest.TestCase):
             content_type="application/json",
         )
         futures_prices = okx.get_futures_prices()
-        assert futures_prices == []
+        assert futures_prices == {}
 
     @responses.activate
     @patch("futuresboard.exchange.okx.Okx.get_instance_ids")
