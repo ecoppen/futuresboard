@@ -399,6 +399,26 @@ class Database:
             positions["short"] = count_short
         return positions
 
+    def get_positions(self) -> list:
+        table_object = self.get_table_object(table_name="positions")
+        positions = []
+        with Session(self.engine) as session:
+            all_positions = session.execute(select(table_object)).all()
+            for position in all_positions:
+                positions.append(
+                    {
+                        "account_id": position[1],
+                        "symbol": position[2],
+                        "upnl": position[3],
+                        "leverage": position[4],
+                        "price": position[5],
+                        "side": position[6],
+                        "amount": position[7],
+                        "liq": position[8],
+                    }
+                )
+        return positions
+
     def get_count_orders(self, account_id: int) -> dict:
         table_object = self.get_table_object(table_name="orders")
         orders: dict = {"buy": 0, "sell": 0}
