@@ -1,0 +1,74 @@
+{% include "header.html" %}
+<meta http-equiv="refresh" content="300">
+<style>
+</style>
+
+<div class="row">
+    <div class="col-2">
+        <div class="card text-center">
+            <div class="card-header">
+                Profit today
+            </div>
+            <div class="card-body">
+                <h3>{{ "%.3g"|format(data["profit_percentages"]["today"]) }}%</h3>
+                {{ "%.3g"|format(data["profit_today"]) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-2">
+        <div class="card text-center">
+            <div class="card-header">
+                Profit this week
+            </div>
+            <div class="card-body">
+                <h3>{{ "%.3g"|format(data["profit_percentages"]["week"]) }}%</h3>
+                {{ "%.3g"|format(data["profit_week"]) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-2">
+        <div class="card text-center">
+            <div class="card-header">
+                Profit this month
+            </div>
+            <div class="card-body">
+                <h3>{{ "%.3g"|format(data["profit_percentages"]["month"]) }}%</h3>
+                {{ "%.3g"|format(data["profit_month"]) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-2">
+        <div class="card text-center">
+            <div class="card-header">
+                Total profit
+            </div>
+            <div class="card-body">
+                <h3>{{ "%.3g"|format(data["profit_percentages"]["total"]) }}%</h3>
+                {{ "%.3g"|format(data["total"]) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-2">
+        <div class="card text-center">
+            <div class="card-header">
+                Unrealised PnL
+            </div>
+            <div class="card-body">
+                <h3>{{ "%.3g"|format(data["unrealised"]) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-2">
+        <div class="card text-center">
+            <div class="card-header">
+                Wallet balance
+            </div>
+            <div class="card-body">
+                <h3>{{ "%.3g"|format(data["balance"]) }}</h3>
+                {{ data["quote"] }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include "footer.html" %}

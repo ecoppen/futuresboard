@@ -1,0 +1,204 @@
+{% include "header.html" %}
+<meta http-equiv="refresh" content="300">
+<style>
+</style>
+
+<div class="row">
+    <div class="col-9">
+        <div class="accordion" id="accordionAccounts">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingActive">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseActive" aria-expanded="true" aria-controls="collapseActive">
+                        Active
+                    </button>
+                </h2>
+                <div id="collapseActive" class="accordion-collapse collapse show" aria-labelledby="headingActive"
+                     data-bs-parent="#accordionAccounts">
+                    <div class="accordion-body" style="max-height: 30rem; overflow-y: auto;">
+                        <table id="active" class="table table-bordered table-sm text-center">
+                            <thead>
+                            <tr>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Instance number">#</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Instance name (from config.json)">Name</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Exchange name">Exchange</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of long positions">Long</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of short positions">Short</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of buy orders">Buy</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of sell orders">Sell</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Unrealised Profit and Loss">uPnL</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Realised Profit and Loss">PnL</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Last scraped (mins)">Updated</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Click to view more">View</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if accounts["active"]|length > 0 %}
+                                {% for account in accounts["active"] %}
+                                    <tr>
+                                        <td>{{ account["id"] }}</td>
+                                        <td>{{ account["name"] }}</td>
+                                        <td>{{ account["exchange"] }}</td>
+                                        <td>{{ account["long"] }}</td>
+                                        <td>{{ account["short"] }}</td>
+                                        <td>{{ account["buy"] }}</td>
+                                        <td>{{ account["sell"] }}</td>
+                                        {% if account["upnl"] >= 0 %}
+                                            <td class="table-success">
+                                                {% else %}
+                                            <td class="table-danger">
+                                        {% endif %}
+                                        {{ "%.3g"|format(account["upnl"]) }}</td>
+                                        {% if account["pnl"] >= 0 %}
+                                            <td class="table-success">
+                                                {% else %}
+                                            <td class="table-danger">
+                                        {% endif %}
+                                        {{ "%.3g"|format(account["pnl"]) }}</td>
+                                        <td>{{ account["last_update"] }}m</td>
+                                        <td><a class="btn btn-primary btn-sm"
+                                               href="{{ url_for('account', account_id=account["id"]) }}"
+                                               role="button"><i class="fa-solid fa-angles-right"></i></a></td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingInactive">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseInactive" aria-expanded="false" aria-controls="collapseInactive">
+                        Inactive
+                    </button>
+                </h2>
+                <div id="collapseInactive" class="accordion-collapse collapse" aria-labelledby="headingInactive"
+                     data-bs-parent="#accordionAccounts">
+                    <div class="accordion-body" style="max-height: 30rem; overflow-y: auto;">
+                        <table id="inactive" class="table table-bordered table-sm text-center">
+                            <thead>
+                            <tr>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Instance number">#</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Instance name (from config.json)">Name</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Exchange name">Exchange</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of long positions">Long</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of short positions">Short</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of buy orders">Buy</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Number of sell orders">Sell</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Unrealised Profit and Loss">uPnL</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Realised Profit and Loss">PnL</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Last scraped (mins)">Updated</th>
+                                <th scope="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Click to view more">View</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if accounts["inactive"]|length > 0 %}
+                                {% for account in accounts["inactive"] %}
+                                    <tr>
+                                        <td>{{ account["id"] }}</td>
+                                        <td>{{ account["name"] }}</td>
+                                        <td>{{ account["exchange"] }}</td>
+                                        <td>{{ account["long"] }}</td>
+                                        <td>{{ account["short"] }}</td>
+                                        <td>{{ account["buy"] }}</td>
+                                        <td>{{ account["sell"] }}</td>
+                                        {% if account["upnl"] >= 0 %}
+                                            <td class="table-success">
+                                                {% else %}
+                                            <td class="table-danger">
+                                        {% endif %}
+                                        {{ "%.3g"|format(account["upnl"]) }}</td>
+
+                                        {% if account["pnl"] >= 0 %}
+                                            <td class="table-success">
+                                                {% else %}
+                                            <td class="table-danger">
+                                        {% endif %}
+                                        {{ "%.3g"|format(account["pnl"]) }}</td>
+                                        <td>{{ account["last_update"] }}</td>
+                                        <td><a class="btn btn-primary btn-sm"
+                                               href="{{ url_for('account', account_id=account["id"]) }}" role="button"><i
+                                                class="fa-solid fa-angles-right"></i></a></td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card">
+            <div class="card-header">
+                Latest news
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col"><div class="d-grid gap-2"><a class="btn btn-outline-info btn-sm" href="{{ url_for('news').include_query_params(start=news["1h"][1]) }}" role="button">1h ({{ news["1h"][0] }})</a></div></div>
+                        <div class="col"><div class="d-grid gap-2"><a class="btn btn-outline-info btn-sm" href="{{ url_for('news').include_query_params(start=news["1d"][1]) }}" role="button">1d ({{ news["1d"][0] }})</a></div></div>
+                        <div class="col"><div class="d-grid gap-2"><a class="btn btn-outline-info btn-sm" href="{{ url_for('news') }}" role="button">all ({{ news["all"][0] }})</a></div></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <br>
+        <div class="card">
+            <div class="card-header">
+                Recent trades
+            </div>
+            <ul class="list-group list-group-flush">
+                {% if recent_trades|length > 0 %}
+                    {% for trade in recent_trades %}
+                        <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-2"><a href="{{ url_for('account', account_id=trade["account_id"]) }}"><span class="badge bg-primary" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Instance number">#{{ trade['account_id'] }}</span></a></div>
+                            <div class="col-4"><span class="badge bg-secondary" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Symbol BASEQUOTE">{{ trade['symbol'] }}</span></div>
+                            <div class="col-3">
+                                {% if trade['profit'] >= 0 %}
+                                <span class="badge bg-success" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Profit">
+                            {% else %}
+                                <span class="badge bg-danger" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Loss">
+                            {% endif %}
+                            {{ "%.3g"|format(trade['profit']) }}
+                            </span>
+                                </div>
+                            <div class="col"><span class="badge bg-dark" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="Minutes since trade">{{ trade['mins_ago'] }}m</span></div>
+                        </div>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <li class="list-group-item">No recent trades</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#active').DataTable({
+            paging: false,
+            info: false,
+            searching: false,
+            order: [[0, "asc"]],
+            "columnDefs": [
+                { "orderable": false, "targets": 10 }
+            ]
+        });
+        $('#inactive').DataTable({
+            paging: false,
+            info: false,
+            searching: false,
+            order: [[0, "asc"]],
+            "columnDefs": [
+                { "orderable": false, "targets": 10 }
+            ]
+        });
+    });
+</script>
+{% include "footer.html" %}

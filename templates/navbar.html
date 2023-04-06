@@ -1,0 +1,70 @@
+<style>
+    .navbar-wrap {
+        overflow: hidden;
+        position: relative;
+    }
+
+    .logo-bg {
+        opacity: 0.15;
+        position: absolute;
+        left: auto;
+        top: auto;
+        width: auto;
+        height: 200%;
+    }
+
+    .site-name {
+        position: relative;
+    }
+</style>
+<nav class="navbar py-2 bg-dark navbar-dark border-bottom navbar-expand-lg">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="container d-flex flex-wrap">
+            <ul class="nav navbar-nav me-auto">
+                <li class="nav-item"><a href="{{url_for('index')}}" class="nav-link px-2 {% if request.path == "/" %}active{% endif %}"
+                                        aria-current="page">Home</a></li>
+                <li class="nav-item"><a href="{{url_for('positions')}}" class="nav-link px-2 {% if request.path == "/positions" %}active{% endif %}"
+                                        aria-current="page">Positions</a></li>
+                <li class="nav-item"><a href="{{url_for('news')}}" class="nav-link px-2 {% if request.path == "/news" %}active{% endif %}"
+                                        aria-current="page">News</a></li>
+                <li class="nav-item"><a href="/docs" class="nav-link px-2"
+                                        aria-current="page">API</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<header class="py-3 mb-4 border-bottom navbar-wrap">
+    <div class="container d-flex flex-wrap justify-content-center">
+        <a href="{{url_for('index')}}" class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto text-light text-decoration-none">
+
+            <img class="logo-bg" src="{{url_for('static', path='/images/logo.png')}}" height="40px" alt="Logo">
+            &nbsp;<span class="fs-4 site-name">{{ page_data['dashboard_title'] }} <span class="text-secondary">{{ page_data['page'] }}</span></span>
+        </a>
+
+        <div class="btn-group btn-group-sm col-12 col-lg-auto mb-3 mb-lg-0 demo-wrap2" role="group">
+            {% if "buttons" in navbar %}
+                {% for button in navbar["buttons"] %}
+                    <a href="{% if navbar["buttons"][button]["news_params"] %} {{ url_for(navbar["buttons"][button]["url"]).include_query_params(start=navbar["buttons"][button]["news_value"]) }} {% else %} {{ url_for(navbar["buttons"][button]["url"]) }}{%  endif %}" class="btn btn-outline-info {% if navbar["buttons"][button]["active"] %}active{% endif %}" >{{ button }}</a>
+                {% endfor %}
+            {% endif %}
+            {% if "select" in navbar %}
+                    <form action="{{ url_for("account_switcher") }}" method="get">
+                        <div class="input-group">
+                            <select class="form-select" name="id" required>
+                                <option value="">{{ navbar["select"]["placeholder"] }}</option>
+                                {% for item in navbar["select"]["items"] %}
+                                    <option value="{{ item["account_id"] }}" {% if item["selected"] %} selected {% endif %}>{{ item["item"] }}</option>
+                                {% endfor %}
+                            </select>
+                            <button class="btn btn-primary btn-sm" type="submit"><i
+                                                        class="fa-solid fa-angles-right"></i></button>
+                        </div>
+                    </form>
+            {% endif %}
+        </div>
+    </div>
+</header>
