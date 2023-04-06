@@ -62,7 +62,7 @@ class Scraper:
                 log.info(
                     f"Checking PnL for {len(pairs)} pairs listed on {account.exchange}"
                 )
-                pairs = [symbol["symbol"] for symbol in pairs]
+                pairs = [pair for pair in pairs]
             else:
                 pairs = self.database.get_previously_traded_pairs(account_id=account.id)
                 log.info(
