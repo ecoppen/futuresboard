@@ -41,7 +41,7 @@ class Bybit(Exchange):
                         return Decimal(raw_json["result"]["list"][0]["lastPrice"])
         return Decimal(-1.0)
 
-    def get_futures_prices(self) -> list:
+    def get_futures_prices(self) -> dict:
         self.check_weight()
         params: dict = {"category": "linear"}
         header, raw_json = send_public_request(
@@ -49,13 +49,12 @@ class Bybit(Exchange):
             url_path="/v5/market/tickers",
             payload=params,
         )
+        prices = {}
         if "result" in [*raw_json]:
             if "list" in [*raw_json["result"]]:
-                return [
-                    {"symbol": pair["symbol"], "price": Decimal(pair["lastPrice"])}
-                    for pair in raw_json["result"]["list"]
-                ]
-        return []
+                for pair in raw_json["result"]["list"]:
+                    prices[pair["symbol"]] = Decimal(pair["lastPrice"])
+        return prices
 
     def get_futures_kline(
         self,
