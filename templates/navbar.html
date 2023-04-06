@@ -27,6 +27,8 @@
             <ul class="nav navbar-nav me-auto">
                 <li class="nav-item"><a href="{{url_for('index')}}" class="nav-link px-2 {% if request.path == "/" %}active{% endif %}"
                                         aria-current="page">Home</a></li>
+                <li class="nav-item"><a href="{{url_for('positions')}}" class="nav-link px-2 {% if request.path == "/positions" %}active{% endif %}"
+                                        aria-current="page">Positions</a></li>
                 <li class="nav-item"><a href="{{url_for('news')}}" class="nav-link px-2 {% if request.path == "/news" %}active{% endif %}"
                                         aria-current="page">News</a></li>
                 <li class="nav-item"><a href="/docs" class="nav-link px-2"

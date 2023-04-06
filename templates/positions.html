@@ -1,0 +1,49 @@
+{% include "header.html" %}
+<meta http-equiv="refresh" content="300">
+
+<div class="row">
+    <div class="col-12">
+        <table id="news" class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Exchange</th>
+                    <th>Symbol</th>
+                    <th>Side</th>
+                    <th>Leverage</th>
+                    <th>Amount</th>
+                    <th>Entry price</th>
+                    <th>Liq price</th>
+                    <th>Current price</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% if positions|length > 0 %}
+                    {% for position in positions %}
+                        <tr>
+                            <td>{{ position["account_id"] }}</td>
+                            <td>{{ position["exchange"] }}</td>
+                            <td>{{ position["symbol"] }}</td>
+                            <td>{{ position["side"] }}</td>
+                            <td>{{ position["leverage"] }}</td>
+                            <td>{{ position["amount"] }}</td>
+                            <td>{{ position["price"] }}</td>
+                            <td>{{ position["liq"] }}</td>
+                            <td>{{ position["current_price"] }}</td>
+                        </tr>
+                    {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#news').DataTable({
+            order: [[5, "desc"]]
+        });
+    });
+</script>
+
+{% include "footer.html" %}

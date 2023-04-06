@@ -131,11 +131,11 @@ def account(
     request: Request,
     account_id: int = fPath(title="The ID of the account to get", gt=0),
 ):
-    accounts = database.get_accounts()
     account_check = database.get_account(account_id=account_id)
     if not account_check:
         return RedirectResponse("/")
 
+    accounts = database.get_accounts()
     ranges = timeranges()
 
     wallet_balances = database.get_wallet_balances(account_id=account_id)
@@ -213,6 +213,46 @@ def account(
             "account": account_check,
             "data": data,
             "navbar": navbar,
+        },
+    )
+
+
+@app.get("/positions", response_class=HTMLResponse, include_in_schema=False)
+def positions(request: Request):
+    page_data = {
+        "dashboard_title": config.dashboard_name,
+        "year": date.today().year,
+        "page": "positions",
+    }
+    all_accounts = database.get_accounts()
+    all_exchanges = []
+    acc_exchange = {}
+    for account in all_accounts["active"] + all_accounts["inactive"]:
+        if account["exchange"] not in all_exchanges:
+            all_exchanges.append(account["exchange"])
+        acc_exchange[account["id"]] = account["exchange"]
+    all_prices = {}
+    for exchange in all_exchanges:
+        all_prices[exchange] = get_prices(
+            exchange=exchange, market=Markets.FUTURES.value
+        )
+
+    positions = database.get_positions()
+    for i in range(len(positions)):
+        positions[i]["exchange"] = acc_exchange[positions[i]["account_id"]]
+        if positions[i]["exchange"] in all_prices:
+            if positions[i]["symbol"] in all_prices[positions[i]["exchange"]]:
+                positions[i]["current_price"] = all_prices[positions[i]["exchange"]][
+                    positions[i]["symbol"]
+                ]
+
+    return templates.TemplateResponse(
+        "positions.html",
+        {
+            "request": request,
+            "page_data": page_data,
+            "navbar": {},
+            "positions": positions,
         },
     )
 
