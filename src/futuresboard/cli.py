@@ -9,7 +9,7 @@ import futuresboard.app
 import futuresboard.scraper
 from futuresboard import __version__  # type: ignore[attr-defined]
 from futuresboard.config import Config
-from pydantic import IPvAnyInterface
+from pydantic.networks import IPvAnyAddress
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ def main():
         "--host",
         default='0.0.0.0',
         help="Server host. Default: 0.0.0.0",
-        type=IPvAnyInterface.validate,
+        type=IPvAnyAddress,
     )
     server_settings.add_argument(
         "--port", type=int, default=None, help="Server port. Default: 5000"
