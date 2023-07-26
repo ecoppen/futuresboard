@@ -4,15 +4,10 @@ import copy
 import enum
 import json
 import pathlib
-from typing import List
-from typing import Optional
+from typing import List, Optional
 
-from pydantic import BaseModel
-from pydantic import DirectoryPath
-from pydantic import Field
-from pydantic import IPvAnyInterface
-from pydantic import root_validator
-from pydantic import validator
+from pydantic import BaseModel, DirectoryPath, Field, root_validator, validator
+from pydantic.networks import IPvAnyAddress
 
 
 class NavbarBG(enum.Enum):
@@ -34,7 +29,9 @@ class Exchanges(enum.Enum):
 class Custom(BaseModel):
     NAVBAR_TITLE: Optional[str] = Field("Futuresboard", min_length=1, max_length=50)
     NAVBAR_BG: Optional[NavbarBG] = NavbarBG.BG_DARK
-    PROJECTIONS: List[float] = Field([1.003, 1.005, 1.01, 1.012], min_items=1, max_items=10)
+    PROJECTIONS: List[float] = Field(
+        [1.003, 1.005, 1.01, 1.012], min_items=1, max_items=10
+    )
 
     @validator("PROJECTIONS", each_item=True)
     @classmethod
@@ -59,7 +56,7 @@ class Config(BaseModel):
     API_BASE_URL: Optional[str]
     AUTO_SCRAPE_INTERVAL: int = 300
     DISABLE_AUTO_SCRAPE: bool = False
-    HOST: Optional[IPvAnyInterface] = IPvAnyInterface.validate("0.0.0.0")  # type: ignore[assignment]
+    HOST: Optional[IPvAnyAddress] = IPvAnyAddress("0.0.0.0")  # nosec
     PORT: Optional[int] = Field(5000, ge=1, le=65535)
     API_KEY: str
     API_SECRET: str
@@ -127,4 +124,4 @@ class Config(BaseModel):
         else:
             config_dict = {}
         config_dict["CONFIG_DIR"] = config_dir
-        return cls.parse_obj(config_dict)
+        return cls.model_validate(config_dict)
