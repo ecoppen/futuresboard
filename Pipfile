@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 flask = "*"
 requests = "*"
-pydantic = "*"
+pydantic = "2.1.1"
 
 [dev-packages]
 bandit = "*"
