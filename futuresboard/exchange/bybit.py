@@ -180,17 +180,25 @@ class Bybit(Exchange):
                     for position in responseJSON["result"]["list"]:
                         if float(position["size"]) > 0:
                             position_side = position_sides[position["side"].lower()]
+                            liq_price = position["liqPrice"]
+                            if liq_price == '':
+                                print("Warning: liquidation price is an empty string. Defaulting to 0.")
+                                liq_price = Decimal(0)
+                            else:
+                                try:
+                                    liq_price = Decimal(liq_price)
+                                except Exception as e:
+                                    print(f"Error converting liquidation price to Decimal: {e}")
+                                    liq_price = Decimal(0)
                             positions.append(
                                 {
                                     "symbol": position["symbol"],
-                                    "unrealised_profit": Decimal(
-                                        position["unrealisedPnl"]
-                                    ),
+                                    "unrealised_profit": Decimal(position["unrealisedPnl"]),
                                     "leverage": Decimal(position["leverage"]),
                                     "entry_price": Decimal(position["avgPrice"]),
                                     "side": position_side,
                                     "amount": Decimal(position["size"]),
-                                    "liquidation_price": Decimal(position["liqPrice"]),
+                                    "liquidation_price": liq_price,
                                 }
                             )
                 else:
