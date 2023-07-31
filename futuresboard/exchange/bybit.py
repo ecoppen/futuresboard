@@ -182,13 +182,13 @@ class Bybit(Exchange):
                             position_side = position_sides[position["side"].lower()]
                             liq_price = position["liqPrice"]
                             if liq_price == '':
-                                print("Warning: liquidation price is an empty string. Defaulting to 0.")
+                                log.warning("Warning: liquidation price is an empty string. Defaulting to 0.")
                                 liq_price = Decimal(0)
                             else:
                                 try:
                                     liq_price = Decimal(liq_price)
                                 except Exception as e:
-                                    print(f"Error converting liquidation price to Decimal: {e}")
+                                    log.warning(f"Error converting liquidation price to Decimal: {e}")
                                     liq_price = Decimal(0)
                             positions.append(
                                 {
@@ -207,7 +207,7 @@ class Bybit(Exchange):
                 break
 
         return positions
-
+    
     def get_open_futures_orders(self, account: dict) -> list:
         params = {"category": "linear", "limit": 50, "settleCoin": "USDT"}
         orders = []
