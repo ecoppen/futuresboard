@@ -1,0 +1,666 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../passivbot/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.1, mkdocs-material-9.1.21">
+    
+    
+      
+        <title>Servers - futuresboard</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.eebd395e.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ecc896b0.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#servers" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="https://ecoppen.github.io/futuresboard" title="futuresboard" class="md-header__button md-logo" aria-label="futuresboard" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            futuresboard
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Servers
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+          
+            
+            
+            
+            <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+            
+              <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+              </label>
+            
+          
+            
+            
+            
+            <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+            
+              <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+              </label>
+            
+          
+        </form>
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ecoppen/futuresboard" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href=".." class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../futuresboard/" class="md-tabs__link">
+      Setup
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../passivbot/" class="md-tabs__link">
+      passivbot
+    </a>
+  </li>
+
+      
+        
+  
+  
+    
+  
+
+
+  <li class="md-tabs__item">
+    <a href="./" class="md-tabs__link md-tabs__link--active">
+      Servers
+    </a>
+  </li>
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://ecoppen.github.io/futuresboard" title="futuresboard" class="md-nav__button md-logo" aria-label="futuresboard" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    futuresboard
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ecoppen/futuresboard" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../futuresboard/" class="md-nav__link">
+        Setup
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../passivbot/" class="md-nav__link">
+        passivbot
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Servers
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Servers
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#server-setup" class="md-nav__link">
+    Server setup
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installing-from-requirements" class="md-nav__link">
+    Installing from requirements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#session-management" class="md-nav__link">
+    Session management
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#server-rebooting" class="md-nav__link">
+    Server rebooting
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="servers">Servers</h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>An external server setup is recommended over one in your home because of speed, reliability and location. This guide is going to assume you're running Debian 10+</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>This is my referral code for vultr which gives $100 free credit for 1 month: <a href="https://www.vultr.com/?ref=9034865-8H">vultr referral</a></p>
+</div>
+<h2 id="server-setup">Server setup</h2>
+<p>Login using <code>root@IP</code> for example in terminal <code>SSH root@10.10.10.10</code> where <code>10.10.10.10</code> is the IP of your server</p>
+<p><code>Yes</code> to save your SSH key. If you are not asked for this, revisit your the setup page of your server.</p>
+<p>Open the SSH config file with nano <code>/etc/ssh/sshd_config</code></p>
+<p>Change <code>#PasswordAuthentication yes</code> to <code>PasswordAuthentication no</code>. If you can't find this line, add it at the bottom of the file. This will disable user login via password only, instead requiring an SSH key.</p>
+<p><code>ctrl+x</code> to quit, <code>y</code> to save changes and then press <code>enter/return</code> to keep the same file name</p>
+<p>Activate the changes with <code>service ssh reload</code></p>
+<p>Open the repository settings file with <code>nano /etc/apt/sources.list</code></p>
+<p>Add <code>deb http://http.us.debian.org/debian/ testing non-free contrib main</code> to the end of the file. This will allow the filesystem to be updated with the latest versions of software.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This will include Python 3.11</p>
+</div>
+<p><code>ctrl+x</code> to quit, <code>y</code> to save changes and then press <code>enter/return</code> to keep the same file name</p>
+<p><code>apt-get update --allow-releaseinfo-change</code> to update the repository list in the OS</p>
+<p><code>apt-get upgrade</code> to install the latest updates. This may take a few minutes.</p>
+<p>Install a popular intrusion prevention software such as <code>apt-get install fail2ban</code>. More information on how to configure this to your needs can be found here: <a href="https://linuxize.com/post/install-configure-fail2ban-on-debian-10/">fail2ban</a></p>
+<p>Install the git framework, for downloading from GitHub with <code>apt-get install git</code></p>
+<p>Install the terminal multiplexer (alternative to screen) with <code>apt-get install tmux</code></p>
+<p>Install the session manager for tmux with <code>apt-get install tmuxp</code></p>
+<p>Make sure the system clock is always accurate with <code>apt-get install systemd-timesyncd</code></p>
+<p>Install the Python package installer with <code>apt-get install python3-pip</code> which will be used to install the libraries required for most python programs</p>
+<p>Install the Python virtual enviroment manager pipenv <code>pip install pipenv</code></p>
+<h2 id="installing-from-requirements">Installing from requirements</h2>
+<p>If you have installed Python 3.11 then you may have to include <code>--break-system-packages</code> at when installing any requirements to a project. Ideally you'll be using a virtual environment and won't need this, for example we installed pipenv for this purpose.</p>
+<h2 id="session-management">Session management</h2>
+<p>Sessions can be managed through multiple <code>screen</code>s however we have already installed the session manager <code>tmuxp</code> that allows the creation and termination of sessions with <code>tmux</code> easily.</p>
+<p>Create the file session YAML file with <code>nano session.yaml</code>. Copy the code below with <code>ctrl + c</code> and paste it into the terminal window by <code>ctrl + v</code> or right click.</p>
+<div class="highlight"><pre><span></span><code>session_name: passiv_session
+windows:
+- window_name: passiv_1
+  layout: even-vertical
+  shell_command_before:
+    - cd ~/passivbot
+  panes:
+    - shell_command:
+        - python3 passivbot.py binance_01 COINUSDT configs/live/COIN.json -m future -lw 0.3
+    - shell_command:
+        -
+    - shell_command:
+        -
+    - shell_command:
+        -
+- window_name: passiv_2
+  layout: even-vertical
+  shell_command_before:
+    - cd ~/passivbot
+  panes:
+    - shell_command:
+        -
+    - shell_command:
+        -
+    - shell_command:
+        -
+    - shell_command:
+        -
+- window_name: passiv_3
+  layout: even-vertical
+  shell_command_before:
+    - cd ~/passivbot
+  panes:
+    - shell_command:
+        -
+    - shell_command:
+        -
+    - shell_command:
+        -
+    - shell_command:
+        -
+- window_name: passiv_GS
+  layout: even-vertical
+  shell_command_before:
+    - cd ~/passivbot
+  panes:
+    - shell_command:
+        -
+    - shell_command:
+        - 
+    - shell_command:
+        - 
+    - shell_command:
+        - 
+</code></pre></div>
+<p>In this file there are four windows: <code>passiv_1</code>, <code>passiv_2</code>, <code>passiv_3</code> and <code>passiv_GS</code></p>
+<p>Each window has four slots for bot commands to run indicated under <code>- shell_command</code> with a <code>-</code>, the first slot has an example filled in for you. This setup allows for 16 bots to be run simultaneously however on closer inspection there is one window called <code>passiv_GS</code> for when you wish to use the <code>-gs</code> command (graceful stop) and keep other bots running</p>
+<p><code>ctrl+b</code> and then <code>w</code> - select a window to view</p>
+<p><code>ctrl+b</code> and then <code>d</code> - detach screen</p>
+<p><code>ctrl+b</code> and then <code>o</code> - move between the slots on each window</p>
+<p><code>ctrl+b</code> and then <code>s</code> - display all sessions</p>
+<p><code>ctrl+b</code> and then <code>{</code> or <code>}</code> - reorder slots on a window</p>
+<p><code>tmuxp load session.yaml</code> - load the screen manager (if they are already present, view the screen)</p>
+<p><code>tmux kill-session</code> - stop all bots/screens that are open (in case you need to reload the bot or change a configuration)</p>
+<h2 id="server-rebooting">Server rebooting</h2>
+<p>If your VPS reboots itself for whatever reason, you will want your bot to restart ASAP to ensure that orders and positions are maintained correctly. Further you will probably want to know and potentially investigate any issues.</p>
+<p>Firstly you need to decide whether you want a notification to be sent to you and via which medium. The code below offers both discord and telegram notifications. If you need to use telegram, make sure you install the required library with the command <code>pip3 install pyTelegramBotAPI</code>. Make sure you change the <code>WEBHOOK_URL</code> if you're using discord and the <code>TELEGRAM_HTTP_API</code> and <code>TELEGRAM_USER_ID</code> if you're using telegram. It should go without saying that you want these to be sent privately, so don't use an open discord server or telegram group.</p>
+<div class="highlight"><pre><span></span><code>import argparse
+
+def init_argparse():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(&quot;-a&quot;, &quot;--action&quot;)
+    parser.add_argument(&quot;-m&quot;, &quot;--message&quot;)
+    return parser
+
+def send_to_discord(action, message_to_send):
+    import requests
+
+    message = &quot;:white_check_mark: Script has run&quot;
+    if action == &quot;start&quot;:
+        message = &quot;:exclamation: VPS booted and passivbot started&quot;
+    elif action == &quot;restart&quot;:
+        message = &quot;:white_check_mark: passivbot restarted&quot;
+    if message_to_send is not None:
+        message = f&quot;{message_to_send}&quot;
+
+    mUrl = &quot;WEBHOOK_URL&quot;
+
+    data = {&quot;content&quot;: message}
+    response = requests.post(mUrl, json=data)
+
+def send_to_telegram(action, message_to_send):
+    import telebot
+
+    message = &quot;✅ Script has run&quot;
+    if action == &quot;start&quot;:
+        message = &quot;❗ VPS booted and passivbot started&quot;
+    elif action == &quot;restart&quot;:
+        message = &quot;✅ passivbot restarted&quot;
+    if message_to_send is not None:
+        message = f&quot;{message_to_send}&quot;
+
+    telegram_http_api = &quot;&quot;
+    telegram_user_id = &quot;&quot;
+
+    bot = telebot.TeleBot(telegram_http_api)
+    bot.send_message(telegram_user_id, message)
+
+parser = init_argparse()
+args = parser.parse_args()
+action, message_to_send = None, None
+if args.action is not None:
+    action = args.action
+if args.message is not None:
+    message_to_send = args.message
+
+send_to_discord(action, message_to_send)
+send_to_telegram(action, message_to_send)
+</code></pre></div>
+<p>You can test that it works by typing <code>python3 notify.py -m hello</code> or <code>python3 notify.py -a start</code>.</p>
+<p>There are two files required. One to start (reboot server) and one to restart (if you want it periodically to check it's alive). You can remove the notify.py from either or both files if you don't intend to use it</p>
+<div class="highlight"><pre><span></span><code>`#!/bin/bash
+
+python3 notify.py -a start
+sleep 0.5
+tmuxp load session.yaml
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>#!/bin/bash
+
+python3 notify.py -a restart
+sleep 0.5
+tmux kill-session
+sleep 0.5
+tmuxp load session.yaml
+</code></pre></div>
+<p>These can be tested by typing <code>sh restart.sh</code>(if the session is running) and <code>sh start.sh</code> if not. If you are using <code>notify.py</code> you will receive a message unless you removed the code previously.</p>
+<p>Next make sure the files sh files are executable by cron with <code>chmod +x start.sh restart.sh</code></p>
+<p>We're now ready to have these run automatically which can be done with crontab. To access this, type: <code>crontab -e</code> and selecting <code>1</code> to use nano as your editor.</p>
+<p>At the bottom of the file, put the following two lines:</p>
+<div class="highlight"><pre><span></span><code>@reboot sleep 10; /bin/bash -c /root/start.sh
+@hourly /bin/bash -c /root/restart.sh
+</code></pre></div>
+<p><code>ctrl+x</code> to quit, <code>y</code> to save changes and then press <code>enter/return</code> to keep the same file name</p>
+<p>Providing this is correct, you should see the message <code>crontab: installing new crontab</code> and then messages every hour or on a reboot.</p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top", "toc.integrate"], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.220ee61c.min.js"></script>
+      
+    
+  </body>
+</html>
